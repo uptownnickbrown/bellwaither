@@ -2,10 +2,12 @@
 Produces executive-level synthesis across all dimensions."""
 
 import json
+
 from openai import AsyncOpenAI
-from app.config import settings
-from app.ai.model_router import get_model_for_task, AITaskType
+
+from app.ai.model_router import AITaskType, get_model_for_task
 from app.ai.prompts.system_prompts import GLOBAL_ORCHESTRATION_PROMPT
+from app.config import settings
 
 
 async def generate_global_summary(

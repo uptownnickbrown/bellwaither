@@ -1,13 +1,14 @@
 """Meridian API: School Quality Assessment Platform."""
 
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.routes import router
 from app.config import settings
 from app.database import init_db
-from app.api.routes import router
-from app.seed import seed_framework, seed_demo_engagement
+from app.seed import seed_demo_engagement, seed_framework
 
 
 @asynccontextmanager

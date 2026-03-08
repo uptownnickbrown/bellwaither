@@ -2,15 +2,17 @@
 
 import uuid
 from datetime import datetime, timedelta
+
 from sqlalchemy import select
+
 from app.database import async_session
-from app.models.framework import Dimension, Component, SuccessCriterion, CriterionType
-from app.models.engagement import Engagement, EngagementStage, EngagementMember, EngagementRole
+from app.models.action_plan import ActionItem, ActionPlan, ItemStatus, PlanStatus
+from app.models.data_request import DataRequest, DataRequestComment, RequestPriority, RequestStatus
+from app.models.engagement import Engagement, EngagementMember, EngagementRole, EngagementStage
 from app.models.evidence import Evidence, EvidenceExtraction, EvidenceMapping, EvidenceType, ProcessingStatus
-from app.models.scoring import ComponentScore, DimensionSummary, GlobalSummary, RatingLevel, ScoreStatus
-from app.models.data_request import DataRequest, DataRequestComment, RequestStatus, RequestPriority
-from app.models.action_plan import ActionPlan, ActionItem, Milestone, PlanStatus, ItemStatus
-from app.models.messaging import MessageThread, Message, ThreadType
+from app.models.framework import Component, CriterionType, Dimension, SuccessCriterion
+from app.models.messaging import Message, MessageThread, ThreadType
+from app.models.scoring import ComponentScore, RatingLevel, ScoreStatus
 
 # Fixed UUIDs for demo data consistency
 ENGAGEMENT_ID = uuid.UUID("10000000-0000-0000-0000-000000000001")

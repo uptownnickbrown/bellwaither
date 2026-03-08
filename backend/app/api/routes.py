@@ -1,34 +1,43 @@
 """API routes for the Meridian platform."""
 
+import json
 import os
 import uuid
-import json
 from datetime import datetime
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Query
-from sqlalchemy.ext.asyncio import AsyncSession
+
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.ai.agents.component_agent import assess_component
+from app.ai.agents.copilot_agent import copilot_chat
+from app.ai.agents.dimension_agent import synthesize_dimension
+from app.ai.agents.extraction_agent import extract_from_spreadsheet, extract_from_text
+from app.ai.agents.global_agent import generate_global_summary
 from app.database import get_db
 from app.models import (
-    Dimension, Component, SuccessCriterion,
-    Engagement, Evidence, EvidenceExtraction, EvidenceMapping,
-    ComponentScore, DimensionSummary, GlobalSummary,
-    DataRequest, DataRequestComment,
-    ActionPlan, ActionItem, Milestone,
-    MessageThread, Message,
+    ActionItem,
+    ActionPlan,
+    Component,
+    ComponentScore,
+    DataRequest,
+    DataRequestComment,
+    Dimension,
+    DimensionSummary,
+    Engagement,
+    Evidence,
+    EvidenceExtraction,
+    EvidenceMapping,
+    GlobalSummary,
+    Message,
+    MessageThread,
 )
-from app.models.evidence import ProcessingStatus, EvidenceType
-from app.models.scoring import RatingLevel, ScoreStatus
 from app.models.data_request import RequestStatus
-from app.models.messaging import ThreadType
+from app.models.evidence import EvidenceType, ProcessingStatus
+from app.models.scoring import RatingLevel, ScoreStatus
 from app.schemas.schemas import *
 from app.services.document_processor import process_document
-from app.ai.agents.extraction_agent import extract_from_text, extract_from_spreadsheet
-from app.ai.agents.component_agent import assess_component
-from app.ai.agents.dimension_agent import synthesize_dimension
-from app.ai.agents.global_agent import generate_global_summary
-from app.ai.agents.copilot_agent import copilot_chat
 
 router = APIRouter()
 
@@ -166,7 +175,7 @@ async def upload_evidence(
                         evidence_id=evidence.id,
                         component_id=comp.id,
                         relevance_score=0.7,
-                        rationale=f"AI-suggested mapping based on content analysis",
+                        rationale="AI-suggested mapping based on content analysis",
                     )
                     db.add(mapping)
 

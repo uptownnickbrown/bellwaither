@@ -1,7 +1,5 @@
 """Document processing service: extracts text from various file formats."""
 
-import io
-import json
 from pathlib import Path
 
 
@@ -58,6 +56,7 @@ async def extract_text_from_image(file_path: str) -> str:
         image_data = base64.b64encode(f.read()).decode("utf-8")
 
     from openai import AsyncOpenAI
+
     from app.config import settings
     client = AsyncOpenAI(api_key=settings.openai_api_key)
 
@@ -96,7 +95,7 @@ async def process_document(file_path: str, filename: str) -> dict:
         text = await extract_text_from_image(file_path)
         return {"type": "text", "content": text}
     elif ext in (".txt", ".csv", ".md"):
-        with open(file_path, "r", errors="replace") as f:
+        with open(file_path, errors="replace") as f:
             text = f.read()
         return {"type": "text", "content": text}
     else:

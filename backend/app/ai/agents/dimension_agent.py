@@ -2,10 +2,12 @@
 Synthesizes across components within a single SQF dimension."""
 
 import json
+
 from openai import AsyncOpenAI
-from app.config import settings
-from app.ai.model_router import get_model_for_task, AITaskType
+
+from app.ai.model_router import AITaskType, get_model_for_task
 from app.ai.prompts.system_prompts import DIMENSION_SYNTHESIS_PROMPT
+from app.config import settings
 
 
 async def synthesize_dimension(

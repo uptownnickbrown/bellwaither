@@ -1,9 +1,9 @@
 """Pydantic schemas for API request/response models."""
 
-from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
 from uuid import UUID
+
+from pydantic import BaseModel
 
 
 # --- Framework ---
@@ -21,8 +21,8 @@ class ComponentResponse(BaseModel):
     id: UUID
     code: str
     name: str
-    description: Optional[str] = None
-    evidence_guidance: Optional[str] = None
+    description: str | None = None
+    evidence_guidance: str | None = None
     criteria: list[SuccessCriterionResponse] = []
 
     class Config:
@@ -33,8 +33,8 @@ class DimensionResponse(BaseModel):
     id: UUID
     number: int
     name: str
-    description: Optional[str] = None
-    color: Optional[str] = None
+    description: str | None = None
+    color: str | None = None
     components: list[ComponentResponse] = []
 
     class Config:
@@ -45,25 +45,25 @@ class DimensionResponse(BaseModel):
 class EngagementCreate(BaseModel):
     name: str
     school_name: str
-    school_type: Optional[str] = None
-    district: Optional[str] = None
-    state: Optional[str] = None
-    grade_levels: Optional[str] = None
-    enrollment: Optional[int] = None
-    description: Optional[str] = None
+    school_type: str | None = None
+    district: str | None = None
+    state: str | None = None
+    grade_levels: str | None = None
+    enrollment: int | None = None
+    description: str | None = None
 
 
 class EngagementResponse(BaseModel):
     id: UUID
     name: str
     school_name: str
-    school_type: Optional[str] = None
-    district: Optional[str] = None
-    state: Optional[str] = None
-    grade_levels: Optional[str] = None
-    enrollment: Optional[int] = None
+    school_type: str | None = None
+    district: str | None = None
+    state: str | None = None
+    grade_levels: str | None = None
+    enrollment: int | None = None
     stage: str
-    description: Optional[str] = None
+    description: str | None = None
     created_at: datetime
 
     class Config:
@@ -77,9 +77,9 @@ class EvidenceResponse(BaseModel):
     filename: str
     file_type: str
     evidence_type: str
-    title: Optional[str] = None
-    description: Optional[str] = None
-    uploaded_by: Optional[str] = None
+    title: str | None = None
+    description: str | None = None
+    uploaded_by: str | None = None
     uploaded_at: datetime
     processing_status: str
 
@@ -93,9 +93,9 @@ class ExtractionResponse(BaseModel):
     id: UUID
     evidence_id: UUID
     summary: str
-    key_findings: Optional[list] = None
-    structured_data: Optional[dict] = None
-    model_used: Optional[str] = None
+    key_findings: list | None = None
+    structured_data: dict | None = None
+    model_used: str | None = None
     created_at: datetime
 
 
@@ -108,17 +108,17 @@ class ComponentScoreResponse(BaseModel):
     component_id: UUID
     rating: str
     status: str
-    strengths: Optional[list] = None
-    gaps: Optional[list] = None
-    contradictions: Optional[list] = None
-    missing_evidence: Optional[list] = None
-    ai_rationale: Optional[str] = None
-    consultant_notes: Optional[str] = None
+    strengths: list | None = None
+    gaps: list | None = None
+    contradictions: list | None = None
+    missing_evidence: list | None = None
+    ai_rationale: str | None = None
+    consultant_notes: str | None = None
     evidence_count: int
-    confidence: Optional[str] = None
-    suggested_actions: Optional[list] = None
-    follow_up_requests: Optional[list] = None
-    model_used: Optional[str] = None
+    confidence: str | None = None
+    suggested_actions: list | None = None
+    follow_up_requests: list | None = None
+    model_used: str | None = None
     scored_at: datetime
 
 
@@ -126,11 +126,11 @@ class DimensionSummaryResponse(BaseModel):
     id: UUID
     engagement_id: UUID
     dimension_id: UUID
-    overall_assessment: Optional[str] = None
-    patterns: Optional[list] = None
-    compounding_risks: Optional[list] = None
-    top_opportunities: Optional[list] = None
-    leadership_attention: Optional[list] = None
+    overall_assessment: str | None = None
+    patterns: list | None = None
+    compounding_risks: list | None = None
+    top_opportunities: list | None = None
+    leadership_attention: list | None = None
     generated_at: datetime
 
     class Config:
@@ -140,12 +140,12 @@ class DimensionSummaryResponse(BaseModel):
 class GlobalSummaryResponse(BaseModel):
     id: UUID
     engagement_id: UUID
-    executive_summary: Optional[str] = None
-    top_strengths: Optional[list] = None
-    critical_gaps: Optional[list] = None
-    strategic_priorities: Optional[list] = None
-    resource_implications: Optional[list] = None
-    recommended_next_steps: Optional[list] = None
+    executive_summary: str | None = None
+    top_strengths: list | None = None
+    critical_gaps: list | None = None
+    strategic_priorities: list | None = None
+    resource_implications: list | None = None
+    recommended_next_steps: list | None = None
     generated_at: datetime
 
     class Config:
@@ -155,25 +155,25 @@ class GlobalSummaryResponse(BaseModel):
 # --- Data Requests ---
 class DataRequestCreate(BaseModel):
     title: str
-    description: Optional[str] = None
-    rationale: Optional[str] = None
-    component_id: Optional[UUID] = None
+    description: str | None = None
+    rationale: str | None = None
+    component_id: UUID | None = None
     priority: str = "medium"
-    assigned_to: Optional[str] = None
-    created_by: Optional[str] = None
+    assigned_to: str | None = None
+    created_by: str | None = None
 
 
 class DataRequestResponse(BaseModel):
     id: UUID
     engagement_id: UUID
-    component_id: Optional[UUID] = None
+    component_id: UUID | None = None
     title: str
-    description: Optional[str] = None
-    rationale: Optional[str] = None
+    description: str | None = None
+    rationale: str | None = None
     status: str
     priority: str
-    assigned_to: Optional[str] = None
-    created_by: Optional[str] = None
+    assigned_to: str | None = None
+    created_by: str | None = None
     created_at: datetime
 
     class Config:
@@ -182,7 +182,7 @@ class DataRequestResponse(BaseModel):
 
 class CommentCreate(BaseModel):
     author: str
-    role: Optional[str] = None
+    role: str | None = None
     content: str
 
 
@@ -190,7 +190,7 @@ class CommentResponse(BaseModel):
     id: UUID
     data_request_id: UUID
     author: str
-    role: Optional[str] = None
+    role: str | None = None
     content: str
     created_at: datetime
 
@@ -203,7 +203,7 @@ class ActionPlanResponse(BaseModel):
     id: UUID
     engagement_id: UUID
     title: str
-    description: Optional[str] = None
+    description: str | None = None
     status: str
     created_at: datetime
 
@@ -214,14 +214,14 @@ class ActionPlanResponse(BaseModel):
 class ActionItemResponse(BaseModel):
     id: UUID
     action_plan_id: UUID
-    component_id: Optional[UUID] = None
+    component_id: UUID | None = None
     title: str
-    description: Optional[str] = None
-    rationale: Optional[str] = None
-    owner: Optional[str] = None
+    description: str | None = None
+    rationale: str | None = None
+    owner: str | None = None
     status: str
-    priority_order: Optional[str] = None
-    target_date: Optional[datetime] = None
+    priority_order: str | None = None
+    target_date: datetime | None = None
 
     class Config:
         from_attributes = True
@@ -232,7 +232,7 @@ class ThreadResponse(BaseModel):
     id: UUID
     engagement_id: UUID
     thread_type: str
-    title: Optional[str] = None
+    title: str | None = None
     created_at: datetime
 
     class Config:
@@ -241,7 +241,7 @@ class ThreadResponse(BaseModel):
 
 class MessageCreate(BaseModel):
     author: str
-    role: Optional[str] = None
+    role: str | None = None
     content: str
 
 
@@ -249,7 +249,7 @@ class MessageResponse(BaseModel):
     id: UUID
     thread_id: UUID
     author: str
-    role: Optional[str] = None
+    role: str | None = None
     content: str
     created_at: datetime
 
@@ -269,4 +269,4 @@ class CopilotResponse(BaseModel):
     model_config = {"protected_namespaces": ()}
 
     content: str
-    model_used: Optional[str] = None
+    model_used: str | None = None
