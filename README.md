@@ -4,39 +4,145 @@ A school quality assessment platform that operationalizes Bellwether's [School Q
 
 This is not a generic dashboard or a single chatbot. It is a **workflow + ontology + evidence system** for school quality engagements — grounded in Bellwether's public 9 dimensions and 43 components, with every finding traceable back to source documents.
 
-## Architecture
+See [handoff.md](handoff.md) for the full product vision and design rationale, or [CLAUDE.md](CLAUDE.md) for developer conventions.
 
-**Monorepo with two services:**
-- `backend/` — Python FastAPI + PostgreSQL (async via SQLAlchemy + asyncpg)
-- `frontend/` — Next.js 16 + React 19 + Tailwind CSS 4
+---
 
-Frontend proxies `/api/*` to the backend via `next.config.ts` rewrites. See [CLAUDE.md](CLAUDE.md) for developer details and [handoff.md](handoff.md) for the full product vision.
+## Table of Contents
 
-## Running locally
+- [Getting Started](#getting-started)
+- [Architecture](#architecture)
+- [Feature Tour](#feature-tour)
+- [The AI System](#the-ai-system)
+- [Data Model](#data-model)
+- [API Reference](#api-reference)
+- [Frontend Structure](#frontend-structure)
+- [Design Principles](#design-principles)
+- [Current Status and Limitations](#current-status-and-limitations)
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- **PostgreSQL** running locally (or accessible via connection string)
+- **Python 3.11+** with a virtual environment
+- **Node.js 20+** and npm
+- **OpenAI API key** with access to gpt-4.1 and gpt-4.1-mini
+
+### Setup
 
 ```bash
-# Prerequisites: PostgreSQL running, database "meridian" created
-# Backend .env must have OPENAI_API_KEY set (see backend/.env.example)
+# 1. Create the database
+createdb meridian
 
-cd backend && source .venv/bin/activate && uvicorn app.main:app --port 8000 --reload
+# 2. Backend
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+# Edit .env and set OPENAI_API_KEY=sk-...
+
+# 3. Frontend
+cd ../frontend
+npm install
+```
+
+### Running
+
+```bash
+# Terminal 1 — Backend (port 8000)
+cd backend && source .venv/bin/activate
+uvicorn app.main:app --port 8000 --reload
+
+# Terminal 2 — Frontend (port 3000)
 cd frontend && npm run dev
 ```
 
-The backend auto-creates tables and seeds demo data on startup (Lincoln Innovation Academy, a fictional K-8 charter school). To reset, drop and recreate the `meridian` database.
+Open http://localhost:3000. The backend auto-creates tables and seeds a demo engagement on first startup (Lincoln Innovation Academy, a fictional K-8 charter school with 420 students in Metro City Public Schools, MN).
+
+### Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `OPENAI_API_KEY` | Yes | — | OpenAI API key for all AI agents |
+| `DATABASE_URL` | No | `postgresql+asyncpg://meridian:meridian@localhost:5432/meridian` | PostgreSQL connection string |
+
+### Resetting the Database
+
+There are no migrations yet. To reset:
+
+```bash
+dropdb meridian && createdb meridian
+# Restart the backend — tables and seed data recreate automatically
+```
+
+---
+
+## Architecture
+
+### Overview
+
+Monorepo with two services:
+
+```
+bellwaither/
+├── backend/           Python FastAPI + PostgreSQL (async via SQLAlchemy + asyncpg)
+│   ├── app/
+│   │   ├── ai/        AI agents, model router, and system prompts
+│   │   ├── api/       API routes (single file currently)
+│   │   ├── models/    SQLAlchemy ORM models
+│   │   ├── services/  Document processing pipeline
+│   │   ├── config.py  Settings via pydantic-settings
+│   │   ├── main.py    FastAPI app, lifespan, CORS
+│   │   └── seed.py    Framework + demo data seeding
+│   └── requirements.txt
+├── frontend/          Next.js 16 + React 19 + Tailwind CSS 4
+│   ├── app/           Next.js App Router pages
+│   ├── components/    React components (views/, CopilotPanel, etc.)
+│   └── lib/           API client, types, utilities
+└── screenshots/       Feature tour screenshots
+```
+
+### How the services connect
+
+The frontend runs on port 3000 and proxies all `/api/*` requests to the backend on port 8000 via a Next.js rewrite rule in `next.config.ts`. Client code uses relative URLs (`/api/...`) — no CORS issues in development.
+
+The backend uses FastAPI's async lifespan to initialize the database, create tables, and seed data on startup. CORS is configured to allow `http://localhost:3000`.
+
+### Tech Stack
+
+**Backend:**
+- FastAPI 0.115 — async web framework
+- SQLAlchemy 2.0 (async mode) + asyncpg — ORM and PostgreSQL driver
+- Pydantic v2 — request/response validation
+- OpenAI SDK 1.51 — AI agent calls
+- pdfplumber, python-docx, openpyxl — document parsing
+- Pillow — image support
+- Alembic 1.13 — installed but not yet configured for migrations
+
+**Frontend:**
+- Next.js 16 — App Router, server components (though most are client-side `"use client"`)
+- React 19 — latest features
+- Tailwind CSS 4 — utility-first styling
+- Lucide React — icon library
+- TypeScript 5.9 — strict typing
 
 ---
 
 ## Feature Tour
 
-The screenshots below walk through Meridian using the seeded demo engagement for **Lincoln Innovation Academy** — a K-8 charter school in Metro City Public Schools with 420 students.
+The screenshots below walk through Meridian using the seeded demo engagement for **Lincoln Innovation Academy**.
 
 ### Dashboard
 
-The engagement dashboard gives a high-level view of assessment progress. KPI cards show evidence collected, components scored, confirmations, and pending data requests. Below, the **SQF Assessment Progress** heatmap visualizes all 9 dimensions and 43 components at a glance — color-coded by rating (Excelling, Meeting Expectations, Developing, Needs Improvement, Not Rated).
+The engagement dashboard provides a high-level view of assessment progress. KPI cards show evidence collected, components scored, confirmations, and pending data requests. The **SQF Assessment Progress** heatmap visualizes all 9 dimensions and 43 components at a glance — color-coded by the 4-point rating scale.
 
 <img src="screenshots/01_dashboard.png" width="800" alt="Engagement dashboard with KPI cards and SQF heatmap">
 
-The lower half of the dashboard surfaces **Key Findings** (the most notable preliminary ratings with one-line evidence summaries) and a **Recent Evidence** feed showing all uploaded documents.
+The lower half surfaces **Key Findings** (the most notable preliminary ratings with one-line evidence summaries) and a **Recent Evidence** feed.
 
 <img src="screenshots/12_dashboard_full.png" width="800" alt="Full dashboard view showing key findings and recent evidence">
 
@@ -52,81 +158,378 @@ Selecting a component reveals its full success criteria — the specific Core Ac
 
 ### Evidence Repository
 
-The Evidence tab is where all source documents live — achievement data, interview transcripts, board minutes, observation reports, budgets, survey results, retention data, and strategic plans. Each document shows its processing status and who uploaded it.
+All source documents live here — achievement data, interview transcripts, board minutes, observation reports, budgets, survey results, retention data, and strategic plans. Each document shows processing status and who uploaded it.
 
 <img src="screenshots/04_evidence_list.png" width="800" alt="Evidence repository listing 8 uploaded documents">
 
-Selecting a document reveals its **AI extraction** — a structured summary and numbered key findings automatically generated when the document was uploaded. The extraction model is shown (e.g., gpt-4.1-mini) for transparency.
+Selecting a document reveals its **AI extraction** — a structured summary and numbered key findings generated automatically on upload. The extraction model is shown for transparency.
 
 <img src="screenshots/04b_evidence_detail.png" width="800" alt="AI extraction showing summary and key findings from student achievement data">
 
 ### Data Requests
 
-Consultants send structured data requests tied to specific framework needs. Each request has a priority level, assignee, status (Pending, In Progress, Accepted, Submitted), and a rationale explaining why the data matters. An inline messaging thread lets consultants and school staff discuss each request without leaving context.
+Consultants send structured data requests tied to specific framework needs. Each request has a priority, assignee, status tracking, and a rationale. Inline messaging threads let consultants and school staff discuss each request in context.
 
 <img src="screenshots/05_data_requests.png" width="800" alt="Data requests view with 5 requests at various statuses">
 
 ### Diagnostic Workspace
 
-The Diagnostic tab is the AI-powered scoring workspace. It implements Meridian's **4-layer AI architecture**:
-- **Layer 2 (Components)** — assess individual components against their success criteria using mapped evidence
-- **Layer 3 (Dimensions)** — synthesize patterns across components within a dimension
-- **Layer 4 (Global)** — executive summary across all dimensions
-
-Each dimension row shows mini badges for its components — colored when scored, gray when not yet assessed. Expanding a dimension reveals individual component ratings, confidence levels, and "Assess" buttons to trigger AI scoring.
+The AI-powered scoring workspace implements Meridian's 4-layer AI architecture. Each dimension row shows mini badges for its components — colored when scored, gray when pending. Expanding a dimension reveals ratings, confidence levels, and "Assess" buttons to trigger AI scoring.
 
 <img src="screenshots/06_diagnostic_overview.png" width="800" alt="Diagnostic workspace showing all 9 dimensions with component badges">
 
-<img src="screenshots/06b_diagnostic_expanded.png" width="800" alt="Organizational Purpose expanded showing component-level ratings and assess buttons">
+<img src="screenshots/06b_diagnostic_expanded.png" width="800" alt="Organizational Purpose expanded showing component-level ratings">
 
 ### Action Plan
 
-The Action Plan translates diagnostic findings into prioritized improvement actions. Each item has an owner, target date, description, and — critically — an **evidence-based rationale** that traces the recommendation back to specific findings from the assessment.
+Diagnostic findings translate into prioritized improvement actions. Each item has an owner, target date, and — critically — an **evidence-based rationale** tracing the recommendation back to specific assessment findings.
 
 <img src="screenshots/08_action_plan.png" width="800" alt="Action plan with 5 prioritized improvement items">
 
-Selecting an action item shows its full detail, including the evidence rationale linking it to specific data points discovered during the assessment.
-
-<img src="screenshots/08b_action_plan_detail.png" width="800" alt="Action plan detail for instructional coaching, showing evidence-based rationale">
-
-<img src="screenshots/08c_action_plan_math.png" width="800" alt="Action plan detail for math achievement gap with evidence citations">
+<img src="screenshots/08b_action_plan_detail.png" width="800" alt="Action plan detail showing evidence-based rationale">
 
 ### Messaging
 
-Team messaging keeps all engagement communication in one place. The General Discussion channel shows conversations between the consultant team (Sarah Chen, Marcus Johnson) and school staff (Dr. Angela Rivera, Tom Nakamura) — discussing data gathering, MAP data uploads, and early analysis patterns.
+Team messaging keeps engagement communication in one place — consultants and school staff discussing data gathering, uploads, and emerging patterns.
 
-<img src="screenshots/09_messaging.png" width="800" alt="Team messaging with threaded discussion between consultants and school staff">
+<img src="screenshots/09_messaging.png" width="800" alt="Team messaging between consultants and school staff">
 
 ### AI Copilot
 
-The AI Copilot is a contextual assistant available on every screen. It's aware of the current page and engagement context, and offers suggested prompts tailored to where you are in the workflow — from "What evidence do we have about teacher retention?" to "Show me contradictions in the evidence" to "Draft a follow-up request for PD data."
+A contextual assistant available on every screen. It knows the current page and engagement context, offering tailored suggestions: "What evidence do we have about teacher retention?", "Show me contradictions in the evidence", "Draft a follow-up request for PD data."
 
 <img src="screenshots/11_role_switched.png" width="800" alt="Dashboard with AI Copilot panel open showing contextual suggestions">
 
 ### Role Switching
 
-Meridian is a **two-sided workspace** — consultants and school administrators see the same engagement from different perspectives. The role switcher in the header toggles between Consultant (Sarah Chen) and School Admin (Dr. Angela Rivera) views. The school admin sees the same data but with role-appropriate context (e.g., the message composer says "Message as Dr. Angela Rivera...").
+Meridian is a **two-sided workspace**. The role switcher toggles between Consultant (Sarah Chen, Lead Consultant) and School Admin (Dr. Angela Rivera, School Leader) views. Both roles see the same engagement data with role-appropriate context.
 
-<img src="screenshots/11a_school_admin_dashboard.png" width="800" alt="Dashboard from the school admin perspective as Dr. Angela Rivera">
+<img src="screenshots/11a_school_admin_dashboard.png" width="800" alt="Dashboard from the school admin perspective">
 
-<img src="screenshots/11d_school_admin_messages.png" width="800" alt="Messages view as school admin with role-appropriate compose field">
+<img src="screenshots/11d_school_admin_messages.png" width="800" alt="Messages view as school admin">
 
 ---
 
-## Key Design Principles
+## The AI System
 
-- **Evidence traceability** — Every score traces back to source documents through a chain: Evidence → AI Extraction → Evidence Mapping → Component Score. This is non-negotiable.
-- **Framework-native** — The SQF ontology is the backbone, not an afterthought. AI reasons within the framework's structure, not outside it.
-- **Multi-level AI** — Not one giant LLM pass. Extraction, component, dimension, and global layers each operate within bounded reasoning units.
-- **Human-in-the-loop** — AI accelerates expert judgment; consultants review and shape all outputs.
-- **Two-sided collaboration** — Consultant-school back-and-forth is central, not a phase-2 add-on.
+Meridian's AI is not a single chat interface. It is a **4-layer hierarchy** where each layer operates within bounded reasoning units, uses structured JSON output, and cites specific evidence for every claim.
 
-## Status
+### Layer Architecture
 
-This is a working prototype. Key caveats:
-- No real authentication yet — the role switcher is UI-only
-- No database migrations — schema changes require dropping and recreating the database
-- SQF success criteria are hypothesized for prototype purposes (dimension and component names are real)
-- Seed data runs on every startup (idempotent)
+```
+Layer 4: Global Agent          ← Executive summary across all dimensions
+    ↑
+Layer 3: Dimension Agent       ← Synthesize patterns across components in one dimension
+    ↑
+Layer 2: Component Agent       ← Assess one of 43 components against its criteria
+    ↑
+Layer 1: Extraction Agent      ← Per-document summarization and fact extraction
 
-See [CLAUDE.md](CLAUDE.md) for developer conventions and [handoff.md](handoff.md) for the full product vision and design rationale.
+Cross-cutting: Copilot Agent   ← Interactive Q&A anywhere in the app
+```
+
+Each layer consumes the output of the layer below it. This means the system never tries to reason over the entire evidence base in a single LLM call — it decomposes the problem along the same lines as Bellwether's own framework.
+
+### Layer 1: Extraction Agent
+
+**Purpose:** Process individual uploaded documents into structured findings.
+
+**Input:** Raw document text or spreadsheet data (after parsing by the document processor).
+
+**Output:** JSON with `summary`, `key_findings` (list), `structured_data` (metrics), and `suggested_components` (SQF component codes the document likely maps to).
+
+**Model:** gpt-4.1-mini (cheaper model — extraction is high-volume, lower-complexity).
+
+**Details:**
+- Handles both text documents and spreadsheets with separate extraction paths
+- Truncates large datasets (>100 rows, >50K characters) before sending to the model
+- Distinguishes facts from inferences and cites page numbers/sections
+- References all 9 SQF dimensions to suggest component mappings
+- Temperature: 0.2 (deterministic)
+
+### Layer 2: Component Agent
+
+**Purpose:** Assess one of the 43 SQF components against its specific success criteria using mapped evidence.
+
+**Input:** Component code/name, dimension context, Core Actions, Progress Indicators, and all evidence items mapped to this component (with relevance scores and excerpts).
+
+**Output:** JSON with `rating` (4-point scale), `confidence` (low/medium/high), `strengths`, `gaps`, `contradictions`, `missing_evidence`, `rationale`, `suggested_actions`, and `follow_up_requests`.
+
+**Model:** gpt-4.1 (stronger model — scoring requires nuanced judgment).
+
+**Critical rules enforced by the system prompt:**
+- Every finding must cite specific evidence
+- If evidence is insufficient, the agent must rate as `not_rated` rather than guess
+- Must distinguish AI inference from direct evidence
+- Temperature: 0.3 (controlled creativity)
+
+### Layer 3: Dimension Agent
+
+**Purpose:** Synthesize patterns across all scored components within one of the 9 SQF dimensions.
+
+**Input:** Dimension name and all component scores within that dimension.
+
+**Output:** JSON with `overall_assessment` (narrative), `patterns` (cross-component themes), `compounding_risks`, `top_opportunities`, and `leadership_attention` items.
+
+**Model:** gpt-4.1 (synthesis task). Temperature: 0.3.
+
+### Layer 4: Global Agent
+
+**Purpose:** Produce an executive-level summary across all 9 dimensions for school leaders and consultants.
+
+**Input:** School name, engagement stage, and all dimension summaries.
+
+**Output:** JSON with `executive_summary` (3-5 paragraphs), `top_strengths`, `critical_gaps`, `strategic_priorities`, `resource_implications`, and `recommended_next_steps`.
+
+**Model:** gpt-4.1 (highest-stakes synthesis). Temperature: 0.3.
+
+**Details:** Writes for a sophisticated education audience. Direct about challenges while acknowledging strengths. Grounds all claims in evidence from lower layers.
+
+### Copilot Agent
+
+**Purpose:** Interactive Q&A anywhere in the app — finding evidence, explaining ratings, identifying gaps, drafting follow-up requests, suggesting actions.
+
+**Input:** School name, current screen context, user role, message, evidence context, and last 10 messages of conversation history.
+
+**Output:** Freeform chat response with `model_used` metadata.
+
+**Model:** gpt-4.1-mini (retrieval/chat task). Temperature: 0.4 (more creative for conversational flow).
+
+**Details:** Context-aware — it knows which screen the user is on and adapts its responses. Always cites specific evidence, is honest about uncertainty, and keeps responses concise and actionable.
+
+### Model Router
+
+All AI calls go through the **model router** (`ai/model_router.py`), which maps task types to models:
+
+| Task Type | Model | Use Case |
+|-----------|-------|----------|
+| `EXTRACTION` | gpt-4.1-mini | Document summarization, fact extraction |
+| `COMPONENT_SCORING` | gpt-4.1 | Component-level assessment |
+| `DIMENSION_SYNTHESIS` | gpt-4.1 | Cross-component pattern analysis |
+| `GLOBAL_ORCHESTRATION` | gpt-4.1 | Executive summary generation |
+| `EVIDENCE_TAGGING` | gpt-4.1-mini | Mapping evidence to components |
+| `COPILOT_CHAT` | gpt-4.1-mini | Interactive Q&A |
+| `REPORT_GENERATION` | gpt-4.1 | Action plan drafting |
+| `EVIDENCE_RETRIEVAL` | gpt-4.1-mini | Evidence search and lookup |
+
+The router is the abstraction layer for future eval-based routing — change the routing table, not the agents.
+
+### Document Processing Pipeline
+
+When a document is uploaded, the processing pipeline (`services/document_processor.py`) handles parsing before the AI sees anything:
+
+| Format | Library | Notes |
+|--------|---------|-------|
+| PDF | pdfplumber | Extracts text per page with page markers |
+| Word (.docx) | python-docx | Extracts paragraphs and table rows |
+| Excel (.xlsx) | openpyxl (read-only mode) | Returns list of dicts with sheet tracking; samples first 100 rows for AI |
+| Images (.png, .jpg, .gif, .webp) | OpenAI Vision API (gpt-4.1-mini) | Describes text, tables, and charts; 4000 max tokens |
+| Text (.txt, .csv, .md) | Raw file read | Preserves content as-is |
+
+After parsing, the extraction agent generates findings, and the system automatically maps evidence to relevant SQF components with relevance scores.
+
+### Evidence Traceability Chain
+
+Every score in Meridian must trace back to source documents:
+
+```
+Evidence (uploaded document)
+  → EvidenceExtraction (AI-generated summary + key findings)
+    → EvidenceMapping (links evidence to components with relevance score 0.0-1.0)
+      → ComponentScore (rating with cited strengths, gaps, contradictions)
+        → DimensionSummary (cross-component patterns)
+          → GlobalSummary (executive overview)
+```
+
+This is a core design principle, not optional. The system prompt for the component agent enforces citation requirements — if the model can't cite evidence, it must rate the component as `not_rated`.
+
+---
+
+## Data Model
+
+### Framework (SQF Ontology)
+
+The SQF structure is seeded on startup from `app/seed.py`:
+
+- **Dimension** — 9 dimensions (e.g., "Organizational Purpose", "Academic Program", "Finance"), each with a number (1-9), description, and display color
+- **Component** — 43 components (e.g., "1A: Mission, Vision, and Values"), each belonging to one dimension, with a code, name, description, and evidence guidance
+- **SuccessCriterion** — Core Actions and Progress Indicators for each component, defining what each rating level looks like
+
+Dimension and component names match Bellwether's public materials. The detailed success criteria are **hypothesized for prototype purposes** — if Bellwether shares their actual rubric, replace the seed data.
+
+### Engagement Models
+
+- **Engagement** — A school assessment workspace (school name, type, district, grade levels, enrollment, stage: Setup → Assessment → Plan Development → Implementation)
+- **EngagementMember** — Team members with roles: Lead Consultant, Analyst, School Leader, Data Steward
+
+### Evidence Models
+
+- **Evidence** — Uploaded documents with metadata (file type, evidence type, processing status, uploader)
+- **EvidenceExtraction** — AI-generated summary, key findings, structured data, and model used
+- **EvidenceMapping** — Links evidence to components with relevance score (0.0-1.0), relevant excerpts, rationale, and a consultant confirmation flag
+
+### Scoring Models
+
+- **ComponentScore** — Rating (4-point scale + not_rated), status (Draft → In Review → Confirmed), confidence level, strengths, gaps, contradictions, missing evidence, AI rationale, consultant notes, and suggested actions
+- **DimensionSummary** — Cross-component patterns, compounding risks, opportunities, and leadership attention items
+- **GlobalSummary** — Executive summary, top strengths, critical gaps, strategic priorities, resource implications, and next steps
+
+### Collaboration Models
+
+- **DataRequest** — Structured requests for evidence (priority, status, assignee, rationale, due date)
+- **DataRequestComment** — Threaded comments on data requests
+- **ActionPlan** — Improvement plans with status tracking (Draft → In Review → Approved → In Progress)
+- **ActionItem** — Individual actions with owner, priority, target date, evidence-based rationale, and linked milestones
+- **Milestone** — Sub-tasks within action items
+- **MessageThread** — Conversation channels (general, per-data-request, per-component, per-action-item)
+- **Message** — Individual messages with author, role, content, and attachments
+
+All models use PostgreSQL UUIDs as primary keys.
+
+---
+
+## API Reference
+
+All endpoints are in `app/api/routes.py` under the `/api` prefix. The main groups:
+
+### Framework
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/framework` | Full SQF structure (dimensions, components, criteria) |
+| GET | `/api/framework/components/{id}` | Single component with all criteria |
+
+### Engagements
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/engagements` | List all engagements |
+| POST | `/api/engagements` | Create new engagement |
+| GET | `/api/engagements/{id}` | Single engagement with members and stats |
+
+### Evidence
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/engagements/{id}/evidence` | List all evidence for engagement |
+| POST | `/api/engagements/{id}/evidence` | Upload document (triggers extraction + mapping) |
+| GET | `/api/engagements/{id}/evidence/{eid}/extractions` | AI-extracted findings |
+
+### Scoring
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/engagements/{id}/scores` | All component scores for engagement |
+| POST | `/api/engagements/{id}/scores/{component_id}/assess` | Trigger AI assessment for a component |
+| PATCH | `/api/engagements/{id}/scores/{score_id}` | Consultant review/confirmation |
+
+### Dimension and Global Synthesis
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/engagements/{id}/dimensions/{dim_id}/synthesize` | Trigger dimension synthesis |
+| GET | `/api/engagements/{id}/dimension-summaries` | List dimension summaries |
+| POST | `/api/engagements/{id}/global-summary` | Generate executive summary |
+| GET | `/api/engagements/{id}/global-summary` | Retrieve most recent global summary |
+
+### Data Requests
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/engagements/{id}/data-requests` | List all data requests |
+| POST | `/api/engagements/{id}/data-requests` | Create new request |
+| PATCH | `/api/engagements/{id}/data-requests/{rid}` | Update status |
+| GET | `/api/engagements/{id}/data-requests/{rid}/comments` | List comments |
+| POST | `/api/engagements/{id}/data-requests/{rid}/comments` | Add comment |
+
+### Action Plans
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/engagements/{id}/action-plans` | List action plans |
+| GET | `/api/engagements/{id}/action-plans/{pid}/items` | List items in a plan |
+
+### Messaging
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/engagements/{id}/threads` | List message threads |
+| GET | `/api/engagements/{id}/threads/{tid}/messages` | List messages in thread |
+| POST | `/api/engagements/{id}/threads/{tid}/messages` | Send message |
+
+### Copilot
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/engagements/{id}/copilot` | Chat with AI copilot (context-aware) |
+
+---
+
+## Frontend Structure
+
+```
+frontend/
+├── app/                          Next.js App Router
+│   ├── layout.tsx                Root layout
+│   └── page.tsx                  Entry point (loads EngagementWorkspace)
+├── components/
+│   ├── EngagementWorkspace.tsx   Main layout: tab navigation, role switcher, state management
+│   ├── CopilotPanel.tsx          AI copilot slide-over panel
+│   └── views/                    One component per tab:
+│       ├── DashboardView.tsx     KPIs, SQF heatmap, key findings, recent evidence
+│       ├── FrameworkView.tsx     3-column SQF browser
+│       ├── EvidenceView.tsx      Document list + AI extraction detail
+│       ├── DataRequestsView.tsx  Request list + detail + inline messaging
+│       ├── ScoringView.tsx       Diagnostic workspace (Layer 2/3/4 tabs)
+│       ├── ActionPlanView.tsx    Action items with evidence rationale
+│       └── MessagingView.tsx     Team messaging channels
+├── lib/
+│   ├── api.ts                    API client functions (fetch wrappers)
+│   └── types.ts                  TypeScript types + rating/status display config
+└── public/                       Static assets
+```
+
+**Conventions:**
+- All view components are client-side (`"use client"`) — data fetching via `useEffect` + `useState`
+- Tailwind utility classes for all styling — clean enterprise SaaS aesthetic with neutral palette, white space, and subtle accent colors
+- Lucide icons throughout
+- No component library (custom UI built with Tailwind)
+
+---
+
+## Design Principles
+
+- **Evidence traceability** — Every score traces back to source documents through a verifiable chain. The AI system prompt enforces citation requirements: if evidence is insufficient, the model must say so rather than guess.
+- **Framework-native** — The SQF ontology (9 dimensions, 43 components, Core Actions, Progress Indicators) is the backbone of every screen, every AI call, and every data structure. AI reasons within the framework, not outside it.
+- **Multi-level AI** — Not one giant LLM pass. Each layer operates within bounded reasoning units sized to the framework's natural decomposition — documents, components, dimensions, global.
+- **Human-in-the-loop** — AI generates draft assessments; consultants review, edit, and confirm. Scores have an explicit status workflow (Draft → In Review → Confirmed). The product accelerates expert judgment, it doesn't replace it.
+- **Two-sided collaboration** — The consultant-school back-and-forth is central, not a phase-2 add-on. Data requests, messaging, evidence uploads, and action plans are all designed for both roles from day one.
+- **The score is an output, not the product** — The product is the evidence-backed diagnostic and planning system. Ratings are one artifact of a broader improvement process.
+
+---
+
+## Current Status and Limitations
+
+This is a working prototype. It demonstrates the full workflow from evidence upload through AI-powered diagnosis to action planning, but several things are not production-ready:
+
+| Area | Status | Next Step |
+|------|--------|-----------|
+| **Authentication** | No real auth — role switcher is UI-only | Add proper auth with separate consultant/school logins |
+| **Database migrations** | Alembic installed but not configured; schema changes require dropping and recreating the DB | Set up Alembic migration scripts |
+| **API organization** | All routes in a single file (`routes.py`) | Split into separate routers (framework, evidence, scoring, etc.) |
+| **SQF criteria** | Dimension/component names are real (Bellwether public); Core Actions and Progress Indicators are hypothesized | Replace seed data if Bellwether shares actual rubric |
+| **File storage** | Uploads stored locally in `uploads/` directory | Move to S3 or equivalent |
+| **Testing** | No automated tests | Add pytest for backend, Jest/Playwright for frontend |
+| **Error handling** | Basic — AI failures surface as 500s | Add retry logic, graceful degradation, user-facing error states |
+| **Seed data** | Runs on every startup (idempotent) | Separate seeding from app startup |
+
+### The 4-Point Rating Scale
+
+Meridian uses Bellwether's 2025 SQF rating scale:
+
+| Rating | Color | Description |
+|--------|-------|-------------|
+| Excelling | Green | Consistently demonstrates all success criteria |
+| Meeting Expectations | Blue | Demonstrates most success criteria with minor gaps |
+| Developing | Orange/Yellow | Partially demonstrates criteria with significant gaps |
+| Needs Improvement | Red | Does not yet demonstrate most criteria |
+
+This is the 2025 scale, not the older 5-point SHA scale.
+
+---
+
+## Related Documents
+
+- **[handoff.md](handoff.md)** — Full product vision, design rationale, product analogies (Watershed, TurboTax, Better), guardrails, and reading list
+- **[CLAUDE.md](CLAUDE.md)** — Developer guide with codebase conventions, run commands, and architecture details
