@@ -4,12 +4,15 @@ A school quality assessment platform that operationalizes Bellwether's [School Q
 
 This is not a generic dashboard or a single chatbot. It is a **workflow + ontology + evidence system** for school quality engagements — grounded in Bellwether's public 9 dimensions and 43 components, with every finding traceable back to source documents.
 
-See [handoff.md](handoff.md) for the full product vision and design rationale, or [CLAUDE.md](CLAUDE.md) for developer conventions.
+**The one-line product thesis:** Watershed-grade traceability + TurboTax-grade guided intake + Better-grade shared workflow, all wrapped around a Bellwether-native school quality ontology and accelerated by multi-level AI orchestration.
+
+See [CLAUDE.md](CLAUDE.md) for developer conventions.
 
 ---
 
 ## Table of Contents
 
+- [Product Vision](#product-vision)
 - [Getting Started](#getting-started)
 - [Architecture](#architecture)
 - [Feature Tour](#feature-tour)
@@ -17,8 +20,33 @@ See [handoff.md](handoff.md) for the full product vision and design rationale, o
 - [Data Model](#data-model)
 - [API Reference](#api-reference)
 - [Frontend Structure](#frontend-structure)
-- [Design Principles](#design-principles)
+- [Design Principles and Guardrails](#design-principles-and-guardrails)
+- [What is Public vs. Hypothesized About the SQF](#what-is-public-vs-hypothesized-about-the-sqf)
 - [Current Status and Limitations](#current-status-and-limitations)
+- [Reference Materials](#reference-materials)
+
+---
+
+## Product Vision
+
+We are not building an AI that judges schools. We are building a **framework-native workflow platform** that helps consultants and schools move through Bellwether-style school quality assessment faster, with stronger evidence coverage, clearer traceability, better collaboration, and better draft action plans.
+
+The system is modeled after three product patterns:
+
+- **[Watershed](https://watershed.com/)** — traceability, source-of-truth design, and expert-mediated data workflows. Every claim answers "Why are you saying that?" with linked evidence, excerpts, metrics, provenance, and confidence.
+- **[TurboTax](https://ttlc.intuit.com/turbotax-support/en-us/help-article/product-setup/upload-documents-full-service-tax-expert/L4cgjPYQI_US_en_US)** — guided intake, adaptive evidence collection, and structured expert-ready preparation. The platform walks users through what's needed and adapts based on what's been provided.
+- **[Better](https://better.com/)** — shared requests, document collection, in-product follow-up, and replacing email-heavy workflows with a two-sided workspace where both parties see progress.
+
+### Strategic Context
+
+These insights shape product decisions:
+
+- **The moat is not AI summarization.** The moat is the combination of workflow, ontology, evidence graph, traceability, and human review. Any LLM can summarize a document; very few products can structure evidence against a 43-component diagnostic framework with full provenance.
+- **The initial buyer is the consulting team, not the school.** Start as an internal accelerator for Bellwether's assessment work, then expand into a joint workspace, then potentially lighter self-serve use.
+- **The best wedge is assessment acceleration.** Not "continuous school operating system." The expensive, labor-intensive front end of an engagement — evidence collection, synthesis, and diagnosis — is where software can compress the most time.
+- **Build the workflow before overbuilding the scoring model.** The first source of value is faster, more organized evidence collection and synthesis, not a perfect rating algorithm.
+- **The highest-value on-site time is trust-building and strategy work.** The software should reduce collection and synthesis burden so consultants' live time with schools is spent on leadership alignment and decision-making, not chasing documents.
+- **This should feel like consulting software, not generic edtech.** The product operationalizes a high-stakes expert workflow — that's why the Watershed/TurboTax/Better analogies matter more than typical edtech comparisons.
 
 ---
 
@@ -488,14 +516,50 @@ frontend/
 
 ---
 
-## Design Principles
+## Design Principles and Guardrails
+
+### Principles
 
 - **Evidence traceability** — Every score traces back to source documents through a verifiable chain. The AI system prompt enforces citation requirements: if evidence is insufficient, the model must say so rather than guess.
-- **Framework-native** — The SQF ontology (9 dimensions, 43 components, Core Actions, Progress Indicators) is the backbone of every screen, every AI call, and every data structure. AI reasons within the framework, not outside it.
-- **Multi-level AI** — Not one giant LLM pass. Each layer operates within bounded reasoning units sized to the framework's natural decomposition — documents, components, dimensions, global.
+- **Framework-native** — Use Bellwether's public SQF skeleton exactly. Do not invent a new top-level framework. The SQF ontology (9 dimensions, 43 components, Core Actions, Progress Indicators) is the backbone of every screen, every AI call, and every data structure. AI reasons within the framework, not outside it.
+- **Multi-level AI** — Not one giant LLM pass. The information load across a full school assessment is too large and too heterogeneous for a single context window. Each layer operates within bounded reasoning units sized to the framework's natural decomposition — documents, components, dimensions, global.
 - **Human-in-the-loop** — AI generates draft assessments; consultants review, edit, and confirm. Scores have an explicit status workflow (Draft → In Review → Confirmed). The product accelerates expert judgment, it doesn't replace it.
 - **Two-sided collaboration** — The consultant-school back-and-forth is central, not a phase-2 add-on. Data requests, messaging, evidence uploads, and action plans are all designed for both roles from day one.
 - **The score is an output, not the product** — The product is the evidence-backed diagnostic and planning system. Ratings are one artifact of a broader improvement process.
+
+### Guardrails
+
+These are things to actively avoid:
+
+- **Do not build a black-box school score.** Bellwether's framework is multi-dimensional and designed for reflection, planning, and improvement — not simplistic ranking.
+- **Do not lead with "replace consultants."** Lead with "make consultants faster, more consistent, and more evidence-backed." Bellwether's process depends on meetings, focus groups, site visits, and shared ownership.
+- **Do not confuse evidence ingestion with decision quality.** The hard problem is not uploading files. It is structuring evidence, preserving provenance, resolving contradictions, and helping people make decisions. A product that ingests a lot of documents but doesn't help people reason about them is not useful.
+- **Do not overclaim Bellwether alignment.** Be explicit about what is public Bellwether structure versus what is prototype logic or placeholder criteria. See the [SQF section below](#what-is-public-vs-hypothesized-about-the-sqf) for specifics.
+- **Do not optimize for one giant LLM pass.** Structure the system around bounded reasoning units — Bellwether's own framework gives you the right decomposition.
+
+---
+
+## What is Public vs. Hypothesized About the SQF
+
+Meridian is anchored in Bellwether's publicly available School Quality Framework materials. It is important to be clear about what comes from Bellwether and what is prototype assumption.
+
+### What is public (safe to use)
+
+- The 9 SQF dimensions and their names
+- The 43 component names within those dimensions
+- The concept of Core Actions and Progress Indicators as the structure for success criteria
+- Bellwether's description of using the SQF in assessments and strategic planning
+- The 4-point rating scale: Excelling, Meeting Expectations, Developing, Needs Improvement
+
+### What is hypothesized (needs replacement if Bellwether shares actual materials)
+
+- **Full detailed criteria for most components** — the Core Actions and Progress Indicators in `seed.py` are educated guesses based on component names and public descriptions
+- **Exact evidence requirements by component** — which document types and data points are needed to score each component
+- **Exact weighting or scoring logic** — how individual criteria roll up into a component rating
+- **Bellwether's proprietary implementation details** — internal processes, templates, report formats
+- **Report formatting and priority-generation logic** — how findings translate into action plan structure
+
+If Bellwether provides their actual rubric, replace the seed data in `app/seed.py`. The dimension and component names should remain stable; the success criteria content is what would change.
 
 ---
 
@@ -529,7 +593,28 @@ This is the 2025 scale, not the older 5-point SHA scale.
 
 ---
 
-## Related Documents
+## Reference Materials
 
-- **[handoff.md](handoff.md)** — Full product vision, design rationale, product analogies (Watershed, TurboTax, Better), guardrails, and reading list
-- **[CLAUDE.md](CLAUDE.md)** — Developer guide with codebase conventions, run commands, and architecture details
+### In this repo
+
+- **[CLAUDE.md](CLAUDE.md)** — Developer guide with codebase conventions, run commands, and file-level architecture details
+
+### Bellwether background reading
+
+These are the key external references for understanding the SQF and the consulting workflow this product accelerates:
+
+- **[Bellwether SQF launch post](https://bellwether.org/blog/reimagining-excellence-introducing-bellwethers-school-quality-framework/)** — The single most important public document. Explains what the SQF is, why Bellwether created it, how it is structured, and how they use it.
+- **[SQF framework image](https://bellwether.org/wp-content/uploads/2025/08/2025-08-27-BDC-SQF-2.0-Blog-0_Framework-scaled.jpg)** — The cleanest public source for the 9 dimensions and 43 components. Useful for verifying that Meridian's seed data matches.
+- **[SQF example component image](https://bellwether.org/wp-content/uploads/2025/08/image2.png)** — Shows how one component is expressed via Core Actions and Progress Indicators. This informed the component-level schema design.
+- **[Shared Strategies: An Examination of Bellwether's School Cohort Program](https://bellwether.org/wp-content/uploads/2023/09/SharedStrategies_Bellwether_September2023.pdf)** — Critical for understanding Bellwether's diagnostic-to-plan-to-monitor operating model and the labor-intensive workflow Meridian should accelerate.
+- **[SchoolPerformanceFrameworks.org](https://bellwether.org/publications/schoolperformanceframeworksorg/)** — How performance frameworks are used for accountability, continuous improvement, and communication. Good conceptual context.
+- **[Intentional Alignment: Strategic Resource Management](https://bellwether.org/publications/intentional-alignment/)** — Key Bellwether thought leadership for the finance and resource-allocation dimensions.
+- **[Beyond the Bottom Line: K-12 Fiscal Accountability](https://bellwether.org/publications/beyond-the-bottom-line/)** — Useful if the finance module needs to sound natively Bellwether rather than generic budgeting software.
+
+### Product pattern references
+
+These are not about education — they're about the product patterns Meridian draws from:
+
+- **[Watershed](https://watershed.com/)** — Traceability, source-of-truth design, expert-mediated data workflows
+- **[Better](https://better.com/)** — Shared requests, document collection, in-product follow-up, replacing email-heavy workflows
+- **[TurboTax document upload flow](https://ttlc.intuit.com/turbotax-support/en-us/help-article/product-setup/upload-documents-full-service-tax-expert/L4cgjPYQI_US_en_US)** — Guided intake, adaptive evidence collection, structured expert-ready preparation

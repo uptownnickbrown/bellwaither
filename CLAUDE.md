@@ -2,7 +2,7 @@
 
 ## What this is
 
-A school quality assessment platform that operationalizes Bellwether's School Quality Framework (SQF). It helps consulting teams and schools move through diagnostic assessments faster using structured workflows and multi-level AI. Read `handoff.md` for the full product vision and design rationale.
+A school quality assessment platform that operationalizes Bellwether's School Quality Framework (SQF). It helps consulting teams and schools move through diagnostic assessments faster using structured workflows and multi-level AI. See the README for the full product vision, feature tour, and design rationale.
 
 ## Architecture
 
