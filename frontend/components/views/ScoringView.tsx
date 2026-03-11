@@ -985,7 +985,7 @@ function ScoreDetail({
           {!isAdmin && <span className="text-xs text-gray-400">Confidence: {score.confidence}</span>}
           {!isAdmin && score.evidence_count > 0 ? (
             <button
-              onClick={() => onNavigate?.("evidence")}
+              onClick={() => onNavigate?.("evidence", `component:${score.component_id}`)}
               className="text-xs text-indigo-600 hover:text-indigo-800 hover:underline font-medium flex items-center gap-1 transition"
             >
               {score.evidence_count} evidence items

@@ -210,7 +210,7 @@ function ComponentDetail({ component, score, engagementId, role = "consultant", 
           </button>
           {score && score.evidence_count > 0 && (
             <button
-              onClick={() => onNavigate?.("evidence")}
+              onClick={() => onNavigate?.("evidence", `component:${component.id}`)}
               className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 hover:underline font-medium transition"
             >
               View Evidence

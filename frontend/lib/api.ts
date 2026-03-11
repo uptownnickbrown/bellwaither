@@ -57,6 +57,10 @@ export const toggleGlobalSummaryApproval = (engId: string, summaryId: string, ap
 export const getEvidenceCounts = (engId: string) =>
   fetchApi<import("./types").EvidenceCountMap>(`/engagements/${engId}/evidence-counts`);
 
+// Evidence IDs for a component
+export const getComponentEvidenceIds = (engId: string, compId: string) =>
+  fetchApi<string[]>(`/engagements/${engId}/components/${compId}/evidence-ids`);
+
 // Batch generation
 export const batchAssessComponents = (engId: string) =>
   fetchApi<import("./types").BatchProgress>(`/engagements/${engId}/batch/assess-components`, { method: "POST" });

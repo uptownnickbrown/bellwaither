@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import type { Evidence, Extraction, EvidenceMapping, UserRole } from "@/lib/types";
-import { getEvidence, getExtractions, getEvidenceMappings, uploadEvidence, getEvidenceDownloadUrl, updateExtraction } from "@/lib/api";
+import { getEvidence, getExtractions, getEvidenceMappings, uploadEvidence, getEvidenceDownloadUrl, updateExtraction, getComponentEvidenceIds } from "@/lib/api";
 import EditableText, { EditableListItem } from "@/components/EditableText";
 import {
   FileText, Upload, Search, Filter, ChevronDown,
@@ -37,6 +37,7 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
   const [search, setSearch] = useState("");
   const [previewEvidence, setPreviewEvidence] = useState<Evidence | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [componentFilter, setComponentFilter] = useState<{ id: string; label: string; evidenceIds: string[] } | null>(null);
 
   const loadEvidence = useCallback(() => {
     getEvidence(engagementId).then(setEvidence);
@@ -47,13 +48,23 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
   // Handle incoming navigation target
   useEffect(() => {
     if (navTargetId && evidence.length > 0) {
-      const target = evidence.find((e) => e.id === navTargetId);
-      if (target) {
-        setSelectedEvidence(target);
+      if (navTargetId.startsWith("component:")) {
+        const compId = navTargetId.slice("component:".length);
+        getComponentEvidenceIds(engagementId, compId).then((ids) => {
+          setComponentFilter({ id: compId, label: "", evidenceIds: ids });
+          // Auto-select first matching evidence
+          const first = evidence.find((e) => ids.includes(e.id));
+          if (first) setSelectedEvidence(first);
+        });
+      } else {
+        const target = evidence.find((e) => e.id === navTargetId);
+        if (target) {
+          setSelectedEvidence(target);
+        }
       }
       onNavTargetConsumed?.();
     }
-  }, [navTargetId, evidence, onNavTargetConsumed]);
+  }, [navTargetId, evidence, engagementId, onNavTargetConsumed]);
 
   useEffect(() => {
     if (selectedEvidence) {
@@ -116,9 +127,11 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
     document.body.removeChild(link);
   };
 
-  const filtered = evidence.filter((ev) =>
-    !search || (ev.title || ev.filename).toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = evidence.filter((ev) => {
+    if (componentFilter && !componentFilter.evidenceIds.includes(ev.id)) return false;
+    if (search && !(ev.title || ev.filename).toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
 
   return (
     <div
@@ -177,6 +190,23 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
               </span>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Component filter banner */}
+      {componentFilter && (
+        <div className="mb-4 flex items-center gap-3 px-4 py-2.5 bg-indigo-50 border border-indigo-200 rounded-lg">
+          <Filter className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+          <span className="text-sm text-indigo-800">
+            Showing <strong>{componentFilter.evidenceIds.length}</strong> evidence item{componentFilter.evidenceIds.length !== 1 ? "s" : ""} mapped to this component
+          </span>
+          <button
+            onClick={() => { setComponentFilter(null); }}
+            className="ml-auto flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-800 transition"
+          >
+            <X className="w-3.5 h-3.5" />
+            Show All
+          </button>
         </div>
       )}
 

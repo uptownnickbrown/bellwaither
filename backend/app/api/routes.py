@@ -474,6 +474,25 @@ async def get_evidence_counts(
     return {str(r.component_id): r.evidence_count for r in rows}
 
 
+@router.get("/engagements/{engagement_id}/components/{component_id}/evidence-ids")
+async def get_component_evidence_ids(
+    engagement_id: uuid.UUID,
+    component_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Get evidence IDs mapped to a specific component."""
+    result = await db.execute(
+        select(EvidenceMapping.evidence_id)
+        .join(Evidence, EvidenceMapping.evidence_id == Evidence.id)
+        .where(
+            Evidence.engagement_id == engagement_id,
+            EvidenceMapping.component_id == component_id,
+        )
+        .distinct()
+    )
+    return [str(r[0]) for r in result.all()]
+
+
 # ---- Approval Toggle Endpoints ----
 
 @router.patch("/engagements/{engagement_id}/scores/{score_id}/approve")
