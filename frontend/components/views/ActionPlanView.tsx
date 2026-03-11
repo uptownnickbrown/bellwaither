@@ -1,12 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { ActionPlan, ActionItem } from "@/lib/types";
-import { getActionPlans, getActionItems } from "@/lib/api";
-import { Target, CheckCircle2, Clock, AlertCircle, Ban, FileText, ArrowRight } from "lucide-react";
+import type { ActionPlan, ActionItem, UserRole } from "@/lib/types";
+import { getActionPlans, getActionItems, updateActionItem } from "@/lib/api";
+import EditableText from "@/components/EditableText";
+import { Target, CheckCircle2, Clock, AlertCircle, Ban, FileText, ArrowRight, Milestone, CalendarClock, ArrowUpRight } from "lucide-react";
 
 interface Props {
   engagementId: string;
+  role?: UserRole;
+  onNavigate?: (tab: string, id?: string) => void;
+  navTargetId?: string | null;
+  onNavTargetConsumed?: () => void;
 }
 
 const STATUS_STYLES: Record<string, { icon: React.ElementType; color: string; bg: string; label: string }> = {
@@ -16,7 +21,8 @@ const STATUS_STYLES: Record<string, { icon: React.ElementType; color: string; bg
   blocked: { icon: Ban, color: "#EF4444", bg: "#FEF2F2", label: "Blocked" },
 };
 
-export default function ActionPlanView({ engagementId }: Props) {
+export default function ActionPlanView({ engagementId, role = "consultant", onNavigate, navTargetId, onNavTargetConsumed }: Props) {
+  const isAdmin = role === "school_admin";
   const [plans, setPlans] = useState<ActionPlan[]>([]);
   const [items, setItems] = useState<ActionItem[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<ActionPlan | null>(null);
@@ -35,6 +41,83 @@ export default function ActionPlanView({ engagementId }: Props) {
     }
   }, [selectedPlan, engagementId]);
 
+  // Handle incoming navigation target
+  useEffect(() => {
+    if (navTargetId && items.length > 0) {
+      const target = items.find((it) => it.id === navTargetId);
+      if (target) {
+        setSelectedItem(target);
+      }
+      onNavTargetConsumed?.();
+    }
+  }, [navTargetId, items, onNavTargetConsumed]);
+
+  // School admin: "coming soon" state when no action plan or items exist
+  if (isAdmin && plans.length === 0) {
+    return (
+      <div className="max-w-2xl mx-auto py-16">
+        <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
+          <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Milestone className="w-8 h-8 text-indigo-400" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-3">Action planning is coming soon</h2>
+          <p className="text-sm text-gray-500 leading-relaxed max-w-md mx-auto mb-6">
+            Action planning begins after the diagnostic assessment. Your team will work together with the
+            consulting team to build priorities and next steps based on the findings.
+          </p>
+          <div className="flex items-center justify-center gap-8 text-sm text-gray-400">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
+                <Target className="w-4 h-4 text-gray-300" />
+              </div>
+              <span>Set priorities</span>
+            </div>
+            <div className="w-px h-8 bg-gray-100" />
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
+                <CalendarClock className="w-4 h-4 text-gray-300" />
+              </div>
+              <span>Define milestones</span>
+            </div>
+            <div className="w-px h-8 bg-gray-100" />
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4 text-gray-300" />
+              </div>
+              <span>Track progress</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // School admin: empty items in an existing plan
+  if (isAdmin && selectedPlan && items.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-lg font-bold text-gray-900">Action Plan</h1>
+            <p className="text-sm text-gray-500">{selectedPlan.title}</p>
+          </div>
+        </div>
+        <div className="max-w-lg mx-auto py-12">
+          <div className="bg-white rounded-2xl border border-gray-200 p-10 text-center">
+            <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-5">
+              <Milestone className="w-7 h-7 text-indigo-400" />
+            </div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">Action items are being developed</h2>
+            <p className="text-sm text-gray-500 leading-relaxed max-w-sm mx-auto">
+              The consulting team is building action items based on the assessment findings.
+              Specific priorities and next steps will appear here as they are finalized.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-4">
@@ -44,7 +127,8 @@ export default function ActionPlanView({ engagementId }: Props) {
             {selectedPlan ? selectedPlan.title : "No action plans yet"}
           </p>
         </div>
-        {selectedPlan && (
+        {/* Hide draft status badge for admin */}
+        {!isAdmin && selectedPlan && (
           <span className="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-medium rounded-full">
             {selectedPlan.status === "draft" ? "Draft" : selectedPlan.status}
           </span>
@@ -93,7 +177,7 @@ export default function ActionPlanView({ engagementId }: Props) {
                 </button>
               );
             })}
-            {items.length === 0 && (
+            {items.length === 0 && !isAdmin && (
               <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
                 <Target className="w-10 h-10 text-gray-200 mx-auto mb-2" />
                 <p className="text-sm text-gray-400">No action items yet</p>
@@ -121,13 +205,45 @@ export default function ActionPlanView({ engagementId }: Props) {
                     <span className="text-xs text-gray-500">Target: <strong>{new Date(selectedItem.target_date).toLocaleDateString()}</strong></span>
                   )}
                 </div>
+                {selectedItem.component_id && (
+                  <div className="flex items-center gap-3 mt-2">
+                    <button
+                      onClick={() => onNavigate?.("scoring", selectedItem.component_id!)}
+                      className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 hover:underline font-medium transition"
+                    >
+                      View in Diagnostic
+                      <ArrowUpRight className="w-3 h-3" />
+                    </button>
+                    <button
+                      onClick={() => onNavigate?.("framework", selectedItem.component_id!)}
+                      className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 hover:underline font-medium transition"
+                    >
+                      View in Framework
+                      <ArrowUpRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="p-5 space-y-4">
                 {selectedItem.description && (
                   <div>
                     <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Description</h3>
-                    <p className="text-sm text-gray-700 leading-relaxed">{selectedItem.description}</p>
+                    {isAdmin ? (
+                      <p className="text-sm text-gray-700 leading-relaxed">{selectedItem.description}</p>
+                    ) : (
+                      <EditableText
+                        value={selectedItem.description}
+                        multiline
+                        className="text-sm text-gray-700 leading-relaxed"
+                        onSave={async (v) => {
+                          await updateActionItem(engagementId, selectedPlan!.id, selectedItem.id, { description: v });
+                          const updated = { ...selectedItem, description: v };
+                          setSelectedItem(updated);
+                          setItems(items.map((it) => it.id === updated.id ? updated : it));
+                        }}
+                      />
+                    )}
                   </div>
                 )}
 
@@ -137,7 +253,21 @@ export default function ActionPlanView({ engagementId }: Props) {
                     <div className="bg-indigo-50/50 rounded-lg p-4">
                       <div className="flex items-start gap-2">
                         <FileText className="w-4 h-4 text-indigo-500 flex-shrink-0 mt-0.5" />
-                        <p className="text-sm text-indigo-800">{selectedItem.rationale}</p>
+                        {isAdmin ? (
+                          <p className="text-sm text-indigo-800 flex-1">{selectedItem.rationale}</p>
+                        ) : (
+                          <EditableText
+                            value={selectedItem.rationale}
+                            multiline
+                            className="text-sm text-indigo-800 flex-1"
+                            onSave={async (v) => {
+                              await updateActionItem(engagementId, selectedPlan!.id, selectedItem.id, { rationale: v });
+                              const updated = { ...selectedItem, rationale: v };
+                              setSelectedItem(updated);
+                              setItems(items.map((it) => it.id === updated.id ? updated : it));
+                            }}
+                          />
+                        )}
                       </div>
                     </div>
                   </div>

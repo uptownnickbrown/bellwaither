@@ -13,9 +13,12 @@ import {
 interface Props {
   engagementId: string;
   role: UserRole;
+  onNavigate?: (tab: string, id?: string) => void;
+  navTargetId?: string | null;
+  onNavTargetConsumed?: () => void;
 }
 
-export default function DataRequestsView({ engagementId, role }: Props) {
+export default function DataRequestsView({ engagementId, role, onNavigate, navTargetId, onNavTargetConsumed }: Props) {
   const [requests, setRequests] = useState<DataRequest[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<DataRequest | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -30,6 +33,17 @@ export default function DataRequestsView({ engagementId, role }: Props) {
   }, [engagementId]);
 
   useEffect(() => { loadRequests(); }, [loadRequests]);
+
+  // Handle incoming navigation target
+  useEffect(() => {
+    if (navTargetId && requests.length > 0) {
+      const target = requests.find((r) => r.id === navTargetId);
+      if (target) {
+        setSelectedRequest(target);
+      }
+      onNavTargetConsumed?.();
+    }
+  }, [navTargetId, requests, onNavTargetConsumed]);
 
   useEffect(() => {
     if (selectedRequest) {
@@ -135,6 +149,24 @@ export default function DataRequestsView({ engagementId, role }: Props) {
                   <span className="text-xs text-gray-400">Created by: {selectedRequest.created_by}</span>
                   <span className="text-xs text-gray-400">Assigned to: {selectedRequest.assigned_to}</span>
                   <span className="text-xs text-gray-400">{new Date(selectedRequest.created_at).toLocaleDateString()}</span>
+                </div>
+                <div className="flex items-center gap-3 mt-3">
+                  {selectedRequest.component_id && (
+                    <button
+                      onClick={() => onNavigate?.("scoring", selectedRequest.component_id!)}
+                      className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 hover:underline font-medium transition"
+                    >
+                      View Component in Diagnostic
+                      <ArrowUpRight className="w-3 h-3" />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => onNavigate?.("messages")}
+                    className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 hover:underline font-medium transition"
+                  >
+                    View in Messages
+                    <ArrowUpRight className="w-3 h-3" />
+                  </button>
                 </div>
               </div>
 

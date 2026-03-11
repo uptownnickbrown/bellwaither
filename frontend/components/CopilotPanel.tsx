@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { chatWithCopilot } from "@/lib/api";
-import type { UserRole } from "@/lib/types";
-import { Sparkles, Send, X, Loader2, User, Bot } from "lucide-react";
+import type { UserRole, CopilotToolResult } from "@/lib/types";
+import { Sparkles, Send, X, Loader2, User, Bot, FileText, AlertCircle, Calendar, Flag, UserCircle, ArrowUpRight } from "lucide-react";
 
 interface Props {
   engagementId: string;
@@ -11,23 +11,103 @@ interface Props {
   context: string;
   role: UserRole;
   onClose: () => void;
+  onNavigate?: (tab: string, id?: string) => void;
 }
 
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
+  toolResults?: CopilotToolResult[] | null;
 }
+
+const PRIORITY_STYLES: Record<string, { label: string; classes: string }> = {
+  high: { label: "High", classes: "bg-red-100 text-red-700" },
+  medium: { label: "Medium", classes: "bg-amber-100 text-amber-700" },
+  low: { label: "Low", classes: "bg-gray-100 text-gray-600" },
+};
 
 const SUGGESTED_PROMPTS = [
   "What evidence do we have about teacher retention?",
   "Which components still need more evidence?",
   "Summarize our strongest findings so far",
+  "Create a data request for the school's PD logs",
+  "Ask the school to send us their curriculum documents",
   "What are the biggest gaps in our assessment?",
-  "Draft a follow-up request for PD data",
-  "Show me contradictions in the evidence",
 ];
 
-export default function CopilotPanel({ engagementId, schoolName, context, role, onClose }: Props) {
+function DataRequestCard({ result, onNavigate }: { result: CopilotToolResult; onNavigate?: (tab: string, id?: string) => void }) {
+  if (result.status === "error") {
+    return (
+      <div className="mt-2 border border-red-200 bg-red-50 rounded-lg p-3">
+        <div className="flex items-center gap-2 text-red-700 text-xs font-medium">
+          <AlertCircle className="w-3.5 h-3.5" />
+          Failed to create data request
+        </div>
+        <p className="text-xs text-red-600 mt-1">{result.error}</p>
+      </div>
+    );
+  }
+
+  const data = result.data;
+  if (!data) return null;
+
+  const priorityStyle = PRIORITY_STYLES[data.priority] || PRIORITY_STYLES.medium;
+
+  return (
+    <div className="mt-2 border border-indigo-200 bg-indigo-50/50 rounded-lg p-3 space-y-2">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 bg-indigo-100 rounded flex items-center justify-center flex-shrink-0">
+            <FileText className="w-3.5 h-3.5 text-indigo-600" />
+          </div>
+          <span className="text-xs font-semibold text-indigo-900">Data Request Created</span>
+        </div>
+        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${priorityStyle.classes}`}>
+          {priorityStyle.label}
+        </span>
+      </div>
+
+      <div className="space-y-1.5">
+        <p className="text-sm font-medium text-gray-900">{data.title}</p>
+        {data.description && (
+          <p className="text-xs text-gray-600 leading-relaxed">{data.description}</p>
+        )}
+      </div>
+
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-gray-500">
+        {data.assigned_to && (
+          <span className="flex items-center gap-1">
+            <UserCircle className="w-3 h-3" />
+            {data.assigned_to}
+          </span>
+        )}
+        {data.due_date && (
+          <span className="flex items-center gap-1">
+            <Calendar className="w-3 h-3" />
+            {new Date(data.due_date).toLocaleDateString()}
+          </span>
+        )}
+        {data.component_code && (
+          <span className="flex items-center gap-1">
+            <Flag className="w-3 h-3" />
+            Component {data.component_code}
+          </span>
+        )}
+        <span className="text-indigo-500 font-medium">Pending</span>
+      </div>
+
+      <button
+        onClick={() => onNavigate?.("requests", data.id)}
+        className="flex items-center gap-1 text-[11px] text-indigo-600 hover:text-indigo-800 hover:underline font-medium transition mt-1"
+      >
+        View in Data Requests
+        <ArrowUpRight className="w-3 h-3" />
+      </button>
+    </div>
+  );
+}
+
+export default function CopilotPanel({ engagementId, schoolName, context, role, onClose, onNavigate }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -56,7 +136,14 @@ export default function CopilotPanel({ engagementId, schoolName, context, role, 
           content: m.content,
         })),
       });
-      setMessages((prev) => [...prev, { role: "assistant", content: result.content }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: result.content,
+          toolResults: result.tool_results,
+        },
+      ]);
     } catch (e) {
       setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, I encountered an error. Please try again." }]);
     }
@@ -88,7 +175,7 @@ export default function CopilotPanel({ engagementId, schoolName, context, role, 
             <div className="text-center py-4">
               <Sparkles className="w-8 h-8 text-indigo-200 mx-auto mb-2" />
               <p className="text-sm text-gray-500 font-medium">How can I help?</p>
-              <p className="text-xs text-gray-400 mt-1">Ask about evidence, findings, or get help with your assessment.</p>
+              <p className="text-xs text-gray-400 mt-1">Ask about evidence, findings, or create data requests directly.</p>
             </div>
             <div className="space-y-2">
               <p className="text-[10px] font-semibold text-gray-400 uppercase">Try asking:</p>
@@ -112,12 +199,22 @@ export default function CopilotPanel({ engagementId, schoolName, context, role, 
                 <Bot className="w-3.5 h-3.5 text-indigo-600" />
               </div>
             )}
-            <div className={`max-w-[85%] rounded-xl px-3 py-2 ${
-              msg.role === "user"
-                ? "bg-indigo-600 text-white"
-                : "bg-gray-50 text-gray-700"
-            }`}>
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+            <div className={`max-w-[85%] ${msg.role === "user" ? "" : ""}`}>
+              <div className={`rounded-xl px-3 py-2 ${
+                msg.role === "user"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-50 text-gray-700"
+              }`}>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+              </div>
+              {/* Render tool result cards for assistant messages */}
+              {msg.role === "assistant" && msg.toolResults && msg.toolResults.length > 0 && (
+                <div className="space-y-2">
+                  {msg.toolResults.map((tr, j) => (
+                    <DataRequestCard key={j} result={tr} onNavigate={onNavigate} />
+                  ))}
+                </div>
+              )}
             </div>
             {msg.role === "user" && (
               <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 mt-0.5">
