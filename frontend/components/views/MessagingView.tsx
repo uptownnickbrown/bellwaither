@@ -2,10 +2,12 @@
 
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import type { MessageThread, Message, UserRole } from "@/lib/types";
-import { getThreads, getMessages, sendMessage, createThread } from "@/lib/api";
+import { getThreads, getMessages, sendMessage, createThread, chatWithCopilot } from "@/lib/api";
+import type { CopilotToolResult } from "@/lib/types";
 import {
   MessageSquare, Send, Hash, ClipboardList, BarChart3, Target,
-  Plus, X, ArrowUpRight, Users,
+  Plus, X, ArrowUpRight, Users, Sparkles, Bot, Loader2,
+  FileText, AlertCircle, Calendar, Flag, UserCircle,
 } from "lucide-react";
 
 interface Props {
@@ -18,6 +20,7 @@ interface Props {
 
 // ── Hardcoded engagement members for @mention ────────────────────────────
 const ENGAGEMENT_MEMBERS = [
+  "Meridian AI",
   "Sarah Chen",
   "Marcus Johnson",
   "Dr. Angela Rivera",
@@ -62,8 +65,8 @@ function dayLabel(dateStr: string): string {
 
 // ── Render message content with @mention highlighting ─────────────────────
 function renderContent(content: string) {
-  // Match @FirstName LastName (with optional "Dr. " prefix)
-  const mentionRegex = /@((?:Dr\.\s)?[A-Z][a-z]+(?:\s[A-Z][a-z]+)+)/g;
+  // Match @Meridian AI or @FirstName LastName (with optional "Dr. " prefix)
+  const mentionRegex = /@(Meridian AI|(?:Dr\.\s)?[A-Z][a-z]+(?:\s[A-Z][a-z]+)+)/g;
   const parts: (string | React.ReactElement)[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
@@ -72,11 +75,17 @@ function renderContent(content: string) {
     if (match.index > lastIndex) {
       parts.push(content.slice(lastIndex, match.index));
     }
+    const isMeridian = match[1] === "Meridian AI";
     parts.push(
       <span
         key={match.index}
-        className="bg-indigo-100 text-indigo-800 px-1 py-0.5 rounded font-medium"
+        className={`px-1 py-0.5 rounded font-medium ${
+          isMeridian
+            ? "bg-indigo-600 text-white"
+            : "bg-indigo-100 text-indigo-800"
+        }`}
       >
+        {isMeridian && <Sparkles className="w-3 h-3 inline mr-0.5 -mt-0.5" />}
         @{match[1]}
       </span>
     );
@@ -90,7 +99,7 @@ function renderContent(content: string) {
 
 // ── Extract mentions from message text ────────────────────────────────────
 function extractMentions(text: string): string[] {
-  const mentionRegex = /@((?:Dr\.\s)?[A-Z][a-z]+(?:\s[A-Z][a-z]+)+)/g;
+  const mentionRegex = /@(Meridian AI|(?:Dr\.\s)?[A-Z][a-z]+(?:\s[A-Z][a-z]+)+)/g;
   const mentions: string[] = [];
   let m: RegExpExecArray | null;
   while ((m = mentionRegex.exec(text)) !== null) {
@@ -99,6 +108,71 @@ function extractMentions(text: string): string[] {
     }
   }
   return mentions;
+}
+
+// ── Tool result card for AI actions shown inline in chat ──────────────────
+const PRIORITY_STYLES: Record<string, { label: string; classes: string }> = {
+  high: { label: "High", classes: "bg-red-100 text-red-700" },
+  medium: { label: "Medium", classes: "bg-amber-100 text-amber-700" },
+  low: { label: "Low", classes: "bg-gray-100 text-gray-600" },
+};
+
+function ToolResultCard({ result, onNavigate }: { result: CopilotToolResult; onNavigate?: (tab: string, id?: string) => void }) {
+  if (result.status === "error") {
+    return (
+      <div className="border border-red-200 bg-red-50 rounded-lg p-3">
+        <div className="flex items-center gap-2 text-red-700 text-xs font-medium">
+          <AlertCircle className="w-3.5 h-3.5" />
+          Failed to create data request
+        </div>
+        <p className="text-xs text-red-600 mt-1">{result.error}</p>
+      </div>
+    );
+  }
+  const data = result.data;
+  if (!data) return null;
+  const priorityStyle = PRIORITY_STYLES[data.priority] || PRIORITY_STYLES.medium;
+
+  return (
+    <div className="border border-indigo-200 bg-indigo-50/50 rounded-lg p-3 space-y-2">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 bg-indigo-100 rounded flex items-center justify-center flex-shrink-0">
+            <FileText className="w-3.5 h-3.5 text-indigo-600" />
+          </div>
+          <span className="text-xs font-semibold text-indigo-900">Data Request Created</span>
+        </div>
+        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${priorityStyle.classes}`}>
+          {priorityStyle.label}
+        </span>
+      </div>
+      <div className="space-y-1.5">
+        <p className="text-sm font-medium text-gray-900">{data.title}</p>
+        {data.description && (
+          <p className="text-xs text-gray-600 leading-relaxed">{data.description}</p>
+        )}
+      </div>
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-gray-500">
+        {data.assigned_to && (
+          <span className="flex items-center gap-1"><UserCircle className="w-3 h-3" />{data.assigned_to}</span>
+        )}
+        {data.due_date && (
+          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{new Date(data.due_date).toLocaleDateString()}</span>
+        )}
+        {data.component_code && (
+          <span className="flex items-center gap-1"><Flag className="w-3 h-3" />Component {data.component_code}</span>
+        )}
+        <span className="text-indigo-500 font-medium">Pending</span>
+      </div>
+      <button
+        onClick={() => onNavigate?.("requests", data.id)}
+        className="flex items-center gap-1 text-[11px] text-indigo-600 hover:text-indigo-800 hover:underline font-medium transition"
+      >
+        View in Data Requests
+        <ArrowUpRight className="w-3 h-3" />
+      </button>
+    </div>
+  );
 }
 
 // ═════════════════════════════════════════════════════════════════════════
@@ -116,6 +190,9 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
   const [showNewChannel, setShowNewChannel] = useState(false);
   const [newChannelName, setNewChannelName] = useState("");
   const newChannelInputRef = useRef<HTMLInputElement>(null);
+
+  // ── AI copilot processing state ────────────────────────────────────────
+  const [aiProcessing, setAiProcessing] = useState(false);
 
   // ── @mention dropdown state ─────────────────────────────────────────────
   const [mentionActive, setMentionActive] = useState(false);
@@ -295,16 +372,57 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
     if (!newMessage.trim() || !selectedThread) return;
     const author = role === "consultant" ? "Sarah Chen" : "Dr. Angela Rivera";
     const mentions = extractMentions(newMessage);
+    const messageText = newMessage;
+    setNewMessage("");
+    closeMention();
+
     await sendMessage(engagementId, selectedThread.id, {
       author,
       role: role === "consultant" ? "consultant" : "school_leader",
-      content: newMessage,
+      content: messageText,
       ...(mentions.length > 0 ? { mentions } : {}),
     });
-    setNewMessage("");
-    closeMention();
-    getMessages(engagementId, selectedThread.id).then(setMessages);
-    loadThreads(); // refresh last_activity
+
+    // Refresh messages immediately so the user sees their own message
+    await getMessages(engagementId, selectedThread.id).then(setMessages);
+    loadThreads();
+
+    // If @Meridian AI was mentioned, trigger the copilot
+    if (mentions.includes("Meridian AI")) {
+      setAiProcessing(true);
+      try {
+        // Strip the @Meridian AI prefix and send to copilot
+        const prompt = messageText.replace(/@Meridian AI\s*/gi, "").trim();
+        const result = await chatWithCopilot(engagementId, {
+          message: prompt,
+          context: "messages",
+          role: role === "consultant" ? "consultant" : "school_admin",
+        });
+
+        // Post the AI response as a message in the thread
+        const attachments = result.tool_results && result.tool_results.length > 0
+          ? { tool_results: result.tool_results }
+          : undefined;
+        await sendMessage(engagementId, selectedThread.id, {
+          author: "Meridian AI",
+          role: "assistant",
+          content: result.content,
+          ...(attachments ? { attachments } : {}),
+        });
+
+        await getMessages(engagementId, selectedThread.id).then(setMessages);
+        loadThreads();
+      } catch {
+        // Post error message
+        await sendMessage(engagementId, selectedThread.id, {
+          author: "Meridian AI",
+          role: "assistant",
+          content: "Sorry, I encountered an error processing that request. Please try again.",
+        });
+        await getMessages(engagementId, selectedThread.id).then(setMessages);
+      }
+      setAiProcessing(false);
+    }
   };
 
   // ── Create channel ──────────────────────────────────────────────────────
@@ -659,13 +777,15 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
 
                 // Regular message
                 const { msg, showAuthor } = item;
+                const isAI = msg.author === "Meridian AI" || msg.role === "assistant";
                 const isConsultant =
-                  msg.role === "consultant" || msg.role === "analyst";
+                  !isAI && (msg.role === "consultant" || msg.role === "analyst");
                 const initials = msg.author
                   .split(" ")
                   .map((n) => n[0])
                   .filter((c) => c && c === c.toUpperCase())
                   .join("");
+                const toolResults = (msg.attachments as { tool_results?: CopilotToolResult[] } | null)?.tool_results;
 
                 if (!showAuthor) {
                   // Continuation message (same author, grouped)
@@ -687,6 +807,13 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
                         <p className="text-sm text-gray-700 leading-relaxed">
                           {renderContent(msg.content)}
                         </p>
+                        {toolResults && toolResults.length > 0 && (
+                          <div className="mt-2 space-y-2">
+                            {toolResults.map((tr, j) => (
+                              <ToolResultCard key={j} result={tr} onNavigate={onNavigate} />
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -695,22 +822,35 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
                 return (
                   <div
                     key={msg.id}
-                    className="flex items-start gap-3 mt-4 first:mt-0 group hover:bg-gray-50 rounded-lg -mx-2 px-2 py-1"
+                    className={`flex items-start gap-3 mt-4 first:mt-0 group hover:bg-gray-50 rounded-lg -mx-2 px-2 py-1 ${
+                      isAI ? "bg-indigo-50/40" : ""
+                    }`}
                   >
-                    <div
-                      className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                        isConsultant
-                          ? "bg-indigo-100 text-indigo-700"
-                          : "bg-emerald-100 text-emerald-700"
-                      }`}
-                    >
-                      {initials}
-                    </div>
+                    {isAI ? (
+                      <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="w-4 h-4 text-white" />
+                      </div>
+                    ) : (
+                      <div
+                        className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                          isConsultant
+                            ? "bg-indigo-100 text-indigo-700"
+                            : "bg-emerald-100 text-emerald-700"
+                        }`}
+                      >
+                        {initials}
+                      </div>
+                    )}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-sm font-semibold text-gray-900">
+                        <span className={`text-sm font-semibold ${isAI ? "text-indigo-700" : "text-gray-900"}`}>
                           {msg.author}
                         </span>
+                        {isAI && (
+                          <span className="text-[9px] font-semibold bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded">
+                            AI
+                          </span>
+                        )}
                         <span className="text-[11px] text-gray-400">
                           {relativeTime(msg.created_at)}
                         </span>
@@ -718,10 +858,31 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
                       <p className="text-sm text-gray-700 leading-relaxed mt-0.5">
                         {renderContent(msg.content)}
                       </p>
+                      {toolResults && toolResults.length > 0 && (
+                        <div className="mt-2 space-y-2">
+                          {toolResults.map((tr, j) => (
+                            <ToolResultCard key={j} result={tr} onNavigate={onNavigate} />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
               })}
+
+              {/* AI processing indicator */}
+              {aiProcessing && (
+                <div className="flex items-start gap-3 mt-4 bg-indigo-50/40 rounded-lg -mx-2 px-2 py-1">
+                  <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="flex items-center gap-2 py-2">
+                    <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />
+                    <span className="text-sm text-indigo-600 font-medium">Meridian AI is thinking...</span>
+                  </div>
+                </div>
+              )}
+
               <div ref={messagesEndRef} />
               {messages.length === 0 && (
                 <div className="text-center py-16">
@@ -744,6 +905,7 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
                     </span>
                   </div>
                   {filteredMembers.map((member, i) => {
+                    const isMeridianAI = member === "Meridian AI";
                     const initials = member
                       .split(" ")
                       .map((n) => n[0])
@@ -762,10 +924,21 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600 flex-shrink-0">
-                          {initials}
+                        {isMeridianAI ? (
+                          <div className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0">
+                            <Sparkles className="w-3 h-3 text-white" />
+                          </div>
+                        ) : (
+                          <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600 flex-shrink-0">
+                            {initials}
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <span>{member}</span>
+                          {isMeridianAI && (
+                            <span className="ml-1.5 text-[10px] text-indigo-500 font-medium">Ask AI to take action</span>
+                          )}
                         </div>
-                        {member}
                       </button>
                     );
                   })}
@@ -785,7 +958,7 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
                   }}
                   placeholder={`Message #${
                     selectedThread?.title || "general"
-                  }   ·   Type @ to mention`}
+                  }   ·   @ to mention  ·  @Meridian AI to assign tasks`}
                   className="flex-1 px-4 py-2.5 bg-transparent text-sm outline-none placeholder:text-gray-400"
                 />
                 <button

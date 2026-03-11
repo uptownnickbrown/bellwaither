@@ -331,6 +331,7 @@ class MessageCreate(BaseModel):
     role: str | None = None
     content: str
     mentions: list[str] | None = None
+    attachments: dict | list | None = None
 
 
 class MessageResponse(BaseModel):
@@ -340,6 +341,7 @@ class MessageResponse(BaseModel):
     role: str | None = None
     content: str
     mentions: list[str] | None = None
+    attachments: dict | list | None = None
     created_at: datetime
 
     class Config:

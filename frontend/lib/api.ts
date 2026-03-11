@@ -102,7 +102,7 @@ export const getThreads = (engId: string) => fetchApi<import("./types").MessageT
 export const createThread = (engId: string, data: { title: string; thread_type?: string }) =>
   fetchApi<import("./types").MessageThread>(`/engagements/${engId}/threads`, { method: "POST", body: JSON.stringify(data) });
 export const getMessages = (engId: string, threadId: string) => fetchApi<import("./types").Message[]>(`/engagements/${engId}/threads/${threadId}/messages`);
-export const sendMessage = (engId: string, threadId: string, data: { author: string; role?: string; content: string; mentions?: string[] }) =>
+export const sendMessage = (engId: string, threadId: string, data: { author: string; role?: string; content: string; mentions?: string[]; attachments?: Record<string, unknown> }) =>
   fetchApi<import("./types").Message>(`/engagements/${engId}/threads/${threadId}/messages`, { method: "POST", body: JSON.stringify(data) });
 
 // Copilot

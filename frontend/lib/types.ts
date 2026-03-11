@@ -193,6 +193,7 @@ export interface Message {
   role: string | null;
   content: string;
   mentions: string[] | null;
+  attachments: { tool_results?: CopilotToolResult[] } | null;
   created_at: string;
 }
 
