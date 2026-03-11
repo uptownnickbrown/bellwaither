@@ -1,23 +1,26 @@
 /**
  * End-to-end screenshot tour of Meridian (Lincoln Innovation Academy).
- * Run: npx playwright test screenshot_tour.mjs --headed  (or without --headed)
- * Or:  node screenshot_tour.mjs
+ * Run:  node screenshot_tour.mjs
  */
 
 import { chromium } from 'playwright-core';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SHOTS = path.join(__dirname, 'screenshots');
 const BASE = 'http://localhost:3000';
 
+// Ensure screenshots dir exists
+if (!fs.existsSync(SHOTS)) fs.mkdirSync(SHOTS, { recursive: true });
+
 async function delay(ms) {
   return new Promise(r => setTimeout(r, ms));
 }
 
 async function screenshot(page, name, fullPage = false) {
-  await delay(1500); // let renders settle
+  await delay(1800);
   await page.screenshot({
     path: path.join(SHOTS, `${name}.png`),
     fullPage,
@@ -25,142 +28,213 @@ async function screenshot(page, name, fullPage = false) {
   console.log(`  📸 ${name}.png`);
 }
 
+async function clickTab(page, pattern) {
+  const tab = page.locator('nav button').filter({ hasText: pattern }).first();
+  if (await tab.count() > 0) {
+    await tab.click();
+    await delay(1500);
+    return true;
+  }
+  return false;
+}
+
 (async () => {
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ headless: true, channel: 'chrome' });
   const context = await browser.newContext({
     viewport: { width: 1440, height: 900 },
   });
   const page = await context.newPage();
 
-  // ─── 1. Dashboard ────────────────────────────────────
-  console.log('\n1. Dashboard');
+  // ─── 1. CONSULTANT DASHBOARD ────────────────────────
+  console.log('\n1. Consultant Dashboard');
   await page.goto(BASE, { waitUntil: 'networkidle' });
-  await delay(2000);
+  await delay(2500);
   await screenshot(page, '01_dashboard');
 
-  // ─── 2. Framework Explorer ───────────────────────────
+  // Scroll down to capture below-fold content (Key Findings + Recent Evidence)
+  const mainContent = page.locator('main').first();
+  await mainContent.evaluate(el => el.scrollTo(0, el.scrollHeight));
+  await delay(1000);
+  await screenshot(page, '01b_dashboard_below_fold');
+  // Scroll back up
+  await mainContent.evaluate(el => el.scrollTo(0, 0));
+  await delay(500);
+
+  // ─── 2. FRAMEWORK EXPLORER ──────────────────────────
   console.log('\n2. Framework Explorer');
-  // Click Framework tab
-  const frameworkTab = page.locator('button, a, [role="tab"]').filter({ hasText: /framework/i }).first();
-  if (await frameworkTab.count() > 0) {
-    await frameworkTab.click();
-    await delay(2000);
-    await screenshot(page, '02_framework_overview');
+  await clickTab(page, /Framework/);
+  await screenshot(page, '02_framework_overview');
 
-    // Click on a dimension to expand
-    const dimension = page.locator('text=/Organizational/i').first();
-    if (await dimension.count() > 0) {
-      await dimension.click();
-      await delay(1500);
-      await screenshot(page, '03_framework_dimension_expanded');
-    }
-  }
-
-  // ─── 3. Evidence Management ──────────────────────────
-  console.log('\n3. Evidence Management');
-  const evidenceTab = page.locator('button, a, [role="tab"]').filter({ hasText: /evidence/i }).first();
-  if (await evidenceTab.count() > 0) {
-    await evidenceTab.click();
-    await delay(2000);
-    await screenshot(page, '04_evidence_list');
-  }
-
-  // ─── 4. Data Requests ────────────────────────────────
-  console.log('\n4. Data Requests');
-  const dataTab = page.locator('button, a, [role="tab"]').filter({ hasText: /data req/i }).first();
-  if (await dataTab.count() > 0) {
-    await dataTab.click();
-    await delay(2000);
-    await screenshot(page, '05_data_requests');
-  }
-
-  // ─── 5. Scoring ──────────────────────────────────────
-  console.log('\n5. Scoring');
-  const scoringTab = page.locator('button, a, [role="tab"]').filter({ hasText: /scor/i }).first();
-  if (await scoringTab.count() > 0) {
-    await scoringTab.click();
-    await delay(2000);
-    await screenshot(page, '06_scoring_overview');
-
-    // Click on a dimension to see component scores
-    const scoreDim = page.locator('text=/Purpose/i, text=/Academic/i, text=/Culture/i').first();
-    if (await scoreDim.count() > 0) {
-      await scoreDim.click();
-      await delay(2000);
-      await screenshot(page, '07_scoring_dimension_detail');
-    }
-  }
-
-  // ─── 6. Action Plan ─────────────────────────────────
-  console.log('\n6. Action Plan');
-  const actionTab = page.locator('button, a, [role="tab"]').filter({ hasText: /action/i }).first();
-  if (await actionTab.count() > 0) {
-    await actionTab.click();
-    await delay(2000);
-    await screenshot(page, '08_action_plan');
-  }
-
-  // ─── 7. Messaging ───────────────────────────────────
-  console.log('\n7. Messaging');
-  const messagingTab = page.locator('button, a, [role="tab"]').filter({ hasText: /messag/i }).first();
-  if (await messagingTab.count() > 0) {
-    await messagingTab.click();
-    await delay(2000);
-    await screenshot(page, '09_messaging');
-  }
-
-  // ─── 8. AI Copilot ──────────────────────────────────
-  console.log('\n8. AI Copilot');
-  // Go back to dashboard first
-  const dashTab = page.locator('button, a, [role="tab"]').filter({ hasText: /dashboard/i }).first();
-  if (await dashTab.count() > 0) {
-    await dashTab.click();
+  // Click first dimension in the left column
+  const dim1 = page.locator('text=/Organizational Purpose/i').first();
+  if (await dim1.count() > 0) {
+    await dim1.click();
     await delay(1500);
   }
+  // Click a specific component row (1A - Mission)
+  const comp1a = page.locator('text=/Mission, Vision, and Values/i').first();
+  if (await comp1a.count() > 0) {
+    await comp1a.click();
+    await delay(1500);
+    await screenshot(page, '02b_framework_component_detail');
+  }
 
-  // Look for copilot button / trigger
-  const copilotBtn = page.locator('button').filter({ hasText: /copilot|ask ai|ai assistant/i }).first();
+  // ─── 3. EVIDENCE REPOSITORY ─────────────────────────
+  console.log('\n3. Evidence Repository');
+  await clickTab(page, /Evidence/);
+  await screenshot(page, '03_evidence_list');
+
+  // Click first evidence item for detail
+  const evItem = page.locator('[class*="cursor-pointer"]').filter({ hasText: /Achievement|Strategic Plan|Budget|Survey/i }).first();
+  if (await evItem.count() > 0) {
+    await evItem.click();
+    await delay(1500);
+    await screenshot(page, '03b_evidence_detail');
+  }
+
+  // ─── 4. DATA REQUESTS ──────────────────────────────
+  console.log('\n4. Data Requests');
+  await clickTab(page, /Data Requests/);
+  await screenshot(page, '04_data_requests');
+
+  // Click a request with comments
+  const drItem = page.locator('[class*="cursor-pointer"]').filter({ hasText: /Discipline|Disagg|Curriculum/i }).first();
+  if (await drItem.count() > 0) {
+    await drItem.click();
+    await delay(1500);
+    await screenshot(page, '04b_data_request_detail');
+  }
+
+  // ─── 5. DIAGNOSTIC WORKSPACE ───────────────────────
+  console.log('\n5. Diagnostic Workspace');
+  await clickTab(page, /Diagnostic/);
+  await delay(2000);
+  await screenshot(page, '05_diagnostic_overview');
+
+  // Click on a dimension to expand
+  const scoreDim = page.locator('text=/Academic Program/i').first();
+  if (await scoreDim.count() > 0) {
+    await scoreDim.click();
+    await delay(1500);
+    await screenshot(page, '05b_diagnostic_expanded');
+  }
+
+  // Click a scored component to see detail
+  const scoredComp = page.locator('[class*="cursor-pointer"]').filter({ hasText: /Instruction|Curriculum/i }).first();
+  if (await scoredComp.count() > 0) {
+    await scoredComp.click();
+    await delay(1500);
+    await screenshot(page, '05c_diagnostic_component_detail');
+  }
+
+  // Switch to Dimensions tab
+  const dimTab = page.locator('button').filter({ hasText: /^Dimensions$/ }).first();
+  if (await dimTab.count() > 0) {
+    await dimTab.click();
+    await delay(1500);
+    await screenshot(page, '05d_dimension_synthesis');
+  }
+
+  // Switch to Executive Summary tab (was "Global Summary (Layer 4)")
+  const globalTab = page.locator('button').filter({ hasText: /Executive Summary/ }).first();
+  if (await globalTab.count() > 0) {
+    await globalTab.click();
+    await delay(1500);
+    await screenshot(page, '05e_executive_summary');
+  }
+
+  // ─── 6. ACTION PLAN ────────────────────────────────
+  console.log('\n6. Action Plan');
+  await clickTab(page, /Action Plan/);
+  await delay(1000);
+  await screenshot(page, '06_action_plan');
+
+  // Click first action item by matching the numbered card
+  const actionItem = page.locator('[class*="cursor-pointer"]').filter({ hasText: /Strengthen|Coaching/i }).first();
+  if (await actionItem.count() > 0) {
+    await actionItem.click();
+    await delay(1500);
+    await screenshot(page, '06b_action_plan_detail');
+  }
+
+  // ─── 7. MESSAGING ──────────────────────────────────
+  console.log('\n7. Messaging');
+  await clickTab(page, /Messages/);
+  await delay(2000);
+  await screenshot(page, '07_messaging');
+
+  // Click a data request thread if visible
+  const drThread = page.locator('text=/DR:|Data Request/i').first();
+  if (await drThread.count() > 0) {
+    await drThread.click();
+    await delay(1500);
+    await screenshot(page, '07b_messaging_dr_thread');
+  }
+
+  // Click back to a regular channel
+  const generalChannel = page.locator('text=/General/i').first();
+  if (await generalChannel.count() > 0) {
+    await generalChannel.click();
+    await delay(1000);
+  }
+
+  // ─── 8. ACTIVITY LOG ────────────────────────────────
+  console.log('\n8. Activity Log');
+  await clickTab(page, /Activity/);
+  await delay(1500);
+  await screenshot(page, '08_activity_log');
+
+  // ─── 9. AI COPILOT ─────────────────────────────────
+  console.log('\n9. AI Copilot');
+  await clickTab(page, /Dashboard/);
+  await delay(1000);
+
+  const copilotBtn = page.locator('button').filter({ hasText: /AI Copilot/i }).first();
   if (await copilotBtn.count() > 0) {
     await copilotBtn.click();
     await delay(1500);
-    await screenshot(page, '10_copilot_panel');
-  } else {
-    // Try looking for a floating action button or icon button
-    const fabBtn = page.locator('[aria-label*="copilot" i], [aria-label*="assistant" i], [title*="copilot" i]').first();
-    if (await fabBtn.count() > 0) {
-      await fabBtn.click();
-      await delay(1500);
-      await screenshot(page, '10_copilot_panel');
-    }
+    await screenshot(page, '09_copilot_panel');
   }
 
-  // ─── 9. Role Switcher ───────────────────────────────
-  console.log('\n9. Role Switcher');
-  // Look for the role toggle
-  const roleSwitch = page.locator('button, select, [role="switch"]').filter({ hasText: /school|admin|consultant|role/i }).first();
-  if (await roleSwitch.count() > 0) {
-    await roleSwitch.click();
-    await delay(2000);
-    await screenshot(page, '11_role_switched');
-  } else {
-    // Try toggle/switch elements
-    const toggle = page.locator('label:has(input[type="checkbox"]), [class*="toggle"], [class*="switch"]').first();
-    if (await toggle.count() > 0) {
-      await toggle.click();
-      await delay(2000);
-      await screenshot(page, '11_role_switched');
-    }
+  // ─── 10. SCHOOL ADMIN VIEW ──────────────────────────
+  console.log('\n10. School Admin View');
+  // Close copilot first if open
+  const closeCopilot = page.locator('button').filter({ hasText: /AI Copilot/i }).first();
+  if (await closeCopilot.count() > 0) {
+    await closeCopilot.click();
+    await delay(500);
   }
 
-  // ─── 10. Full page scroll captures ──────────────────
-  console.log('\n10. Full page captures');
-  // Go back to dashboard for a full-page shot
-  if (await dashTab.count() > 0) {
-    await dashTab.click();
+  // Switch to school admin
+  const schoolAdminBtn = page.locator('button').filter({ hasText: /School Admin/i }).first();
+  if (await schoolAdminBtn.count() > 0) {
+    await schoolAdminBtn.click();
     await delay(2000);
-    await screenshot(page, '12_dashboard_full', true);
+    await screenshot(page, '10_admin_dashboard');
+
+    // Scroll to show the full admin dashboard
+    await mainContent.evaluate(el => el.scrollTo(0, el.scrollHeight));
+    await delay(1000);
+    await screenshot(page, '10b_admin_dashboard_lower');
+    await mainContent.evaluate(el => el.scrollTo(0, 0));
+    await delay(500);
+
+    // Admin scoring view
+    await clickTab(page, /Diagnostic|Assessment/);
+    await delay(1500);
+    await screenshot(page, '10c_admin_scoring');
+
+    // Admin data requests
+    await clickTab(page, /Data Requests/);
+    await delay(1500);
+    await screenshot(page, '10d_admin_data_requests');
+
+    // Admin messages
+    await clickTab(page, /Messages/);
+    await delay(1500);
+    await screenshot(page, '10e_admin_messages');
   }
 
   await browser.close();
-  console.log(`\nDone! Screenshots saved to ${SHOTS}/`);
+  console.log(`\n✅ Done! Screenshots saved to ${SHOTS}/`);
 })();
