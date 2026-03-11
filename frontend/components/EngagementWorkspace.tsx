@@ -77,7 +77,15 @@ export default function EngagementWorkspace({ engagement, framework, engagements
       <header className="bg-white border-b border-gray-200 px-6 h-14 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <Compass className="w-6 h-6 text-indigo-600" />
+            <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
+              <circle cx="16" cy="16" r="14.5" fill="#4F46E5" stroke="#4338CA" strokeWidth="1"/>
+              <g transform="translate(16,16) rotate(45)">
+                <rect x="-7" y="-7" width="14" height="14" rx="2.5" fill="none" stroke="white" strokeWidth="2"/>
+                <line x1="0" y1="-7" x2="0" y2="7" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                <line x1="-7" y1="0" x2="7" y2="0" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                <circle cx="0" cy="-3.5" r="1.5" fill="white"/>
+              </g>
+            </svg>
             <span className="font-bold text-lg text-gray-900 tracking-tight">Meridian</span>
           </div>
           <div className="w-px h-6 bg-gray-200" />
