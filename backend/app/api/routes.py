@@ -495,7 +495,10 @@ async def toggle_score_approval(
         raise HTTPException(status_code=404, detail="Score not found")
     score.approved = data.approved
     if data.approved:
+        score.status = "confirmed"
         score.reviewed_at = datetime.utcnow()
+    else:
+        score.status = "draft"
     # Get component name for activity log
     comp_result = await db.execute(select(Component).where(Component.id == score.component_id))
     comp = comp_result.scalar_one_or_none()
