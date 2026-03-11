@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import type { Engagement, Dimension, UserRole } from "@/lib/types";
+import { getThreads } from "@/lib/api";
 import {
   Compass, LayoutDashboard, FileText, ClipboardList,
   Target, BarChart3, MessageSquare, Sparkles,
-  ChevronDown, School, Users,
+  ChevronDown, School, Users, Activity,
 } from "lucide-react";
 import DashboardView from "./views/DashboardView";
 import FrameworkView from "./views/FrameworkView";
@@ -14,9 +15,10 @@ import DataRequestsView from "./views/DataRequestsView";
 import ScoringView from "./views/ScoringView";
 import ActionPlanView from "./views/ActionPlanView";
 import MessagingView from "./views/MessagingView";
+import ActivityView from "./views/ActivityView";
 import CopilotPanel from "./CopilotPanel";
 
-type Tab = "dashboard" | "framework" | "evidence" | "requests" | "scoring" | "actions" | "messages";
+type Tab = "dashboard" | "framework" | "evidence" | "requests" | "scoring" | "actions" | "messages" | "activity";
 
 const TABS: { key: Tab; label: string; icon: React.ElementType }[] = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -26,6 +28,7 @@ const TABS: { key: Tab; label: string; icon: React.ElementType }[] = [
   { key: "scoring", label: "Diagnostic", icon: BarChart3 },
   { key: "actions", label: "Action Plan", icon: Target },
   { key: "messages", label: "Messages", icon: MessageSquare },
+  { key: "activity", label: "Activity", icon: Activity },
 ];
 
 interface Props {
@@ -40,15 +43,38 @@ export default function EngagementWorkspace({ engagement, framework, engagements
   const [role, setRole] = useState<UserRole>("consultant");
   const [copilotOpen, setCopilotOpen] = useState(false);
   const [engDropdownOpen, setEngDropdownOpen] = useState(false);
+  const [navTargetId, setNavTargetId] = useState<string | null>(null);
+  const [messageCount, setMessageCount] = useState(0);
+
+  // Fetch message thread counts for badge
+  useEffect(() => {
+    let mounted = true;
+    const fetchCounts = async () => {
+      try {
+        const threads = await getThreads(engagement.id);
+        const total = threads.reduce((sum, t) => sum + (t.message_count || 0), 0);
+        if (mounted) setMessageCount(total);
+      } catch { /* ignore */ }
+    };
+    fetchCounts();
+    const interval = setInterval(fetchCounts, 30000);
+    return () => { mounted = false; clearInterval(interval); };
+  }, [engagement.id]);
+
+  const navigateTo = useCallback((tab: string, id?: string) => {
+    setActiveTab(tab as Tab);
+    setNavTargetId(id || null);
+  }, []);
 
   const currentUser = role === "consultant"
     ? { name: "Sarah Chen", role: "Lead Consultant" }
     : { name: "Dr. Angela Rivera", role: "School Leader" };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAFBFC]">
-      {/* Top Bar */}
-      <header className="bg-white border-b border-gray-200 px-6 h-14 flex items-center justify-between flex-shrink-0 z-30">
+    <div className="h-screen flex flex-col bg-[#FAFBFC] overflow-hidden">
+      {/* Top Bar + Tab Navigation: sticky so they remain visible when scrolling */}
+      <div className="sticky top-0 z-30 flex-shrink-0">
+      <header className="bg-white border-b border-gray-200 px-6 h-14 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Compass className="w-6 h-6 text-indigo-600" />
@@ -133,7 +159,7 @@ export default function EngagementWorkspace({ engagement, framework, engagements
       </header>
 
       {/* Tab Navigation */}
-      <nav className="bg-white border-b border-gray-200 px-6 flex-shrink-0">
+      <nav className="bg-white border-b border-gray-200 px-6">
         <div className="flex gap-1">
           {TABS.map(({ key, label, icon: Icon }) => (
             <button
@@ -147,21 +173,28 @@ export default function EngagementWorkspace({ engagement, framework, engagements
             >
               <Icon className="w-4 h-4" />
               {label}
+              {key === "messages" && messageCount > 0 && (
+                <span className="ml-1 px-1.5 py-0.5 text-[10px] font-semibold bg-indigo-100 text-indigo-700 rounded-full">
+                  {messageCount}
+                </span>
+              )}
             </button>
           ))}
         </div>
       </nav>
+      </div>
 
       {/* Content Area */}
       <div className="flex flex-1 overflow-hidden">
         <main className={`flex-1 overflow-y-auto p-6 ${copilotOpen ? "" : ""}`}>
-          {activeTab === "dashboard" && <DashboardView engagement={engagement} framework={framework} />}
-          {activeTab === "framework" && <FrameworkView framework={framework} engagementId={engagement.id} />}
-          {activeTab === "evidence" && <EvidenceView engagementId={engagement.id} role={role} />}
-          {activeTab === "requests" && <DataRequestsView engagementId={engagement.id} role={role} />}
-          {activeTab === "scoring" && <ScoringView engagementId={engagement.id} framework={framework} />}
-          {activeTab === "actions" && <ActionPlanView engagementId={engagement.id} />}
-          {activeTab === "messages" && <MessagingView engagementId={engagement.id} role={role} />}
+          {activeTab === "dashboard" && <DashboardView engagement={engagement} framework={framework} role={role} onNavigate={navigateTo} />}
+          {activeTab === "framework" && <FrameworkView framework={framework} engagementId={engagement.id} role={role} onNavigate={navigateTo} navTargetId={navTargetId} onNavTargetConsumed={() => setNavTargetId(null)} />}
+          {activeTab === "evidence" && <EvidenceView engagementId={engagement.id} role={role} onNavigate={navigateTo} navTargetId={navTargetId} onNavTargetConsumed={() => setNavTargetId(null)} />}
+          {activeTab === "requests" && <DataRequestsView engagementId={engagement.id} role={role} onNavigate={navigateTo} navTargetId={navTargetId} onNavTargetConsumed={() => setNavTargetId(null)} />}
+          {activeTab === "scoring" && <ScoringView engagementId={engagement.id} framework={framework} role={role} onNavigate={navigateTo} navTargetId={navTargetId} onNavTargetConsumed={() => setNavTargetId(null)} />}
+          {activeTab === "actions" && <ActionPlanView engagementId={engagement.id} role={role} onNavigate={navigateTo} navTargetId={navTargetId} onNavTargetConsumed={() => setNavTargetId(null)} />}
+          {activeTab === "messages" && <MessagingView engagementId={engagement.id} role={role} onNavigate={navigateTo} navTargetId={navTargetId} onNavTargetConsumed={() => setNavTargetId(null)} />}
+          {activeTab === "activity" && <ActivityView engagementId={engagement.id} role={role} />}
         </main>
 
         {/* Copilot Panel */}
@@ -172,6 +205,7 @@ export default function EngagementWorkspace({ engagement, framework, engagements
             context={activeTab}
             role={role}
             onClose={() => setCopilotOpen(false)}
+            onNavigate={navigateTo}
           />
         )}
       </div>

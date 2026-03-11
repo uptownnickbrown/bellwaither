@@ -12,6 +12,7 @@ from app.models.engagement import Engagement, EngagementMember, EngagementRole, 
 from app.models.evidence import Evidence, EvidenceExtraction, EvidenceMapping, EvidenceType, ProcessingStatus
 from app.models.framework import Component, CriterionType, Dimension, SuccessCriterion
 from app.models.messaging import Message, MessageThread, ThreadType
+from app.models.activity import ActivityLog
 from app.models.scoring import ComponentScore, RatingLevel, ScoreStatus
 
 # Fixed UUIDs for demo data consistency
@@ -1004,16 +1005,16 @@ async def seed_demo_engagement():
 
         action_items = [
             ("Strengthen Instructional Coaching and PD System", "Implement structured coaching cycles with clear protocols, observation cadence, and differentiated PD based on teacher needs and observation data.",
-             comps.get("4D"), "Dr. Angela Rivera", "1", ItemStatus.NOT_STARTED,
+             comps.get("4D"), "Dr. Angela Rivera", "1", ItemStatus.IN_PROGRESS,
              "Observation data shows average quality of 2.8/4.0 with significant gaps in differentiation (2.3) and higher-order questioning (2.4). Principal identifies PD as inconsistent."),
             ("Develop Formal Family Engagement Strategy", "Create and implement a comprehensive family engagement strategy with equity focus, including bilingual communication systems and diverse involvement opportunities.",
-             comps.get("6A"), "Dr. Angela Rivera", "2", ItemStatus.NOT_STARTED,
+             comps.get("6A"), "Marcus Johnson", "2", ItemStatus.NOT_STARTED,
              "Family survey shows communication satisfaction at 64% and involvement opportunities at 58%. 11-point satisfaction gap for Spanish-speaking families."),
             ("Build Cash Reserves and Diversify Revenue", "Develop a 2-year plan to increase cash reserves from 45 to 60+ days and reduce revenue concentration risk through grant strategy and fundraising.",
-             comps.get("9A"), "Tom Nakamura", "3", ItemStatus.NOT_STARTED,
+             comps.get("9A"), "Tom Nakamura", "3", ItemStatus.IN_PROGRESS,
              "Cash reserves at 45 days vs 60-day best practice. 96% revenue from per-pupil funding creates concentration risk. Grant funding declining 15%."),
             ("Address Math Achievement Gap", "Evaluate current math curriculum and intervention programs, develop targeted improvement plan for math instruction with focus on EL students and students with disabilities.",
-             comps.get("2A"), "Dr. Angela Rivera", "4", ItemStatus.NOT_STARTED,
+             comps.get("2A"), "Dr. Angela Rivera", "4", ItemStatus.COMPLETED,
              "Math proficiency flat at 38% over 3 years. Growth percentile at 44th. Significant gaps for EL students (math data not disaggregated in current evidence). Principal identifies math as top academic concern."),
             ("Improve Teacher Retention Equity", "Investigate and address retention gaps for STEM teachers (68%), first-year teachers (65%), and teachers of color (76% vs 88%).",
              comps.get("4B"), "Dr. Angela Rivera", "5", ItemStatus.NOT_STARTED,
@@ -1057,5 +1058,76 @@ async def seed_demo_engagement():
         ]
         for m in general_messages:
             db.add(m)
+
+        # Document Review channel
+        doc_review_thread = MessageThread(
+            engagement_id=ENGAGEMENT_ID,
+            thread_type=ThreadType.GENERAL,
+            title="Document Review",
+        )
+        db.add(doc_review_thread)
+        await db.flush()
+
+        doc_review_messages = [
+            Message(thread_id=doc_review_thread.id, author="Marcus Johnson", role="consultant",
+                    content="I've started reviewing the uploaded evidence. The strategic plan document is solid - clear goals and measurable outcomes. However, the budget spreadsheet seems to be missing the personnel line items. @Tom can you check on that?",
+                    mentions=["Tom Nakamura"]),
+            Message(thread_id=doc_review_thread.id, author="Tom Nakamura", role="school_admin",
+                    content="Good catch - I think the version I uploaded was the summary view. Let me re-export with full detail including personnel costs and benefits."),
+            Message(thread_id=doc_review_thread.id, author="Sarah Chen", role="consultant",
+                    content="Also noting that the PD agendas we received only cover Q1. @Dr. Angela Rivera, do you have agendas from Q2-Q3 as well? Those would help us see if there's been progression in the PD focus areas.",
+                    mentions=["Dr. Angela Rivera"]),
+            Message(thread_id=doc_review_thread.id, author="Dr. Angela Rivera", role="school_leader",
+                    content="Yes, I'll ask our PD coordinator to compile the remaining agendas. We shifted our PD focus mid-year so the Q2-Q3 sessions look quite different from Q1 - which is actually a good thing."),
+        ]
+        for m in doc_review_messages:
+            db.add(m)
+
+        # Leadership Team Prep channel
+        leadership_thread = MessageThread(
+            engagement_id=ENGAGEMENT_ID,
+            thread_type=ThreadType.GENERAL,
+            title="Leadership Team Prep",
+        )
+        db.add(leadership_thread)
+        await db.flush()
+
+        leadership_messages = [
+            Message(thread_id=leadership_thread.id, author="Sarah Chen", role="consultant",
+                    content="Wanted to start a thread about preparing for the on-site visit. We're tentatively looking at the week of April 14th. @Dr. Angela Rivera, does that work for your leadership team's schedule?",
+                    mentions=["Dr. Angela Rivera"]),
+            Message(thread_id=leadership_thread.id, author="Dr. Angela Rivera", role="school_leader",
+                    content="April 14th week should work. I'll confirm with our assistant principals and instructional coaches. Should we plan for a full day or multiple half-days?"),
+            Message(thread_id=leadership_thread.id, author="Sarah Chen", role="consultant",
+                    content="I'd recommend two full days if possible. Day 1 for classroom observations and teacher focus groups. Day 2 for leadership interviews, document review, and a preliminary debrief. @Marcus can you draft the observation protocol?",
+                    mentions=["Marcus Johnson"]),
+            Message(thread_id=leadership_thread.id, author="Marcus Johnson", role="consultant",
+                    content="Will do. I'll base it on the SQF instructional quality indicators from Dimension 2. Should have a draft ready by next Monday for team review."),
+            Message(thread_id=leadership_thread.id, author="Tom Nakamura", role="school_admin",
+                    content="I'll coordinate logistics on our end - visitor badges, room reservations for interviews, and making sure the master schedule is updated so you can plan observations efficiently."),
+        ]
+        for m in leadership_messages:
+            db.add(m)
+
+        # Seed activity log entries
+        now = datetime.utcnow()
+        activity_entries = [
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="engagement", target_label="Lincoln Innovation Academy - SQF Assessment", created_at=now - timedelta(hours=6)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Student Achievement Data 2022-2025", detail="AI extracted 7 key findings", created_at=now - timedelta(hours=5, minutes=45)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="School Leader Interview Transcript", detail="AI extracted 8 key findings", created_at=now - timedelta(hours=5, minutes=40)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="Board Meeting Minutes Sep-Dec 2025", detail="AI extracted 5 key findings", created_at=now - timedelta(hours=5, minutes=30)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Classroom Observation Summary Report Q1 2025", detail="AI extracted 6 key findings", created_at=now - timedelta(hours=5, minutes=20)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="2024-25 Annual Budget and Actuals", detail="AI extracted 4 key findings", created_at=now - timedelta(hours=5, minutes=10)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="AI System", action="scored", target_type="component_score", target_label="1A: Mission, Vision, and Values", detail="Rated as Developing (low confidence)", created_at=now - timedelta(hours=4)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="AI System", action="scored", target_type="component_score", target_label="2A: Academic Vision and Design", detail="Rated as Developing (medium confidence)", created_at=now - timedelta(hours=3, minutes=55)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="AI System", action="scored", target_type="component_score", target_label="2C: Instruction", detail="Rated as Developing (medium confidence)", created_at=now - timedelta(hours=3, minutes=50)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="AI System", action="generated", target_type="dimension_summary", target_label="1. Organizational Purpose", created_at=now - timedelta(hours=3)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="AI System", action="generated", target_type="global_summary", target_label="Executive Summary", created_at=now - timedelta(hours=2, minutes=30)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="data_request", target_label="Disaggregated Discipline Data 2024-25", detail="Assigned to Tom Nakamura (High priority)", created_at=now - timedelta(hours=2)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="action_item", target_label="Strengthen Instructional Coaching and PD System", detail="Priority 1 - Owner: Dr. Angela Rivera", created_at=now - timedelta(hours=1, minutes=30)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="edited", target_type="component_score", target_label="2A: Academic Vision and Design", detail="Updated rationale text", created_at=now - timedelta(minutes=45)),
+        ]
+        for a in activity_entries:
+            db.add(a)
 
         await db.commit()
