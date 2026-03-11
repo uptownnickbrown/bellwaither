@@ -1,0 +1,31 @@
+Student_ID,Grade,Tier,Subject,Intervention_Program,Start_Date,Weeks_in_Intervention,Sessions_Per_Week,Minutes_Per_Session,Fall_Benchmark_Score,Fall_Percentile,Winter_Benchmark_Score,Winter_Percentile,Growth_Points,Growth_Target,Meeting_Growth_Target,Progress_Monitoring_Frequency,Most_Recent_PM_Score,PM_Trend,Staff_Provider,Next_Steps
+STU-101,K,Tier 2,Reading,Fundations Small Group,2024-09-16,20,3,20,112,15,120,22,8,6,Yes,Biweekly,122,Improving,Ms. Walsh,Continue Tier 2; reassess in spring
+STU-102,K,Tier 3,Reading,Fundations Intensive + Lexia,2024-09-16,20,5,30,98,5,106,8,8,10,No,Weekly,108,Flat,Ms. Walsh,Refer to MTSS team for evaluation discussion
+STU-103,1,Tier 2,Reading,Guided Reading + Lexia Core5,2024-09-23,19,3,20,148,18,156,24,8,6,Yes,Biweekly,158,Improving,Ms. Mitchell,Continue Tier 2; strong progress
+STU-104,1,Tier 2,Reading,Guided Reading + Lexia Core5,2024-09-23,19,3,20,145,14,150,18,5,6,No,Biweekly,151,Slow Growth,Ms. Mitchell,Increase to Tier 3; add phonics intervention
+STU-105,1,Tier 3,Reading,Wilson Reading System,2024-10-07,17,4,30,132,5,140,8,8,10,No,Weekly,142,Improving,Ms. Walsh,Continue Tier 3; showing acceleration
+STU-106,2,Tier 2,Reading,Guided Reading Groups,2024-09-16,20,3,20,168,20,176,25,8,6,Yes,Biweekly,178,Improving,Ms. Mitchell,Reassess for possible exit from Tier 2
+STU-107,2,Tier 2,Math,Do The Math (Marilyn Burns),2024-09-16,20,3,20,172,16,178,20,6,6,Yes,Biweekly,179,Improving,Mr. Okafor,Continue Tier 2; focus on fact fluency
+STU-108,2,Tier 3,Reading,Orton-Gillingham Approach,2024-09-09,21,5,30,155,6,162,10,7,10,No,Weekly,163,Slow Growth,Ms. Walsh,SpEd evaluation initiated Jan 2025
+STU-109,3,Tier 2,Reading,Collaborative Guided Reading,2024-09-16,20,3,20,182,18,190,23,8,6,Yes,Biweekly,192,Improving,Ms. Mitchell,Strong response to intervention
+STU-110,3,Tier 2,Math,Number Talks + Strategic Practice,2024-09-23,19,3,20,188,15,193,18,5,6,No,Biweekly,194,Slow Growth,Mr. Okafor,Add DreamBox targeted practice; reassess in 6 weeks
+STU-111,3,Tier 3,Reading,Wilson Reading System,2024-09-09,21,5,30,170,7,176,10,6,10,No,Weekly,177,Slow Growth,Ms. Walsh,Currently being evaluated for SpEd
+STU-112,3,Tier 2,Reading,Vocabulary and Comprehension Group,2024-10-07,17,3,20,186,20,194,26,8,6,Yes,Biweekly,196,Improving,Ms. Mitchell,Continue; adding writing component
+STU-113,4,Tier 2,Math,Fraction Intervention (Conceptual),2024-09-23,19,3,20,196,18,202,22,6,6,Yes,Biweekly,203,Improving,Mr. Okafor,Continue through fractions unit completion
+STU-114,4,Tier 2,Reading,Comprehension Strategy Group,2024-09-16,20,3,20,192,16,198,20,6,6,Yes,Biweekly,200,Improving,Ms. Mitchell,Approaching exit criteria
+STU-115,4,Tier 3,Math,Touch Math + Concrete Models,2024-09-09,21,4,30,182,6,188,9,6,10,No,Weekly,189,Slow Growth,Mr. Hernandez D.,Has IEP; adjusting goals at annual review
+STU-116,5,Tier 2,Reading,Close Reading Groups,2024-09-23,19,3,20,200,17,207,22,7,6,Yes,Biweekly,209,Improving,Ms. Mitchell,Continue; focus shifting to inference
+STU-117,5,Tier 2,Math,Problem Solving Strategies,2024-09-23,19,3,20,205,15,209,18,4,6,No,Biweekly,210,Flat,Mr. Okafor,Increase session frequency; add manipulatives
+STU-118,5,Tier 3,Reading,Lexia Core5 + 1:1 Tutoring,2024-09-09,21,5,30,188,6,195,9,7,10,No,Weekly,196,Improving,Ms. Walsh,Has IEP; showing growth but gaps remain
+STU-119,6,Tier 2,Reading,Newsela Guided Practice,2024-09-16,20,3,20,208,18,215,23,7,6,Yes,Biweekly,217,Improving,Ms. Mitchell,Continue; strong engagement with Newsela platform
+STU-120,6,Tier 2,Math,Pre-Teaching Key Concepts,2024-09-23,19,3,20,214,16,218,19,4,6,No,Biweekly,219,Slow Growth,Mr. Okafor,Switch to more structured intervention; check prerequisite skills
+STU-121,6,Tier 3,Reading,Intensive Decoding + Fluency,2024-09-09,21,4,30,195,5,202,8,7,10,No,Weekly,204,Improving,Mr. Hernandez D.,Has IEP; showing promising acceleration
+STU-122,7,Tier 2,Math,Algebra Readiness,2024-09-23,19,3,20,220,15,225,18,5,6,No,Biweekly,226,Slow Growth,Mr. Okafor,Add Khan Academy targeted practice
+STU-123,7,Tier 2,Reading,Academic Vocabulary + Comprehension,2024-09-16,20,3,20,214,17,221,22,7,6,Yes,Biweekly,223,Improving,Ms. Mitchell,Continue; student engagement improving
+STU-124,7,Tier 3,Math,Intensive Computation + Word Problems,2024-09-09,21,4,30,208,5,214,8,6,10,No,Weekly,215,Slow Growth,Mr. Hernandez D.,Has IEP; considering additional testing for math LD
+STU-125,8,Tier 2,Reading,Close Reading + Text Analysis,2024-09-23,19,3,20,220,16,226,20,6,6,Yes,Biweekly,228,Improving,Ms. Mitchell,Focus on high school readiness skills
+STU-126,8,Tier 2,Math,Pre-Algebra Concepts,2024-09-23,19,3,20,225,15,229,18,4,6,No,Biweekly,230,Slow Growth,Mr. Okafor,Intensify; high school math readiness concern
+STU-127,8,Tier 3,Reading,Intensive Fluency + Comprehension,2024-09-09,21,4,30,205,5,212,8,7,10,No,Weekly,213,Improving,Mr. Hernandez D.,Has IEP; transition planning includes reading support recommendation for HS
+STU-128,K,Tier 2,Math,Number Sense Intervention,2024-10-07,17,3,20,118,18,126,24,8,6,Yes,Biweekly,128,Improving,Mr. Okafor,Strong response; may exit Tier 2 in spring
+STU-129,3,Tier 2,Math,Multiplication Fluency,2024-10-14,16,3,20,184,16,190,20,6,5,Yes,Biweekly,192,Improving,Mr. Okafor,Continue through multiplication mastery
+STU-130,6,Tier 2,Math,Ratio and Proportion Support,2024-10-21,15,3,20,212,17,218,22,6,5,Yes,Biweekly,219,Improving,Mr. Okafor,Targeted support working well

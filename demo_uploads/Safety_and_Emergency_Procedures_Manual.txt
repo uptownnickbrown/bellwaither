@@ -1,0 +1,386 @@
+LINCOLN INNOVATION ACADEMY
+SAFETY AND EMERGENCY PROCEDURES MANUAL
+2024-2025 School Year
+
+Last Updated: August 2024
+Safety Coordinator: Operations Manager, Derek Olson
+Building Administrator: Dr. Angela Rivera, Principal
+Emergency Contact: 911 | Non-Emergency: (651) 555-0147
+
+====================================================================
+TABLE OF CONTENTS
+====================================================================
+
+1. General Safety Protocols
+2. Emergency Communication
+3. Fire Emergency / Evacuation
+4. Lockdown Procedures
+5. Severe Weather / Tornado
+6. Medical Emergency
+7. Hazardous Materials
+8. Bomb Threat
+9. Active Threat
+10. Reunification Procedures
+11. Drill Schedule and Documentation
+12. Staff Roles and Responsibilities
+13. Building Security
+14. Visitor Management
+
+====================================================================
+1. GENERAL SAFETY PROTOCOLS
+====================================================================
+
+Lincoln Innovation Academy is committed to providing a safe and secure learning environment for all students, staff, and visitors. All staff members are responsible for maintaining awareness of safety procedures and participating in all required training and drills.
+
+Key principles:
+- Safety is everyone's responsibility
+- When in doubt, report concerns to administration immediately
+- Follow established protocols; do not improvise unless lives are at immediate risk
+- Account for all students at all times during emergency situations
+- Maintain calm, clear communication
+
+All staff complete the following safety training annually:
+- Emergency procedures overview (August professional development)
+- CPR/First Aid certification (required for all classroom teachers; provided biannually)
+- Mandatory reporter training (required by Minnesota law)
+- Blood-borne pathogen training
+- De-escalation and crisis intervention (CPI training for identified staff)
+
+====================================================================
+2. EMERGENCY COMMUNICATION
+====================================================================
+
+INTERNAL COMMUNICATION:
+- Primary: Intercom/PA system (all classrooms and common areas)
+- Secondary: Two-way radios (administration, office staff, custodial, specials teachers)
+- Tertiary: Cell phones (text-based group message via admin team group)
+- Silent alert: Email with subject line "EMERGENCY" sent from front office
+
+Code language for PA announcements:
+- "Code Red" = Lockdown (threat inside building)
+- "Code Yellow" = Lockout (threat outside building, secure perimeter)
+- "Code Green" = Evacuation
+- "Code Blue" = Medical emergency (location will be specified)
+- "Code Gray" = Severe weather shelter
+
+EXTERNAL COMMUNICATION:
+- 911 called immediately for any life-threatening emergency
+- ParentSquare: Mass notification to all families (text, email, app notification)
+- School website: Updated with information during extended emergencies
+- Social media: Official updates posted only by principal or designee
+- Media inquiries: Directed to principal only; no staff should speak to media
+
+FAMILY REUNIFICATION NOTIFICATION:
+- ParentSquare message with reunification site location and procedures
+- Families directed NOT to come to school building during active emergencies
+- Reunification site: Grace Lutheran Church, 1247 Elm Street (0.3 miles from school)
+- Secondary site: Roosevelt Community Center, 890 Oak Avenue (0.5 miles from school)
+
+====================================================================
+3. FIRE EMERGENCY / EVACUATION
+====================================================================
+
+SIGNAL: Continuous fire alarm (horn and strobe lights)
+
+PROCEDURES:
+1. Teacher: Grab red emergency folder (contains class roster, emergency contacts, first aid supplies)
+2. Students line up immediately; no personal belongings
+3. Exit building using designated route posted by classroom door
+4. Teacher is LAST person out; close door behind you (do not lock)
+5. Proceed to designated assembly area on field (minimum 300 feet from building)
+6. Teacher: Take attendance using roster; report ANY missing students immediately to grade-level lead
+7. Grade-level leads report to principal at command post
+8. Remain at assembly area until "ALL CLEAR" announcement
+
+EVACUATION ROUTES:
+- K-2 classrooms (Wing A): Exit through Door A1 (east), assemble at east field
+- 3-5 classrooms (Wing B): Exit through Door B1 (south), assemble at south parking lot
+- 6-8 classrooms (Wing C): Exit through Door C1 (west), assemble at west field
+- Office/Common areas: Exit through main entrance (north), assemble at front sidewalk
+- Cafeteria: Exit through cafeteria emergency exit (south), assemble at south parking lot
+- Gymnasium: Exit through gym emergency exit (east), assemble at east field
+
+STUDENTS WITH MOBILITY NEEDS:
+- Evacuation chairs stationed at top of each stairwell
+- Designated staff trained on evacuation chair operation:
+  * Wing A: Derek Olson (custodial) and Ms. Patel (1st grade)
+  * Wing C: Mr. Foster (8th grade) and Marcus Johnson (para)
+- Students with mobility needs have individualized evacuation plans on file
+
+====================================================================
+4. LOCKDOWN PROCEDURES (Code Red)
+====================================================================
+
+SIGNAL: PA announcement "Code Red, Code Red, Code Red" followed by location if known
+
+Used when: Threat is INSIDE the building
+
+PROCEDURES:
+1. LOCKS: Lock classroom door immediately
+2. LIGHTS: Turn off lights
+3. OUT OF SIGHT: Move students away from doors and windows to designated safe corner
+4. QUIET: Maintain silence; silence all cell phones
+5. Teacher: Take attendance silently; note any missing or extra students
+6. Do NOT open door for anyone until "ALL CLEAR" from administration or law enforcement
+7. Cover door window if possible
+8. If students are in hallway: Enter nearest room immediately
+9. If students are in restroom: Lock stall, stand on toilet, remain silent
+10. If outside: Do NOT re-enter building; move to off-site evacuation point
+
+ADMINISTRATION:
+- Call 911 immediately
+- Lock exterior doors remotely (office can engage magnetic locks)
+- Send ParentSquare notification to families
+- Direct law enforcement upon arrival
+
+SPECIAL CONSIDERATIONS:
+- Cafeteria: Kitchen staff lock kitchen doors; students shelter in place in cafeteria with staff
+- Gymnasium: Coach locks exterior doors; students move to locker rooms
+- Playground: Staff move students to Grace Lutheran Church (reunification site); do NOT re-enter building
+
+====================================================================
+5. SEVERE WEATHER / TORNADO (Code Gray)
+====================================================================
+
+SIGNAL: PA announcement "Code Gray, Code Gray, Code Gray"
+
+SHELTER LOCATIONS (interior rooms, lowest floor, away from windows):
+- K-2: Hallway A (interior corridor), students sit against wall in tornado position
+- 3-5: Hallway B (interior corridor), students sit against wall in tornado position
+- 6-8: Lower level corridor near gym locker rooms
+- Office staff: Interior conference room
+- Cafeteria: Students move to lower level corridor
+
+PROCEDURES:
+1. Move students quickly and calmly to shelter location
+2. Students assume tornado position: sitting, facing wall, hands over head and neck
+3. Teacher: Bring red emergency folder and take attendance
+4. Close all doors between shelter area and exterior rooms
+5. Stay away from windows, skylights, and exterior doors
+6. Remain in shelter until "ALL CLEAR" from administration
+
+TORNADO WATCH vs. WARNING:
+- Watch: Be prepared. Review shelter locations with students. Monitor weather radio.
+- Warning: Immediately execute Code Gray procedures. Do not wait for PA announcement if tornado is visible.
+
+Weather monitoring: NOAA weather radio in main office (always on during severe weather season, March-September). Derek Olson monitors weather alerts and notifies principal.
+
+====================================================================
+6. MEDICAL EMERGENCY (Code Blue)
+====================================================================
+
+PROCEDURES:
+1. Assess scene safety; do not move injured person unless in immediate danger
+2. Call front office: "Code Blue in [location]"
+3. Office calls 911 if needed and dispatches trained staff to location
+4. Certified staff begin first aid/CPR as needed
+5. Send other students away from scene with another adult
+6. Retrieve AED if cardiac emergency (AED locations: main office, gymnasium, cafeteria)
+7. Designate someone to meet ambulance at main entrance and guide to location
+8. Notify parent/guardian immediately
+9. Document incident on medical incident form within 24 hours
+
+LIFE-THREATENING ALLERGIES:
+- 14 students have life-threatening allergies (list maintained by school nurse and in each teacher's emergency folder)
+- EpiPens: Student-specific EpiPens stored in nurse's office and classroom teacher's emergency kit
+- All staff trained on EpiPen administration during August PD
+- Nut-aware school: No nut products in K-2 classrooms; nut-free table in cafeteria
+
+SEIZURE PROTOCOL:
+- 3 students with seizure disorders (action plans in emergency folders)
+- Time the seizure; call office if >3 minutes or first-time seizure
+- Clear area around student; do not restrain; place on side after seizure ends
+- Follow individual student seizure action plan
+
+====================================================================
+7. HAZARDOUS MATERIALS
+====================================================================
+
+If chemical spill or hazardous material release is reported:
+1. Evacuate affected area immediately
+2. Notify office; office calls 911
+3. If INDOOR spill: Evacuate building (Code Green)
+4. If OUTDOOR release: Shelter in place (close windows, shut off HVAC if possible)
+5. Do not attempt to clean up unknown substances
+6. Account for all students
+7. Follow direction of fire department HazMat team upon arrival
+
+Chemical storage: All cleaning chemicals stored in locked custodial closet. Science lab chemicals stored in locked cabinet with inventory list. MSDS sheets available in custodial office and science lab.
+
+====================================================================
+8. BOMB THREAT
+====================================================================
+
+If threat received by phone:
+1. Keep caller on line as long as possible
+2. Note exact words, background sounds, caller characteristics
+3. Signal another staff member to call 911
+4. Complete Bomb Threat Checklist (located in main office binder)
+5. Do NOT use cell phones or two-way radios (potential detonation trigger)
+6. Principal determines evacuation based on law enforcement guidance
+7. Evacuation to off-site location (Grace Lutheran Church)
+
+If threat received in writing or electronically:
+1. Do not handle the document further; preserve for law enforcement
+2. Notify principal immediately
+3. Call 911
+4. Follow law enforcement guidance
+
+====================================================================
+9. ACTIVE THREAT (Run, Hide, Fight)
+====================================================================
+
+In an active threat situation where lockdown is not possible or has been breached:
+
+RUN: If safe to do so, evacuate the building immediately
+- Leave belongings behind
+- Help others if possible without endangering yourself
+- Do not attempt to move wounded people
+- Keep hands visible when encountering law enforcement
+- Proceed to off-site reunification point
+
+HIDE: If evacuation is not possible
+- Find a room that locks; barricade the door
+- Hide behind large items
+- Silence phones
+- Remain quiet and out of sight
+
+FIGHT: As an absolute last resort
+- Act with aggression; commit to your actions
+- Use improvised weapons (fire extinguisher, chairs, books)
+- Work as a team if possible
+
+Staff who have completed ALICE or similar training: 8 (target: all staff by end of 2025-26)
+
+====================================================================
+10. REUNIFICATION PROCEDURES
+====================================================================
+
+PRIMARY REUNIFICATION SITE: Grace Lutheran Church, 1247 Elm Street
+SECONDARY SITE: Roosevelt Community Center, 890 Oak Avenue
+
+PROCESS:
+1. Students transported to reunification site by staff (walking or bus as appropriate)
+2. Teachers maintain class groups and take continuous attendance
+3. ParentSquare notification sent with reunification location and instructions
+4. Parents/guardians enter through CHECK-IN area with photo ID
+5. Staff verify identity against emergency contact list in PowerSchool
+6. Student released only to authorized adults on emergency contact list
+7. Parent signs release log with time
+8. Students without pickup remain with staff until all students are claimed
+9. Unaccompanied students: Contact emergency contacts in order listed; if unreachable after 2 hours, contact Ramsey County child protection
+
+REUNIFICATION TEAM:
+- Check-in Lead: Office Manager, Patricia Ng
+- Student Staging: Counselors (Ms. Washington, Mr. Pham)
+- Parent Communication: Family Liaison, Tamara Williams
+- Logistics: Operations Manager, Derek Olson
+- Incident Commander: Dr. Angela Rivera (or designee)
+
+====================================================================
+11. DRILL SCHEDULE AND DOCUMENTATION
+====================================================================
+
+Minnesota state law requires the following minimum drills per year:
+- Fire drills: 5 per year (monthly September through January)
+- Lockdown drills: 5 per year
+- Severe weather drills: 1 per year (spring)
+- Reunification/evacuation drill: 1 per year (recommended best practice)
+
+2024-25 DRILL LOG:
+
+| Date | Type | Duration | Issues/Notes | Completed By |
+|------|------|----------|-------------|--------------|
+| 09/06/2024 | Fire | 3:42 | Good. Wing C slightly slow to exit. | Olson |
+| 09/20/2024 | Lockdown | 1:15 (time to secure) | 2 classrooms had difficulty locking doors - maintenance needed | Olson |
+| 10/04/2024 | Fire | 3:18 | Improved. All wings under 3:30 target. | Olson |
+| 10/18/2024 | Lockdown | 0:58 | All rooms secured under 1 minute. Good improvement. | Rivera |
+| 11/01/2024 | Fire | 3:05 | Best time this year. Students calm and orderly. | Olson |
+| 11/15/2024 | Lockdown | 1:02 | Students in hallway responded well. One student in restroom - practiced protocol. | Rivera |
+| 12/06/2024 | Fire | 3:12 | Cold weather drill. Students without coats - discussed grab-and-go procedure. | Olson |
+| 12/20/2024 | Lockdown | 0:55 | Fastest lockdown time. Door hardware repaired from Sept issue. | Olson |
+| 01/10/2025 | Fire | 3:08 | Final required fire drill. Smooth execution. | Olson |
+| 01/24/2025 | Lockdown | 0:52 | Final required lockdown drill. Excellent performance. | Rivera |
+| 03/07/2025 | Severe Weather | N/A | Scheduled. Spring severe weather drill. | Olson |
+| 04/2025 | Reunification | TBD | Planned tabletop exercise with Grace Lutheran Church. | Rivera/Olson |
+
+====================================================================
+12. STAFF ROLES AND RESPONSIBILITIES
+====================================================================
+
+PRINCIPAL (Dr. Angela Rivera):
+- Incident Commander for all emergencies until relieved by emergency services
+- Makes decision to evacuate, shelter, or lockdown
+- Authorizes external communication
+- Liaison with law enforcement and fire department
+
+OPERATIONS MANAGER (Derek Olson):
+- Safety Coordinator; maintains all safety equipment and documentation
+- Monitors weather alerts
+- Conducts monthly safety walkthrough of building
+- Coordinates drill schedule
+- Manages building access control system
+
+OFFICE STAFF (Patricia Ng, front office):
+- Calls 911 when directed
+- Activates PA system for emergency codes
+- Sends ParentSquare notifications
+- Maintains visitor log and emergency contact database
+- Monitors security cameras
+
+CLASSROOM TEACHERS:
+- Execute emergency procedures with students
+- Maintain red emergency folder (updated monthly)
+- Take attendance during every emergency/drill
+- Report missing or extra students immediately
+
+COUNSELORS:
+- Provide emotional support during and after emergencies
+- Lead crisis response for students after traumatic events
+- Coordinate with outside mental health resources if needed
+
+CUSTODIAL STAFF:
+- Assist with building security (locking doors, checking exits)
+- Operate building systems (HVAC shutoff, elevator shutoff)
+- Assist with student/staff evacuation as needed
+
+====================================================================
+13. BUILDING SECURITY
+====================================================================
+
+- All exterior doors locked during school hours (8:15 AM - 3:45 PM)
+- Main entrance: Buzzer entry with visual verification via camera
+- All visitors must present photo ID and be logged in Raptor visitor management system
+- Background check run through Raptor for all visitors against sex offender registries
+- Security cameras: 16 exterior cameras, 8 interior cameras (hallways, entrances, parking lot)
+- Camera footage retained for 30 days
+- Playground fully fenced with self-closing gates
+- After-hours access: Key fob entry for authorized staff only; access log maintained
+
+====================================================================
+14. VISITOR MANAGEMENT
+====================================================================
+
+All visitors must:
+1. Enter through main entrance only
+2. Present government-issued photo ID
+3. State purpose of visit
+4. Be scanned through Raptor visitor management system
+5. Receive and display visitor badge
+6. Be escorted to destination by office staff or host teacher
+7. Return badge and sign out upon departure
+
+Exceptions: Law enforcement in uniform responding to a call
+
+Volunteers: Must complete background check through school before first visit. Background checks valid for 2 years. Current volunteers with cleared backgrounds: 28.
+
+====================================================================
+
+This manual is reviewed and updated annually. All staff acknowledge receipt during August professional development. A signed acknowledgment form is kept on file in the main office.
+
+Questions about safety procedures should be directed to Derek Olson (operations@lincolninnovation.org) or Dr. Angela Rivera (principal@lincolninnovation.org).
+
+Lincoln Innovation Academy
+1500 Innovation Drive
+St. Paul, MN 55108
+Main Office: (651) 555-0147

@@ -15,7 +15,7 @@ See [CLAUDE.md](CLAUDE.md) for developer conventions.
 - [Product Vision](#product-vision)
 - [Getting Started](#getting-started)
 - [Architecture](#architecture)
-- [Feature Tour](#feature-tour)
+- [Feature Tour](TOUR.md)
 - [The AI System](#the-ai-system)
 - [Data Model](#data-model)
 - [API Reference](#api-reference)
@@ -52,14 +52,23 @@ These insights shape product decisions:
 
 ## Getting Started
 
-### Prerequisites
+### Quick Start (Docker)
 
-- **PostgreSQL** running locally (or accessible via connection string)
-- **Python 3.11+** with a virtual environment
-- **Node.js 20+** and npm
-- **OpenAI API key** with access to gpt-4.1 and gpt-4.1-mini
+```bash
+# 1. Create .env in the project root with your OpenAI key
+echo "OPENAI_API_KEY=sk-your-key-here" > .env
 
-### Setup
+# 2. Start everything
+docker compose up --build -d
+
+# 3. Open http://localhost:3000
+```
+
+This starts PostgreSQL, the FastAPI backend, and the Next.js frontend. The backend auto-creates tables and seeds a demo engagement on first startup (Lincoln Innovation Academy, a fictional K-8 charter school with 420 students in Metro City Public Schools, MN).
+
+### Without Docker
+
+**Prerequisites:** PostgreSQL running locally, Python 3.11+, Node.js 20+, OpenAI API key.
 
 ```bash
 # 1. Create the database
@@ -67,29 +76,14 @@ createdb meridian
 
 # 2. Backend
 cd backend
-python -m venv .venv
-source .venv/bin/activate
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env
-# Edit .env and set OPENAI_API_KEY=sk-...
-
-# 3. Frontend
-cd ../frontend
-npm install
-```
-
-### Running
-
-```bash
-# Terminal 1 — Backend (port 8000)
-cd backend && source .venv/bin/activate
+cp .env.example .env    # Edit and set OPENAI_API_KEY
 uvicorn app.main:app --port 8000 --reload
 
-# Terminal 2 — Frontend (port 3000)
-cd frontend && npm run dev
+# 3. Frontend (separate terminal)
+cd frontend && npm install && npm run dev
 ```
-
-Open http://localhost:3000. The backend auto-creates tables and seeds a demo engagement on first startup (Lincoln Innovation Academy, a fictional K-8 charter school with 420 students in Metro City Public Schools, MN).
 
 ### Environment Variables
 
@@ -97,15 +91,25 @@ Open http://localhost:3000. The backend auto-creates tables and seeds a demo eng
 |----------|----------|---------|-------------|
 | `OPENAI_API_KEY` | Yes | — | OpenAI API key for all AI agents |
 | `DATABASE_URL` | No | `postgresql+asyncpg://meridian:meridian@localhost:5432/meridian` | PostgreSQL connection string |
+| `BACKEND_URL` | No | `http://localhost:8000` | Backend URL for the frontend proxy (set automatically in Docker) |
 
 ### Resetting the Database
 
 There are no migrations yet. To reset:
 
 ```bash
+# Docker
+docker compose exec db psql -U meridian -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+docker compose restart backend
+
+# Without Docker
 dropdb meridian && createdb meridian
 # Restart the backend — tables and seed data recreate automatically
 ```
+
+### Demo Documents
+
+The `demo_uploads/` folder contains 29 realistic school documents (CSVs, reports, transcripts) that are not pre-loaded into the platform. Upload them through the Evidence tab to demonstrate the full processing pipeline.
 
 ---
 
@@ -162,79 +166,18 @@ The backend uses FastAPI's async lifespan to initialize the database, create tab
 
 ## Feature Tour
 
-The screenshots below walk through Meridian using the seeded demo engagement for **Lincoln Innovation Academy**.
+See **[TOUR.md](TOUR.md)** for the full visual walkthrough with 22 annotated screenshots covering both the consultant and school admin views.
 
-### Dashboard
-
-The engagement dashboard provides a high-level view of assessment progress. KPI cards show evidence collected, components scored, confirmations, and pending data requests. The **SQF Assessment Progress** heatmap visualizes all 9 dimensions and 43 components at a glance — color-coded by the 4-point rating scale.
-
-<img src="screenshots/01_dashboard.png" width="800" alt="Engagement dashboard with KPI cards and SQF heatmap">
-
-The lower half surfaces **Key Findings** (the most notable preliminary ratings with one-line evidence summaries) and a **Recent Evidence** feed.
-
-<img src="screenshots/12_dashboard_full.png" width="800" alt="Full dashboard view showing key findings and recent evidence">
-
-### School Quality Framework Browser
-
-The Framework tab lets users explore Bellwether's SQF structure: 9 dimensions, 43 components, each with Core Actions and Progress Indicators. The three-column layout shows dimensions on the left, components in the center (with ratings and confidence levels), and detailed success criteria on the right.
-
-<img src="screenshots/02_framework_overview.png" width="800" alt="Framework browser showing dimensions, components, and ratings">
-
-Selecting a component reveals its full success criteria — the specific Core Actions and Progress Indicators that define what each rating level looks like.
-
-<img src="screenshots/03b_framework_component_detail.png" width="800" alt="Component detail showing success criteria for Mission, Vision, and Values">
-
-### Evidence Repository
-
-All source documents live here — achievement data, interview transcripts, board minutes, observation reports, budgets, survey results, retention data, and strategic plans. Each document shows processing status and who uploaded it.
-
-<img src="screenshots/04_evidence_list.png" width="800" alt="Evidence repository listing 8 uploaded documents">
-
-Selecting a document reveals its **AI extraction** — a structured summary and numbered key findings generated automatically on upload. The extraction model is shown for transparency.
-
-<img src="screenshots/04b_evidence_detail.png" width="800" alt="AI extraction showing summary and key findings from student achievement data">
-
-### Data Requests
-
-Consultants send structured data requests tied to specific framework needs. Each request has a priority, assignee, status tracking, and a rationale. Inline messaging threads let consultants and school staff discuss each request in context.
-
-<img src="screenshots/05_data_requests.png" width="800" alt="Data requests view with 5 requests at various statuses">
-
-### Diagnostic Workspace
-
-The AI-powered scoring workspace implements Meridian's 4-layer AI architecture. Each dimension row shows mini badges for its components — colored when scored, gray when pending. Expanding a dimension reveals ratings, confidence levels, and "Assess" buttons to trigger AI scoring.
-
-<img src="screenshots/06_diagnostic_overview.png" width="800" alt="Diagnostic workspace showing all 9 dimensions with component badges">
-
-<img src="screenshots/06b_diagnostic_expanded.png" width="800" alt="Organizational Purpose expanded showing component-level ratings">
-
-### Action Plan
-
-Diagnostic findings translate into prioritized improvement actions. Each item has an owner, target date, and — critically — an **evidence-based rationale** tracing the recommendation back to specific assessment findings.
-
-<img src="screenshots/08_action_plan.png" width="800" alt="Action plan with 5 prioritized improvement items">
-
-<img src="screenshots/08b_action_plan_detail.png" width="800" alt="Action plan detail showing evidence-based rationale">
-
-### Messaging
-
-Team messaging keeps engagement communication in one place — consultants and school staff discussing data gathering, uploads, and emerging patterns.
-
-<img src="screenshots/09_messaging.png" width="800" alt="Team messaging between consultants and school staff">
-
-### AI Copilot
-
-A contextual assistant available on every screen. It knows the current page and engagement context, offering tailored suggestions: "What evidence do we have about teacher retention?", "Show me contradictions in the evidence", "Draft a follow-up request for PD data."
-
-<img src="screenshots/11_role_switched.png" width="800" alt="Dashboard with AI Copilot panel open showing contextual suggestions">
-
-### Role Switching
-
-Meridian is a **two-sided workspace**. The role switcher toggles between Consultant (Sarah Chen, Lead Consultant) and School Admin (Dr. Angela Rivera, School Leader) views. Both roles see the same engagement data with role-appropriate context.
-
-<img src="screenshots/11a_school_admin_dashboard.png" width="800" alt="Dashboard from the school admin perspective">
-
-<img src="screenshots/11d_school_admin_messages.png" width="800" alt="Messages view as school admin">
+Quick highlights:
+- **Consultant dashboard** with SQF heatmap, KPI cards, and cross-linked findings
+- **Framework browser** — 9 dimensions, 43 components, Core Actions and Progress Indicators
+- **Evidence repository** with AI extraction, document preview, and download
+- **Data requests** with inline conversations synced to the Messages tab
+- **4-layer diagnostic workspace** — component assessment, dimension synthesis, global summary, with batch generation, approve/lock, and "insufficient evidence" handling
+- **Action planning** with evidence-based rationale and component cross-links
+- **Slack-style messaging** with channels, @mentions, and data request thread sync
+- **AI copilot** with tool calling (creates data requests from chat)
+- **Two-sided role switching** — consultant view (editing, AI controls, feedback) vs. school admin view (progress-oriented, read-only, no AI terminology)
 
 ---
 
@@ -439,21 +382,37 @@ All endpoints are in `app/api/routes.py` under the `/api` prefix. The main group
 | GET | `/api/engagements/{id}/evidence` | List all evidence for engagement |
 | POST | `/api/engagements/{id}/evidence` | Upload document (triggers extraction + mapping) |
 | GET | `/api/engagements/{id}/evidence/{eid}/extractions` | AI-extracted findings |
+| PATCH | `/api/engagements/{id}/evidence/{eid}/extractions/{ext_id}` | Edit extraction summary/findings |
+| GET | `/api/engagements/{id}/evidence/{eid}/download` | Download original file |
+| GET | `/api/engagements/{id}/evidence/{eid}/mappings` | Component mappings for an evidence item |
+| GET | `/api/engagements/{id}/evidence-counts` | Evidence count per component |
 
 ### Scoring
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/engagements/{id}/scores` | All component scores for engagement |
 | POST | `/api/engagements/{id}/scores/{component_id}/assess` | Trigger AI assessment for a component |
-| PATCH | `/api/engagements/{id}/scores/{score_id}` | Consultant review/confirmation |
+| PATCH | `/api/engagements/{id}/scores/{score_id}` | Edit score fields (strengths, gaps, rationale, etc.) |
+| PATCH | `/api/engagements/{id}/scores/{score_id}/approve` | Toggle approval/lock on a score |
 
 ### Dimension and Global Synthesis
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/engagements/{id}/dimensions/{dim_id}/synthesize` | Trigger dimension synthesis |
 | GET | `/api/engagements/{id}/dimension-summaries` | List dimension summaries |
+| PATCH | `/api/engagements/{id}/dimension-summaries/{sid}` | Edit dimension summary |
+| PATCH | `/api/engagements/{id}/dimension-summaries/{sid}/approve` | Toggle approval/lock |
 | POST | `/api/engagements/{id}/global-summary` | Generate executive summary |
 | GET | `/api/engagements/{id}/global-summary` | Retrieve most recent global summary |
+| PATCH | `/api/engagements/{id}/global-summary/{sid}` | Edit global summary |
+| PATCH | `/api/engagements/{id}/global-summary/{sid}/approve` | Toggle approval/lock |
+
+### Batch Generation
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/engagements/{id}/batch/assess-components` | Generate all component assessments |
+| POST | `/api/engagements/{id}/batch/synthesize-dimensions` | Generate all dimension summaries |
+| POST | `/api/engagements/{id}/batch/generate-global` | Generate global summary |
 
 ### Data Requests
 | Method | Endpoint | Description |
@@ -473,14 +432,21 @@ All endpoints are in `app/api/routes.py` under the `/api` prefix. The main group
 ### Messaging
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/engagements/{id}/threads` | List message threads |
-| GET | `/api/engagements/{id}/threads/{tid}/messages` | List messages in thread |
-| POST | `/api/engagements/{id}/threads/{tid}/messages` | Send message |
+| GET | `/api/engagements/{id}/threads` | List threads (includes data request conversations) |
+| POST | `/api/engagements/{id}/threads` | Create new channel |
+| GET | `/api/engagements/{id}/threads/{tid}/messages` | List messages (syncs DR comments for DR threads) |
+| POST | `/api/engagements/{id}/threads/{tid}/messages` | Send message (creates DR comment for DR threads) |
 
 ### Copilot
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/engagements/{id}/copilot` | Chat with AI copilot (context-aware) |
+| POST | `/api/engagements/{id}/copilot` | Chat with AI copilot (context-aware, with tool calling) |
+
+### Feedback
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/engagements/{id}/feedback` | Submit thumbs up/down on AI output |
+| GET | `/api/engagements/{id}/feedback` | Get feedback (filter by target_type/target_id) |
 
 ---
 
@@ -492,8 +458,11 @@ frontend/
 │   ├── layout.tsx                Root layout
 │   └── page.tsx                  Entry point (loads EngagementWorkspace)
 ├── components/
-│   ├── EngagementWorkspace.tsx   Main layout: tab navigation, role switcher, state management
-│   ├── CopilotPanel.tsx          AI copilot slide-over panel
+│   ├── EngagementWorkspace.tsx   Main layout: tab nav, role switcher, cross-navigation
+│   ├── CopilotPanel.tsx          AI copilot slide-over panel with tool calling
+│   ├── EditableText.tsx          Reusable in-place text editing (consultant-only)
+│   ├── AIFeedback.tsx            Thumbs up/down feedback widget (consultant-only)
+│   ├── DocumentPreviewModal.tsx  Full-screen document preview overlay
 │   └── views/                    One component per tab:
 │       ├── DashboardView.tsx     KPIs, SQF heatmap, key findings, recent evidence
 │       ├── FrameworkView.tsx     3-column SQF browser
