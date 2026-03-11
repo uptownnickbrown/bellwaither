@@ -9,6 +9,7 @@ import {
   Plus, X, ArrowUpRight, Users, Sparkles, Bot, Loader2,
   FileText, AlertCircle, Calendar, Flag, UserCircle,
 } from "lucide-react";
+import AIMarkdown from "@/components/AIMarkdown";
 
 interface Props {
   engagementId: string;
@@ -804,9 +805,13 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
                         </span>
                       </div>
                       <div className="min-w-0 flex-1 py-0.5">
-                        <p className="text-sm text-gray-700 leading-relaxed">
-                          {renderContent(msg.content)}
-                        </p>
+                        {isAI ? (
+                          <AIMarkdown content={msg.content} />
+                        ) : (
+                          <p className="text-sm text-gray-700 leading-relaxed">
+                            {renderContent(msg.content)}
+                          </p>
+                        )}
                         {toolResults && toolResults.length > 0 && (
                           <div className="mt-2 space-y-2">
                             {toolResults.map((tr, j) => (
@@ -855,9 +860,15 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
                           {relativeTime(msg.created_at)}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-700 leading-relaxed mt-0.5">
-                        {renderContent(msg.content)}
-                      </p>
+                      <div className="mt-0.5">
+                        {isAI ? (
+                          <AIMarkdown content={msg.content} />
+                        ) : (
+                          <p className="text-sm text-gray-700 leading-relaxed">
+                            {renderContent(msg.content)}
+                          </p>
+                        )}
+                      </div>
                       {toolResults && toolResults.length > 0 && (
                         <div className="mt-2 space-y-2">
                           {toolResults.map((tr, j) => (

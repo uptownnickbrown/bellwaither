@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { chatWithCopilot } from "@/lib/api";
 import type { UserRole, CopilotToolResult } from "@/lib/types";
 import { Sparkles, Send, X, Loader2, User, Bot, FileText, AlertCircle, Calendar, Flag, UserCircle, ArrowUpRight } from "lucide-react";
+import AIMarkdown from "@/components/AIMarkdown";
 
 interface Props {
   engagementId: string;
@@ -205,7 +206,11 @@ export default function CopilotPanel({ engagementId, schoolName, context, role, 
                   ? "bg-indigo-600 text-white"
                   : "bg-gray-50 text-gray-700"
               }`}>
-                <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                {msg.role === "assistant" ? (
+                  <AIMarkdown content={msg.content} />
+                ) : (
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                )}
               </div>
               {/* Render tool result cards for assistant messages */}
               {msg.role === "assistant" && msg.toolResults && msg.toolResults.length > 0 && (
