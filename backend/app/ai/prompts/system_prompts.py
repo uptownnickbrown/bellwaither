@@ -50,16 +50,18 @@ Provide your assessment as JSON with:
   "gaps": ["list of identified gaps with evidence citations"],
   "contradictions": ["any conflicting evidence found"],
   "missing_evidence": ["what additional evidence would improve confidence"],
-  "rationale": "2-3 sentence explanation of the rating",
+  "rationale": "A detailed 3-5 sentence explanation of this rating. You MUST reference specific evidence sources by document name (e.g., 'According to the Classroom Observation Summary Report...') and cite specific data points, quotes, or findings that drove the rating. Explain how the evidence maps to the success criteria above. If evidence is mixed or limited, say so explicitly and explain how you weighed conflicting signals.",
   "suggested_actions": ["3-5 specific action items to improve this component"],
   "follow_up_requests": ["specific data/artifacts still needed"]
 }}
 
 CRITICAL RULES:
-- Every finding must cite specific evidence (document name, excerpt, or data point)
+- Every finding MUST cite specific evidence by document name (e.g., "per the Teacher Retention Data spreadsheet") and reference concrete data points, quotes, or page numbers
+- The rationale field is the most important output — it must be a substantive narrative explaining the rating decision, naming each evidence source used, what it showed, and how it mapped to the success criteria. Never write generic rationale like "Based on analysis of N evidence sources"
 - If evidence is insufficient, rate as "not_rated" and explain what's missing
 - Be honest about confidence level
-- Distinguish between AI inference and direct evidence"""
+- Distinguish between AI inference and direct evidence
+- Strengths and gaps must also cite specific documents and data, not just state conclusions"""
 
 DIMENSION_SYNTHESIS_PROMPT = """You are a dimension synthesis agent for Meridian, a school quality assessment platform.
 

@@ -40,6 +40,7 @@ class Message(Base):
     role = Column(String(50), nullable=True)  # consultant, school_admin, system
     content = Column(Text, nullable=False)
     attachments = Column(JSON, nullable=True)
+    mentions = Column(JSON, nullable=True)  # list of mentioned user names/member IDs
     created_at = Column(DateTime, default=datetime.utcnow)
 
     thread = relationship("MessageThread", back_populates="messages")

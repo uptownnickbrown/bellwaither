@@ -2,7 +2,7 @@ import enum
 import uuid
 from datetime import datetime
 
-from sqlalchemy import JSON, Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, Boolean, Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -34,6 +34,7 @@ class ComponentScore(Base):
 
     rating = Column(SAEnum(RatingLevel), default=RatingLevel.NOT_RATED)
     status = Column(SAEnum(ScoreStatus), default=ScoreStatus.DRAFT)
+    approved = Column(Boolean, default=False, nullable=False)  # Lock to prevent regeneration
 
     strengths = Column(JSON, nullable=True)           # list of strength findings
     gaps = Column(JSON, nullable=True)                # list of gap findings
@@ -67,6 +68,7 @@ class DimensionSummary(Base):
     compounding_risks = Column(JSON, nullable=True)
     top_opportunities = Column(JSON, nullable=True)
     leadership_attention = Column(JSON, nullable=True)  # what leaders should focus on
+    approved = Column(Boolean, default=False, nullable=False)  # Lock to prevent regeneration
     model_used = Column(String(50), nullable=True)
     generated_at = Column(DateTime, default=datetime.utcnow)
 
@@ -84,5 +86,6 @@ class GlobalSummary(Base):
     strategic_priorities = Column(JSON, nullable=True)
     resource_implications = Column(JSON, nullable=True)
     recommended_next_steps = Column(JSON, nullable=True)
+    approved = Column(Boolean, default=False, nullable=False)  # Lock to prevent regeneration
     model_used = Column(String(50), nullable=True)
     generated_at = Column(DateTime, default=datetime.utcnow)
