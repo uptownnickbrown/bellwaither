@@ -42,6 +42,7 @@ export interface Evidence {
   engagement_id: string;
   filename: string;
   file_type: string;
+  file_size: number | null;
   evidence_type: string;
   title: string | null;
   description: string | null;
@@ -56,8 +57,19 @@ export interface Extraction {
   summary: string;
   key_findings: string[] | null;
   structured_data: Record<string, unknown> | null;
+  raw_text: string | null;
   model_used: string | null;
   created_at: string;
+}
+
+export interface EvidenceMapping {
+  id: string;
+  evidence_id: string;
+  component_id: string;
+  component_code: string | null;
+  component_name: string | null;
+  relevance_score: number;
+  rationale: string | null;
 }
 
 export interface ComponentScore {
@@ -66,6 +78,7 @@ export interface ComponentScore {
   component_id: string;
   rating: string;
   status: string;
+  approved: boolean;
   strengths: string[] | null;
   gaps: string[] | null;
   contradictions: string[] | null;
@@ -89,6 +102,7 @@ export interface DimensionSummary {
   compounding_risks: string[] | null;
   top_opportunities: string[] | null;
   leadership_attention: string[] | null;
+  approved: boolean;
   generated_at: string;
 }
 
@@ -101,8 +115,20 @@ export interface GlobalSummary {
   strategic_priorities: string[] | null;
   resource_implications: string[] | null;
   recommended_next_steps: string[] | null;
+  approved: boolean;
   generated_at: string;
 }
+
+export interface BatchProgress {
+  total: number;
+  completed: number;
+  skipped_approved: number;
+  skipped_no_evidence: number;
+  failed: number;
+  results: Array<{ status: string; component_code?: string; dimension?: string; error?: string }>;
+}
+
+export type EvidenceCountMap = Record<string, number>;
 
 export interface DataRequest {
   id: string;
@@ -153,8 +179,11 @@ export interface MessageThread {
   id: string;
   engagement_id: string;
   thread_type: string;
+  reference_id: string | null;
   title: string | null;
   created_at: string;
+  message_count: number;
+  last_activity: string | null;
 }
 
 export interface Message {
@@ -163,6 +192,41 @@ export interface Message {
   author: string;
   role: string | null;
   content: string;
+  mentions: string[] | null;
+  created_at: string;
+}
+
+export interface CopilotToolResult {
+  tool: string;
+  status: "success" | "error";
+  data?: {
+    id: string;
+    title: string;
+    description: string | null;
+    rationale: string | null;
+    priority: string;
+    status: string;
+    assigned_to: string | null;
+    due_date: string | null;
+    created_at: string | null;
+    component_code: string | null;
+  };
+  error?: string;
+}
+
+export interface CopilotChatResponse {
+  content: string;
+  model_used: string | null;
+  tool_results: CopilotToolResult[] | null;
+}
+
+export interface AIFeedbackItem {
+  id: string;
+  engagement_id: string;
+  target_type: string;
+  target_id: string;
+  rating: string;
+  comment: string | null;
   created_at: string;
 }
 
@@ -189,3 +253,13 @@ export const PRIORITY_CONFIG = {
   medium: { label: "Medium", color: "#F59E0B" },
   low: { label: "Low", color: "#6B7280" },
 } as const;
+
+export interface ActivityEntry {
+  id: string;
+  actor: string;
+  action: string;
+  target_type: string;
+  target_label: string | null;
+  detail: string | null;
+  created_at: string;
+}
