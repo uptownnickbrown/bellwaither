@@ -175,8 +175,10 @@ Quick highlights:
 - **Data requests** with inline conversations synced to the Messages tab
 - **4-layer diagnostic workspace** — component assessment, dimension synthesis, global summary, with batch generation, approve/lock, and "insufficient evidence" handling
 - **Action planning** with evidence-based rationale and component cross-links
-- **Slack-style messaging** with channels, @mentions, and data request thread sync
+- **Slack-style messaging** with channels, @mentions, @Meridian AI for inline AI actions, and data request thread sync
 - **AI copilot** with tool calling (creates data requests from chat)
+- **Activity log** tracking all engagement events with multiple actors and action types
+- **@Meridian AI mentions** in chat — invoke the AI copilot inline from any conversation
 - **Two-sided role switching** — consultant view (editing, AI controls, feedback) vs. school admin view (progress-oriented, read-only, no AI terminology)
 
 ---
@@ -386,6 +388,7 @@ All endpoints are in `app/api/routes.py` under the `/api` prefix. The main group
 | GET | `/api/engagements/{id}/evidence/{eid}/download` | Download original file |
 | GET | `/api/engagements/{id}/evidence/{eid}/mappings` | Component mappings for an evidence item |
 | GET | `/api/engagements/{id}/evidence-counts` | Evidence count per component |
+| GET | `/api/engagements/{id}/components/{comp_id}/evidence-ids` | Evidence IDs mapped to a component |
 
 ### Scoring
 | Method | Endpoint | Description |
@@ -442,6 +445,16 @@ All endpoints are in `app/api/routes.py` under the `/api` prefix. The main group
 |--------|----------|-------------|
 | POST | `/api/engagements/{id}/copilot` | Chat with AI copilot (context-aware, with tool calling) |
 
+### Activity
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/engagements/{id}/activity` | Activity log entries |
+
+### Export
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/engagements/{id}/export` | Export assessment as PDF |
+
 ### Feedback
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -463,6 +476,7 @@ frontend/
 │   ├── EditableText.tsx          Reusable in-place text editing (consultant-only)
 │   ├── AIFeedback.tsx            Thumbs up/down feedback widget (consultant-only)
 │   ├── DocumentPreviewModal.tsx  Full-screen document preview overlay
+│   ├── AIMarkdown.tsx            Shared markdown renderer for AI content
 │   └── views/                    One component per tab:
 │       ├── DashboardView.tsx     KPIs, SQF heatmap, key findings, recent evidence
 │       ├── FrameworkView.tsx     3-column SQF browser
@@ -470,7 +484,8 @@ frontend/
 │       ├── DataRequestsView.tsx  Request list + detail + inline messaging
 │       ├── ScoringView.tsx       Diagnostic workspace (Layer 2/3/4 tabs)
 │       ├── ActionPlanView.tsx    Action items with evidence rationale
-│       └── MessagingView.tsx     Team messaging channels
+│       ├── MessagingView.tsx     Team messaging channels
+│       └── ActivityView.tsx     Activity log
 ├── lib/
 │   ├── api.ts                    API client functions (fetch wrappers)
 │   └── types.ts                  TypeScript types + rating/status display config

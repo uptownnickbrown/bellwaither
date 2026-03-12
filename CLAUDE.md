@@ -51,8 +51,9 @@ Plus a **Copilot** (`ai/agents/copilot_agent.py`) for interactive Q&A anywhere i
 ## Frontend structure
 
 - `components/EngagementWorkspace.tsx` — Main layout with tab nav and role switcher
-- `components/views/` — One file per tab (Dashboard, Framework, Evidence, DataRequests, Scoring, ActionPlan, Messaging)
+- `components/views/` — One file per tab (Dashboard, Framework, Evidence, DataRequests, Scoring, ActionPlan, Messaging, Activity)
 - `components/CopilotPanel.tsx` — AI copilot slide-over panel
+- `components/AIMarkdown.tsx` — Shared lightweight markdown renderer for AI content (lists, bold, italic, code, headings, @mentions). Used by MessagingView and CopilotPanel.
 - `lib/api.ts` — API client functions
 - `lib/types.ts` — TypeScript types + rating/status display config
 

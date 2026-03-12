@@ -16,7 +16,7 @@ The consultant dashboard provides a real-time view of assessment progress. KPI c
 
 The lower half surfaces **Key Findings** — the most notable preliminary ratings with one-line evidence summaries — and a **Recent Evidence** feed. Every card is clickable: stat cards navigate to their respective tabs, heatmap blocks deep-link to the component in the Diagnostic workspace, and evidence items open in the Evidence tab.
 
-<img src="screenshots/01b_dashboard_full.png" width="800" alt="Full dashboard view showing key findings and recent evidence">
+<img src="screenshots/01b_dashboard_below_fold.png" width="800" alt="Full dashboard view showing key findings and recent evidence">
 
 ### School Quality Framework Browser
 
@@ -62,9 +62,9 @@ Clicking a component opens its full assessment detail: strengths, gaps, contradi
 
 <img src="screenshots/05d_dimension_synthesis.png" width="800" alt="Dimension-level synthesis showing cross-component patterns">
 
-**Global (Layer 4)** — Executive summary across all dimensions. Top strengths, critical gaps, strategic priorities, resource implications, and recommended next steps. Written for a sophisticated education audience.
+**Executive Summary** — Executive summary across all dimensions. Top strengths, critical gaps, strategic priorities, resource implications, and recommended next steps. Written for a sophisticated education audience.
 
-<img src="screenshots/05e_global_summary.png" width="800" alt="Global executive summary with strategic priorities">
+<img src="screenshots/05e_executive_summary.png" width="800" alt="Executive summary with strategic priorities">
 
 Components with no mapped evidence show a clear "Insufficient Evidence" state instead of fabricated analysis, with guidance to upload or map evidence first.
 
@@ -74,23 +74,35 @@ Diagnostic findings translate into prioritized improvement actions. Each item ha
 
 <img src="screenshots/06_action_plan.png" width="800" alt="Action plan with prioritized improvement items">
 
+Selecting an action item opens a detail panel with the full description, evidence-based rationale, owner, target date, and cross-navigation links to the related component in the Framework or Diagnostic views.
+
+<img src="screenshots/06b_action_plan_detail.png" width="800" alt="Action plan detail panel with description, rationale, owner, and cross-links">
+
 ### Messaging
 
 A Slack-style messaging experience for engagement communication. The sidebar is split into **Channels** (general discussion, document review, leadership prep) and **Data Requests** (conversations from data request threads, automatically synced).
 
 Features include channel creation, @mentions with a member dropdown (type `@` to trigger), message grouping for consecutive messages from the same author, day separators, and relative timestamps. Data request threads show a banner linking back to the request in the Data Requests tab.
 
+Users can also type `@Meridian AI` in any chat to invoke the AI copilot inline. The AI responds with formatted markdown, can create data requests, and its responses appear with a distinctive sparkle avatar and AI badge.
+
 <img src="screenshots/07_messaging.png" width="800" alt="Messaging with channels, data request threads, and @mentions">
 
 <img src="screenshots/07b_messaging_dr_thread.png" width="800" alt="Data request conversation synced to Messages tab">
 
+### Activity Log
+
+Tracks all engagement actions — uploads, AI assessments, approvals, edits, data requests, messages — with varied actors, action types, and timestamps grouped by day. This provides a complete audit trail of who did what and when across the engagement.
+
+<img src="screenshots/08_activity_log.png" width="800" alt="Activity log showing engagement actions grouped by day">
+
 ### AI Copilot
 
-A contextual assistant available on every screen via the "AI Copilot" toggle. It knows the current page context and engagement data, and can answer questions, find evidence, explain ratings, and draft content.
+A contextual assistant available on every screen via the "AI Copilot" toggle. It knows the current page context and engagement data, and can answer questions, find evidence, explain ratings, and draft content. Suggested prompts are context-aware — they change based on which tab is active (Dashboard shows progress questions, Evidence shows document questions, etc.).
 
 The copilot can also **create data requests** directly from chat using tool calling — say "Create a data request for the school's PD logs and assign it to Tom" and it will extract the details, create the request in the database, and show a confirmation card with a link to view it.
 
-<img src="screenshots/08_copilot_panel.png" width="800" alt="AI Copilot panel with contextual suggestions and tool calling">
+<img src="screenshots/09_copilot_panel.png" width="800" alt="AI Copilot panel with contextual suggestions and tool calling">
 
 ---
 
@@ -104,29 +116,31 @@ The dashboard centers on **what the school needs to do** and **how the assessmen
 
 The heatmap and findings are still visible, giving the school leader transparency into where things stand. "Not Rated" components show as "Pending" instead.
 
-<img src="screenshots/09_admin_dashboard.png" width="800" alt="School admin dashboard with progress ring and action items">
+<img src="screenshots/10_admin_dashboard.png" width="800" alt="School admin dashboard with progress ring and action items">
 
-<img src="screenshots/09b_admin_dashboard_full.png" width="800" alt="Full school admin dashboard showing heatmap and findings">
+<img src="screenshots/10b_admin_dashboard_lower.png" width="800" alt="Full school admin dashboard showing heatmap and findings">
 
 ### School Admin Assessment View
 
 The same assessment data, presented as clean read-only results. No "Assess" buttons, no "Generate All", no approval toggles. "Gaps" are relabeled as "Areas for Growth." AI rationale and contradictions sections are hidden entirely. If the assessment isn't far enough along, a professional "Assessment in progress" state replaces the content.
 
-<img src="screenshots/09c_admin_scoring.png" width="800" alt="School admin assessment results view">
+<img src="screenshots/10c_admin_scoring.png" width="800" alt="School admin assessment results view">
 
 ### School Admin Data Requests & Messages
 
 Data requests show the same request details and comment threads, with role-appropriate author attribution. The messaging view is identical in functionality — both roles participate in the same conversations.
 
-<img src="screenshots/09d_admin_data_requests.png" width="800" alt="School admin data requests view">
+<img src="screenshots/10d_admin_data_requests.png" width="800" alt="School admin data requests view">
 
-<img src="screenshots/09e_admin_messages.png" width="800" alt="School admin messaging view">
+<img src="screenshots/10e_admin_messages.png" width="800" alt="School admin messaging view">
 
 ---
 
 ## Cross-Navigation
 
 Every reference to an object in the app is a working link. Component codes in the Evidence tab navigate to the Framework view. Evidence counts in the Diagnostic workspace link to the Evidence tab. Data request thread banners in Messages navigate to the Data Requests tab. Dashboard cards and heatmap blocks deep-link to their respective targets. The copilot's data request confirmation cards link to the newly created request.
+
+Navigating from the Diagnostic or Framework views to Evidence automatically filters the evidence list to show only items mapped to that component, with a dismissible banner indicating the active filter.
 
 This cross-linking means you can follow any thread of reasoning — from a score to its evidence, from a data request to its conversation, from a finding to its action plan item — without losing context.
 
