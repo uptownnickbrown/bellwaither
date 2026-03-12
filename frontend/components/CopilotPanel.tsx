@@ -27,14 +27,68 @@ const PRIORITY_STYLES: Record<string, { label: string; classes: string }> = {
   low: { label: "Low", classes: "bg-gray-100 text-gray-600" },
 };
 
-const SUGGESTED_PROMPTS = [
-  "What evidence do we have about teacher retention?",
-  "Which components still need more evidence?",
-  "Summarize our strongest findings so far",
-  "Create a data request for the school's PD logs",
-  "Ask the school to send us their curriculum documents",
-  "What are the biggest gaps in our assessment?",
-];
+const SUGGESTED_PROMPTS: Record<string, string[]> = {
+  dashboard: [
+    "Give me a quick summary of where this assessment stands",
+    "Which dimensions need the most attention right now?",
+    "What should our team focus on this week?",
+    "How much of the framework have we covered so far?",
+  ],
+  framework: [
+    "Which dimensions have the least component coverage?",
+    "Explain the rubric criteria for Talent Management",
+    "How many components still have no evidence mapped?",
+    "What does 'Meeting Expectations' look like for Instructional Rigor?",
+    "List all components under the Culture & Climate dimension",
+  ],
+  evidence: [
+    "Summarize the key findings from our most recent uploads",
+    "What types of evidence are we still missing?",
+    "Which documents map to the most components?",
+    "Are there any uploaded documents that haven't been processed yet?",
+    "What evidence do we have about teacher retention?",
+  ],
+  requests: [
+    "What data requests are still outstanding?",
+    "Create a data request for the school's PD logs",
+    "Which requests are past their due date?",
+    "Draft a follow-up reminder for pending requests",
+    "What data should we request next based on our gaps?",
+  ],
+  scoring: [
+    "Which components have the lowest confidence scores?",
+    "Compare ratings across the Talent Management dimension",
+    "Are there any components rated without sufficient evidence?",
+    "What are our strongest-rated areas so far?",
+    "Which scores might need revisiting based on new evidence?",
+  ],
+  actions: [
+    "What are the highest-priority action items right now?",
+    "Suggest next steps based on our lowest-rated components",
+    "Which action items are coming due this month?",
+    "Draft an action plan for improving Instructional Rigor",
+    "Summarize progress on existing action items",
+  ],
+  messages: [
+    "Summarize the most recent message threads",
+    "Draft a message to the school requesting curriculum documents",
+    "Are there any unanswered messages from the school?",
+    "Write a progress update to share with the school team",
+  ],
+  activity: [
+    "What changes were made in the last week?",
+    "Who has been most active on this engagement?",
+    "Show me a timeline of recent scoring updates",
+    "Have any component ratings changed recently?",
+  ],
+  default: [
+    "What evidence do we have about teacher retention?",
+    "Which components still need more evidence?",
+    "Summarize our strongest findings so far",
+    "Create a data request for the school's PD logs",
+    "What are the biggest gaps in our assessment?",
+  ],
+};
 
 function DataRequestCard({ result, onNavigate }: { result: CopilotToolResult; onNavigate?: (tab: string, id?: string) => void }) {
   if (result.status === "error") {
@@ -180,7 +234,7 @@ export default function CopilotPanel({ engagementId, schoolName, context, role, 
             </div>
             <div className="space-y-2">
               <p className="text-[10px] font-semibold text-gray-400 uppercase">Try asking:</p>
-              {SUGGESTED_PROMPTS.map((prompt, i) => (
+              {(SUGGESTED_PROMPTS[context] || SUGGESTED_PROMPTS.default).map((prompt, i) => (
                 <button
                   key={i}
                   onClick={() => handleSend(prompt)}

@@ -979,8 +979,8 @@ async def seed_demo_engagement():
             db.add(dr)
             await db.flush()
 
-            # Add sample comments to the submitted one
-            if status == RequestStatus.SUBMITTED:
+            # Add sample comments to data requests
+            if title == "Disaggregated Discipline Data 2024-25":
                 comments = [
                     DataRequestComment(data_request_id=dr.id, author="Tom Nakamura", role="data_steward",
                                        content="I've pulled the discipline data from our SIS. The file includes all referrals, suspensions, and incidents for 2024-25 disaggregated as requested. Let me know if you need additional breakdowns."),
@@ -988,6 +988,31 @@ async def seed_demo_engagement():
                                        content="Thank you Tom. This looks comprehensive. One follow-up: can you also include the in-school suspension data? I see out-of-school suspensions but want to capture the full picture."),
                     DataRequestComment(data_request_id=dr.id, author="Tom Nakamura", role="data_steward",
                                        content="Good catch - I'll add the ISS data and re-upload by end of week."),
+                ]
+                for c in comments:
+                    db.add(c)
+            elif title == "Curriculum Inventory by Subject and Grade":
+                comments = [
+                    DataRequestComment(data_request_id=dr.id, author="Dr. Angela Rivera", role="data_steward",
+                                       content="I've started compiling the curriculum inventory. We have most of the ELA and math materials cataloged already. Working on getting the science and social studies lists from department heads now."),
+                    DataRequestComment(data_request_id=dr.id, author="Dr. Angela Rivera", role="data_steward",
+                                       content="Quick update - science and social studies are done. Still waiting on the electives team for their materials list. Should have everything together by early next week."),
+                ]
+                for c in comments:
+                    db.add(c)
+            elif title == "Multi-Year Financial Projections":
+                comments = [
+                    DataRequestComment(data_request_id=dr.id, author="Sarah Chen", role="analyst",
+                                       content="These projections look solid, Tom. The enrollment scenario modeling is exactly what we needed. I've accepted the submission - we'll incorporate this into the financial sustainability analysis."),
+                    DataRequestComment(data_request_id=dr.id, author="Tom Nakamura", role="data_steward",
+                                       content="Great, glad it's what you needed. Just a note - the Year 3 projections assume the current per-pupil rate holds. If you need a sensitivity analysis with different funding scenarios, let me know."),
+                ]
+                for c in comments:
+                    db.add(c)
+            elif title == "Current Professional Development Calendar and Agendas":
+                comments = [
+                    DataRequestComment(data_request_id=dr.id, author="Dr. Angela Rivera", role="data_steward",
+                                       content="Got it - I'll pull the PD calendar from our scheduling system and gather the agendas from this year's sessions. Should be able to start on this by Thursday."),
                 ]
                 for c in comments:
                     db.add(c)
@@ -1112,20 +1137,44 @@ async def seed_demo_engagement():
         # Seed activity log entries
         now = datetime.utcnow()
         activity_entries = [
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="engagement", target_label="Lincoln Innovation Academy - SQF Assessment", created_at=now - timedelta(hours=6)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Student Achievement Data 2022-2025", detail="AI extracted 7 key findings", created_at=now - timedelta(hours=5, minutes=45)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="School Leader Interview Transcript", detail="AI extracted 8 key findings", created_at=now - timedelta(hours=5, minutes=40)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="Board Meeting Minutes Sep-Dec 2025", detail="AI extracted 5 key findings", created_at=now - timedelta(hours=5, minutes=30)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Classroom Observation Summary Report Q1 2025", detail="AI extracted 6 key findings", created_at=now - timedelta(hours=5, minutes=20)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="2024-25 Annual Budget and Actuals", detail="AI extracted 4 key findings", created_at=now - timedelta(hours=5, minutes=10)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="AI System", action="scored", target_type="component_score", target_label="1A: Mission, Vision, and Values", detail="Rated as Developing (low confidence)", created_at=now - timedelta(hours=4)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="AI System", action="scored", target_type="component_score", target_label="2A: Academic Vision and Design", detail="Rated as Developing (medium confidence)", created_at=now - timedelta(hours=3, minutes=55)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="AI System", action="scored", target_type="component_score", target_label="2C: Instruction", detail="Rated as Developing (medium confidence)", created_at=now - timedelta(hours=3, minutes=50)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="AI System", action="generated", target_type="dimension_summary", target_label="1. Organizational Purpose", created_at=now - timedelta(hours=3)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="AI System", action="generated", target_type="global_summary", target_label="Executive Summary", created_at=now - timedelta(hours=2, minutes=30)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="data_request", target_label="Disaggregated Discipline Data 2024-25", detail="Assigned to Tom Nakamura (High priority)", created_at=now - timedelta(hours=2)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="action_item", target_label="Strengthen Instructional Coaching and PD System", detail="Priority 1 - Owner: Dr. Angela Rivera", created_at=now - timedelta(hours=1, minutes=30)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="edited", target_type="component_score", target_label="2A: Academic Vision and Design", detail="Updated rationale text", created_at=now - timedelta(minutes=45)),
+            # === Day 1 (3 days ago) — Engagement kickoff and initial uploads ===
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="engagement", target_label="Lincoln Innovation Academy - SQF Assessment", created_at=now - timedelta(days=3, hours=6)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Student Achievement Data 2022-2025", detail="AI extracted 7 key findings", created_at=now - timedelta(days=3, hours=5, minutes=30)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="School Leader Interview Transcript", detail="AI extracted 8 key findings", created_at=now - timedelta(days=3, hours=5, minutes=15)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="Board Meeting Minutes Sep-Dec 2025", detail="AI extracted 5 key findings", created_at=now - timedelta(days=3, hours=4, minutes=45)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="Staff Climate Survey Results 2025", detail="AI extracted 6 key findings", created_at=now - timedelta(days=3, hours=4, minutes=20)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Classroom Observation Summary Report Q1 2025", detail="AI extracted 6 key findings", created_at=now - timedelta(days=3, hours=3, minutes=50)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Family Engagement Survey 2024-25", detail="AI extracted 4 key findings", created_at=now - timedelta(days=3, hours=3, minutes=30)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="School Improvement Plan 2024-2027", detail="AI extracted 9 key findings", created_at=now - timedelta(days=3, hours=2, minutes=45)),
+
+            # === Day 2 (1-2 days ago) — More uploads, AI scoring, synthesis, approvals ===
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="2024-25 Annual Budget and Actuals", detail="AI extracted 4 key findings", created_at=now - timedelta(days=2, hours=7, minutes=10)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="Title I Expenditure Report 2024-25", detail="AI extracted 3 key findings", created_at=now - timedelta(days=2, hours=6, minutes=45)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="Teacher Retention and Hiring Data 2020-2025", detail="AI extracted 5 key findings", created_at=now - timedelta(days=2, hours=6, minutes=15)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="Student Attendance and Chronic Absenteeism Report", detail="AI extracted 6 key findings", created_at=now - timedelta(days=2, hours=5, minutes=30)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="scored", target_type="component_score", target_label="1A: Mission, Vision, and Values", detail="Rated as Developing (low confidence)", created_at=now - timedelta(days=1, hours=8)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="scored", target_type="component_score", target_label="1B: Strategic Planning", detail="Rated as Needs Improvement (low confidence)", created_at=now - timedelta(days=1, hours=7, minutes=55)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="scored", target_type="component_score", target_label="2A: Academic Vision and Design", detail="Rated as Developing (medium confidence)", created_at=now - timedelta(days=1, hours=7, minutes=50)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="scored", target_type="component_score", target_label="2B: Curriculum and Assessment", detail="Rated as Developing (medium confidence)", created_at=now - timedelta(days=1, hours=7, minutes=45)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="scored", target_type="component_score", target_label="2C: Instruction", detail="Rated as Developing (medium confidence)", created_at=now - timedelta(days=1, hours=7, minutes=40)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="scored", target_type="component_score", target_label="3A: School Culture", detail="Rated as Meeting Expectations (medium confidence)", created_at=now - timedelta(days=1, hours=7, minutes=35)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="scored", target_type="component_score", target_label="4A: Talent Strategy", detail="Rated as Needs Improvement (low confidence)", created_at=now - timedelta(days=1, hours=7, minutes=30)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="generated", target_type="dimension_summary", target_label="1. Organizational Purpose", detail="Synthesized across 3 components", created_at=now - timedelta(days=1, hours=6)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="generated", target_type="dimension_summary", target_label="2. Academic Program Quality", detail="Synthesized across 5 components", created_at=now - timedelta(days=1, hours=5, minutes=50)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="generated", target_type="dimension_summary", target_label="3. Culture, Climate, and Student Support", detail="Synthesized across 4 components", created_at=now - timedelta(days=1, hours=5, minutes=40)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="generated", target_type="global_summary", target_label="Executive Summary", detail="Synthesized across 9 dimensions", created_at=now - timedelta(days=1, hours=5)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="approved", target_type="component_score", target_label="1A: Mission, Vision, and Values", detail="Confirmed AI rating of Developing", created_at=now - timedelta(days=1, hours=3, minutes=30)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="approved", target_type="component_score", target_label="2C: Instruction", detail="Confirmed AI rating of Developing", created_at=now - timedelta(days=1, hours=3, minutes=15)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="edited", target_type="component_score", target_label="2A: Academic Vision and Design", detail="Upgraded from Developing to Meeting Expectations with added rationale", created_at=now - timedelta(days=1, hours=2, minutes=45)),
+
+            # === Day 3 (today) — Data requests, action items, messages, score edits ===
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Marcus Johnson", action="created", target_type="data_request", target_label="Disaggregated Discipline Data 2024-25", detail="Assigned to Tom Nakamura (High priority)", created_at=now - timedelta(hours=6, minutes=30)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Marcus Johnson", action="created", target_type="data_request", target_label="SPED Compliance and IEP Timeliness Report", detail="Assigned to Dr. Angela Rivera (Medium priority)", created_at=now - timedelta(hours=6, minutes=10)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="action_item", target_label="Strengthen Instructional Coaching and PD System", detail="Priority 1 - Owner: Dr. Angela Rivera", created_at=now - timedelta(hours=5, minutes=15)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="action_item", target_label="Develop Data-Driven Culture with Regular Assessment Cycles", detail="Priority 2 - Owner: Tom Nakamura", created_at=now - timedelta(hours=5)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="message", target_label="Next steps and site visit planning", detail="Sent in Assessment Discussion thread", created_at=now - timedelta(hours=3, minutes=45)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="edited", target_type="component_score", target_label="3A: School Culture", detail="Added additional evidence citations from climate survey", created_at=now - timedelta(hours=2, minutes=20)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="edited", target_type="component_score", target_label="4A: Talent Strategy", detail="Updated rationale text with retention data context", created_at=now - timedelta(hours=1, minutes=10)),
         ]
         for a in activity_entries:
             db.add(a)

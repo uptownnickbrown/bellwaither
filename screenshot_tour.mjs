@@ -146,11 +146,12 @@ async function clickTab(page, pattern) {
   // ─── 6. ACTION PLAN ────────────────────────────────
   console.log('\n6. Action Plan');
   await clickTab(page, /Action Plan/);
-  await delay(1000);
+  await delay(1500);
   await screenshot(page, '06_action_plan');
 
-  // Click first action item by matching the numbered card
-  const actionItem = page.locator('[class*="cursor-pointer"]').filter({ hasText: /Strengthen|Coaching/i }).first();
+  // Action items are <button> elements (not divs with cursor-pointer).
+  // Click the first action item button in the list.
+  const actionItem = page.locator('button.w-full.text-left').filter({ hasText: /Strengthen|Family|Cash|Math|Retention/i }).first();
   if (await actionItem.count() > 0) {
     await actionItem.click();
     await delay(1500);
