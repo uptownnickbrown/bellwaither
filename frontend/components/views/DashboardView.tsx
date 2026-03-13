@@ -238,7 +238,7 @@ export default function DashboardView({ engagement, framework, role = "consultan
                         return (
                           <div
                             key={comp.id}
-                            className="h-8 rounded flex-1 flex items-center justify-center text-[10px] font-medium transition-all hover:scale-105 cursor-pointer"
+                            className="h-9 rounded flex-1 flex items-center justify-center text-[11px] font-semibold transition-all hover:scale-105 cursor-pointer"
                             style={{ backgroundColor: config.bg, color: config.color, minWidth: "28px" }}
                             title={`${comp.code} ${comp.name}: ${rating === "not_rated" ? "Pending review" : config.label}`}
                             onClick={() => onNavigate?.("scoring", comp.id)}
@@ -254,8 +254,8 @@ export default function DashboardView({ engagement, framework, role = "consultan
             </div>
             <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100">
               {Object.entries(RATING_CONFIG).map(([key, config]) => (
-                <div key={key} className="flex items-center gap-1.5 text-xs text-gray-500">
-                  <div className="w-3 h-3 rounded" style={{ backgroundColor: config.bg, border: `1px solid ${config.color}` }} />
+                <div key={key} className="flex items-center gap-1.5 text-xs text-gray-600 font-medium">
+                  <div className="w-3.5 h-3.5 rounded" style={{ backgroundColor: config.bg, border: `1.5px solid ${config.color}` }} />
                   {key === "not_rated" ? "Pending" : config.label}
                 </div>
               ))}
@@ -296,7 +296,7 @@ export default function DashboardView({ engagement, framework, role = "consultan
                               <span className="text-xs font-semibold text-gray-500">{comp?.code}</span>
                               <span className="text-sm font-medium text-gray-800 group-hover:text-indigo-600 transition">{comp?.name}</span>
                               <span
-                                className="text-[10px] font-medium px-2 py-0.5 rounded-full ml-auto flex-shrink-0"
+                                className="text-[11px] font-semibold px-2 py-0.5 rounded-full ml-auto flex-shrink-0"
                                 style={{ backgroundColor: config.bg, color: config.color }}
                               >
                                 {config.label}
@@ -383,7 +383,7 @@ export default function DashboardView({ engagement, framework, role = "consultan
                       return (
                         <div
                           key={comp.id}
-                          className="h-8 rounded flex-1 flex items-center justify-center text-[10px] font-medium transition-all hover:scale-105 cursor-pointer"
+                          className="h-9 rounded flex-1 flex items-center justify-center text-[11px] font-semibold transition-all hover:scale-105 cursor-pointer"
                           style={{ backgroundColor: config.bg, color: config.color, minWidth: "28px" }}
                           title={`${comp.code} ${comp.name}: ${config.label}`}
                           onClick={() => onNavigate?.("scoring", comp.id)}
@@ -398,8 +398,8 @@ export default function DashboardView({ engagement, framework, role = "consultan
             </div>
             <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100">
               {Object.entries(RATING_CONFIG).map(([key, config]) => (
-                <div key={key} className="flex items-center gap-1.5 text-xs text-gray-500">
-                  <div className="w-3 h-3 rounded" style={{ backgroundColor: config.bg, border: `1px solid ${config.color}` }} />
+                <div key={key} className="flex items-center gap-1.5 text-xs text-gray-600 font-medium">
+                  <div className="w-3.5 h-3.5 rounded" style={{ backgroundColor: config.bg, border: `1.5px solid ${config.color}` }} />
                   {config.label}
                 </div>
               ))}
@@ -412,7 +412,7 @@ export default function DashboardView({ engagement, framework, role = "consultan
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <h2 className="text-sm font-semibold text-gray-900 mb-4">Key Findings (Preliminary)</h2>
               {scoredComponents === 0 ? (
-                <p className="text-sm text-gray-400">No component assessments yet. Upload evidence and run AI assessments to see findings.</p>
+                <p className="text-sm text-gray-400">No component assessments yet. Upload evidence and run assessments to see findings.</p>
               ) : (
                 <div className="space-y-3">
                   {scores
@@ -437,7 +437,7 @@ export default function DashboardView({ engagement, framework, role = "consultan
                               <span className="text-xs font-semibold text-gray-500">{comp?.code}</span>
                               <span className="text-sm font-medium text-gray-800 group-hover:text-indigo-600 transition">{comp?.name}</span>
                               <span
-                                className="text-[10px] font-medium px-2 py-0.5 rounded-full ml-auto flex-shrink-0"
+                                className="text-[11px] font-semibold px-2 py-0.5 rounded-full ml-auto flex-shrink-0"
                                 style={{ backgroundColor: config.bg, color: config.color }}
                               >
                                 {config.label}

@@ -234,11 +234,11 @@ export interface AIFeedbackItem {
 export type UserRole = "consultant" | "school_admin";
 
 export const RATING_CONFIG = {
-  excelling: { label: "Excelling", color: "#059669", bg: "#ECFDF5", textClass: "text-emerald-700" },
-  meeting_expectations: { label: "Meeting Expectations", color: "#6366F1", bg: "#EEF2FF", textClass: "text-indigo-700" },
-  developing: { label: "Developing", color: "#F59E0B", bg: "#FFFBEB", textClass: "text-amber-700" },
-  needs_improvement: { label: "Needs Improvement", color: "#EF4444", bg: "#FEF2F2", textClass: "text-red-700" },
-  not_rated: { label: "Not Rated", color: "#9CA3AF", bg: "#F9FAFB", textClass: "text-gray-500" },
+  excelling: { label: "Excelling", color: "#065F46", bg: "#D1FAE5", textClass: "text-emerald-800" },
+  meeting_expectations: { label: "Meeting Expectations", color: "#3730A3", bg: "#E0E7FF", textClass: "text-indigo-800" },
+  developing: { label: "Developing", color: "#92400E", bg: "#FEF3C7", textClass: "text-amber-800" },
+  needs_improvement: { label: "Needs Improvement", color: "#991B1B", bg: "#FEE2E2", textClass: "text-red-800" },
+  not_rated: { label: "Not Rated", color: "#4B5563", bg: "#F3F4F6", textClass: "text-gray-600" },
 } as const;
 
 export const STATUS_CONFIG = {
