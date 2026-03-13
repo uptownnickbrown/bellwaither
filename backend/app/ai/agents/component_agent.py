@@ -2,12 +2,15 @@
 Synthesizes evidence for a single SQF component and produces ratings."""
 
 import json
+import logging
 
 from openai import AsyncOpenAI
 
 from app.ai.model_router import AITaskType, get_model_for_task
 from app.ai.prompts.system_prompts import COMPONENT_ASSESSMENT_PROMPT
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 async def assess_component(
@@ -21,6 +24,8 @@ async def assess_component(
     """Assess a single SQF component based on mapped evidence."""
     client = AsyncOpenAI(api_key=settings.openai_api_key)
     model = get_model_for_task(AITaskType.COMPONENT_ASSESSMENT)
+
+    logger.info("Component assessment started: %s %s model=%s evidence_count=%d", component_code, component_name, model, len(evidence_items))
 
     # Format evidence for the prompt
     evidence_text = ""
@@ -60,4 +65,5 @@ Respond with JSON only."""}
     result = json.loads(response.choices[0].message.content)
     result["model_used"] = model
     result["evidence_count"] = len(evidence_items)
+    logger.info("Component assessment completed: %s model=%s rating=%s", component_code, model, result.get("rating"))
     return result

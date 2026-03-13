@@ -413,12 +413,13 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
 
         await getMessages(engagementId, selectedThread.id).then(setMessages);
         loadThreads();
-      } catch {
-        // Post error message
+      } catch (e) {
+        const detail = e instanceof Error ? e.message : "Unknown error";
+        console.error("Messaging AI error:", detail);
         await sendMessage(engagementId, selectedThread.id, {
           author: "Meridian AI",
           role: "assistant",
-          content: "Sorry, I encountered an error processing that request. Please try again.",
+          content: `Sorry, I encountered an error processing that request. ${detail}`,
         });
         await getMessages(engagementId, selectedThread.id).then(setMessages);
       }

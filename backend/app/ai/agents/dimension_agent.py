@@ -2,12 +2,15 @@
 Synthesizes across components within a single SQF dimension."""
 
 import json
+import logging
 
 from openai import AsyncOpenAI
 
 from app.ai.model_router import AITaskType, get_model_for_task
 from app.ai.prompts.system_prompts import DIMENSION_SYNTHESIS_PROMPT
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 async def synthesize_dimension(
@@ -17,6 +20,8 @@ async def synthesize_dimension(
     """Synthesize findings across all components in a dimension."""
     client = AsyncOpenAI(api_key=settings.openai_api_key)
     model = get_model_for_task(AITaskType.DIMENSION_SYNTHESIS)
+
+    logger.info("Dimension synthesis started: %s model=%s components=%d", dimension_name, model, len(component_scores))
 
     # Format component data
     component_text = ""
@@ -48,4 +53,5 @@ async def synthesize_dimension(
 
     result = json.loads(response.choices[0].message.content)
     result["model_used"] = model
+    logger.info("Dimension synthesis completed: %s model=%s", dimension_name, model)
     return result

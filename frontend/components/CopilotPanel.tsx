@@ -200,7 +200,9 @@ export default function CopilotPanel({ engagementId, schoolName, context, role, 
         },
       ]);
     } catch (e) {
-      setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, I encountered an error. Please try again." }]);
+      const detail = e instanceof Error ? e.message : "Unknown error";
+      console.error("Copilot error:", detail);
+      setMessages((prev) => [...prev, { role: "assistant", content: `Sorry, I encountered an error. ${detail}` }]);
     }
     setLoading(false);
   };

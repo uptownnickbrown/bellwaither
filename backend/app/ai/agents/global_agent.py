@@ -2,12 +2,15 @@
 Produces executive-level synthesis across all dimensions."""
 
 import json
+import logging
 
 from openai import AsyncOpenAI
 
 from app.ai.model_router import AITaskType, get_model_for_task
 from app.ai.prompts.system_prompts import GLOBAL_ORCHESTRATION_PROMPT
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 async def generate_global_summary(
@@ -18,6 +21,8 @@ async def generate_global_summary(
     """Generate a global executive summary across all dimensions."""
     client = AsyncOpenAI(api_key=settings.openai_api_key)
     model = get_model_for_task(AITaskType.GLOBAL_ORCHESTRATION)
+
+    logger.info("Global summary started: school=%s stage=%s model=%s dimensions=%d", school_name, stage, model, len(dimension_summaries))
 
     # Format dimension data
     dimension_text = ""
@@ -50,4 +55,5 @@ async def generate_global_summary(
 
     result = json.loads(response.choices[0].message.content)
     result["model_used"] = model
+    logger.info("Global summary completed: school=%s model=%s", school_name, model)
     return result

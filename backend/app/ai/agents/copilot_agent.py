@@ -1,6 +1,7 @@
 """Cross-cutting: AI Copilot agent for interactive Q&A with tool-calling support."""
 
 import json
+import logging
 import uuid
 from datetime import datetime
 
@@ -13,6 +14,8 @@ from app.ai.prompts.system_prompts import COPILOT_SYSTEM_PROMPT
 from app.config import settings
 from app.models import Component, DataRequest
 from app.models.data_request import RequestPriority, RequestStatus
+
+logger = logging.getLogger(__name__)
 
 
 # ---- OpenAI Tool Definitions ----
@@ -206,6 +209,8 @@ async def copilot_chat(
         call_kwargs["tools"] = COPILOT_TOOLS
         call_kwargs["tool_choice"] = "auto"
 
+    logger.info("Copilot chat started: model=%s role=%s context=%s tools=%s", model, user_role, current_context, tools_enabled)
+
     response = await client.chat.completions.create(**call_kwargs)
 
     assistant_message = response.choices[0].message
@@ -271,6 +276,8 @@ async def copilot_chat(
         final_content = follow_up.choices[0].message.content
     else:
         final_content = assistant_message.content
+
+    logger.info("Copilot chat completed: model=%s tool_calls=%d", model, len(tool_results))
 
     return {
         "content": final_content,

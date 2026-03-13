@@ -2,9 +2,12 @@
 Model Router: Routes AI requests to the appropriate model based on task type.
 Designed for future eval-based routing and A/B testing.
 """
+import logging
 from enum import Enum
 
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 class AITaskType(str, Enum):
@@ -47,4 +50,6 @@ MODEL_ROUTING: dict[AITaskType, str] = {
 
 def get_model_for_task(task_type: AITaskType) -> str:
     """Get the appropriate model for a given task type."""
-    return MODEL_ROUTING.get(task_type, settings.model_extraction)
+    model = MODEL_ROUTING.get(task_type, settings.model_extraction)
+    logger.debug("Routed task %s -> model %s", task_type.value, model)
+    return model

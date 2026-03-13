@@ -6,7 +6,12 @@ async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
     ...options,
   });
   if (!res.ok) {
-    throw new Error(`API error: ${res.status} ${res.statusText}`);
+    let detail = res.statusText;
+    try {
+      const body = await res.json();
+      if (body.detail) detail = body.detail;
+    } catch { /* no JSON body */ }
+    throw new Error(`API error ${res.status}: ${detail}`);
   }
   return res.json();
 }

@@ -194,6 +194,7 @@ async def upload_evidence(
         evidence.title = ai_result.get("title", file.filename)
         await log_activity(db, engagement_id, uploaded_by, "uploaded", "evidence", evidence.title or file.filename, f"AI extracted {len(ai_result.get('key_findings', []))} key findings")
     except Exception as e:
+        logger.exception("Evidence processing failed for %s (engagement %s)", file.filename, engagement_id)
         evidence.processing_status = ProcessingStatus.FAILED
         evidence.processing_error = str(e)
 
@@ -364,14 +365,18 @@ async def assess_component_endpoint(
     progress_indicators = [c.text for c in comp.criteria if c.criterion_type == CriterionType.PROGRESS_INDICATOR]
 
     # Run AI assessment
-    ai_result = await assess_component(
-        component_code=comp.code,
-        component_name=comp.name,
-        dimension_name=comp.dimension.name if comp.dimension else "Unknown",
-        core_actions=core_actions,
-        progress_indicators=progress_indicators,
-        evidence_items=evidence_items,
-    )
+    try:
+        ai_result = await assess_component(
+            component_code=comp.code,
+            component_name=comp.name,
+            dimension_name=comp.dimension.name if comp.dimension else "Unknown",
+            core_actions=core_actions,
+            progress_indicators=progress_indicators,
+            evidence_items=evidence_items,
+        )
+    except Exception as e:
+        logger.exception("AI component assessment failed for %s", comp.code)
+        raise HTTPException(status_code=502, detail=f"AI service error during component assessment: {e}")
 
     # Upsert score
     existing = await db.execute(
@@ -994,7 +999,11 @@ async def synthesize_dimension_endpoint(
             detail="Insufficient evidence: no components in this dimension have been assessed yet.",
         )
 
-    ai_result = await synthesize_dimension(dim.name, component_scores_data)
+    try:
+        ai_result = await synthesize_dimension(dim.name, component_scores_data)
+    except Exception as e:
+        logger.exception("AI dimension synthesis failed for %s", dim.name)
+        raise HTTPException(status_code=502, detail=f"AI service error during dimension synthesis: {e}")
 
     summary = DimensionSummary(
         engagement_id=engagement_id,
@@ -1072,7 +1081,11 @@ async def generate_global_summary_endpoint(
             "compounding_risks": ds.compounding_risks,
         })
 
-    ai_result = await generate_global_summary(eng.school_name, eng.stage.value, dimension_data)
+    try:
+        ai_result = await generate_global_summary(eng.school_name, eng.stage.value, dimension_data)
+    except Exception as e:
+        logger.exception("AI global summary generation failed for engagement %s", engagement_id)
+        raise HTTPException(status_code=502, detail=f"AI service error during global summary: {e}")
 
     summary = GlobalSummary(
         engagement_id=engagement_id,
@@ -1458,16 +1471,20 @@ async def copilot_endpoint(
             ctx["key_findings"] = ev.extractions[0].key_findings
         evidence_context.append(ctx)
 
-    result = await copilot_chat(
-        school_name=eng.school_name,
-        current_context=data.context,
-        user_role=data.role,
-        user_message=data.message,
-        evidence_context=evidence_context,
-        conversation_history=data.conversation_history,
-        engagement_id=engagement_id,
-        db=db,
-    )
+    try:
+        result = await copilot_chat(
+            school_name=eng.school_name,
+            current_context=data.context,
+            user_role=data.role,
+            user_message=data.message,
+            evidence_context=evidence_context,
+            conversation_history=data.conversation_history,
+            engagement_id=engagement_id,
+            db=db,
+        )
+    except Exception as e:
+        logger.exception("AI copilot chat failed for engagement %s", engagement_id)
+        raise HTTPException(status_code=502, detail=f"AI service error during copilot chat: {e}")
 
     return CopilotResponse(**result)
 
