@@ -257,7 +257,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
           <p className="text-sm text-gray-500">
             {isAdmin
               ? "Component-level diagnostic results for your school"
-              : "AI-powered multi-level assessment with evidence traceability"}
+              : "Multi-level assessment with evidence traceability"}
           </p>
         </div>
       </div>
@@ -440,7 +440,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                               <span className="text-[10px] text-gray-400">{score.confidence}</span>
                             )}
                             {/* Approve/Unlock button (consultant only) */}
-                            {!isAdmin && score && score.rating !== "not_rated" && (
+                            {!isAdmin && score && (score.rating !== "not_rated" || isApproved) && (
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -476,7 +476,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                       : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
                                 }`}
-                                title={hasNoEvidence ? "No evidence mapped" : isApproved ? "Unlock to reassess" : "Run AI assessment"}
+                                title={hasNoEvidence ? "No evidence mapped" : isApproved ? "Unlock to reassess" : "Run assessment"}
                               >
                                 {loading === comp.id ? (
                                   <Loader2 className="w-3 h-3 animate-spin" />
@@ -637,7 +637,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                           value={summary.overall_assessment}
                           multiline
                           className="text-sm text-gray-700 leading-relaxed"
-                          readOnly={isAdmin}
+                          readOnly={isAdmin || isApproved}
                           onSave={async (v) => {
                             await updateDimensionSummary(engagementId, summary.id, { overall_assessment: v });
                             setDimSummaries(dimSummaries.map((ds) => ds.id === summary.id ? { ...ds, overall_assessment: v } : ds));
@@ -662,7 +662,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                                 <EditableListItem
                                   value={p}
                                   className="text-xs text-gray-600 flex-1"
-                                  readOnly={isAdmin}
+                                  readOnly={isAdmin || isApproved}
                                   onSave={async (v) => {
                                     const updated = [...(summary.patterns || [])];
                                     updated[i] = v;
@@ -685,7 +685,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                                 <EditableListItem
                                   value={o}
                                   className="text-xs text-gray-600 flex-1"
-                                  readOnly={isAdmin}
+                                  readOnly={isAdmin || isApproved}
                                   onSave={async (v) => {
                                     const updated = [...(summary.top_opportunities || [])];
                                     updated[i] = v;
@@ -823,7 +823,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                       value={globalSummary.executive_summary}
                       multiline
                       className="text-sm text-gray-700 leading-relaxed whitespace-pre-line"
-                      readOnly={isAdmin}
+                      readOnly={isAdmin || globalSummary.approved}
                       onSave={async (v) => {
                         await updateGlobalSummary(engagementId, globalSummary.id, { executive_summary: v });
                         setGlobalSummary({ ...globalSummary, executive_summary: v });
@@ -846,7 +846,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                       field="top_strengths"
                       engagementId={engagementId}
                       summaryId={globalSummary.id}
-                      readOnly={isAdmin}
+                      readOnly={isAdmin || globalSummary.approved}
                       onUpdate={(updated) => setGlobalSummary({ ...globalSummary, top_strengths: updated })}
                     />
                   )}
@@ -858,7 +858,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                       field="critical_gaps"
                       engagementId={engagementId}
                       summaryId={globalSummary.id}
-                      readOnly={isAdmin}
+                      readOnly={isAdmin || globalSummary.approved}
                       onUpdate={(updated) => setGlobalSummary({ ...globalSummary, critical_gaps: updated })}
                     />
                   )}
@@ -870,7 +870,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                       field="strategic_priorities"
                       engagementId={engagementId}
                       summaryId={globalSummary.id}
-                      readOnly={isAdmin}
+                      readOnly={isAdmin || globalSummary.approved}
                       onUpdate={(updated) => setGlobalSummary({ ...globalSummary, strategic_priorities: updated })}
                     />
                   )}
@@ -882,7 +882,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                       field="recommended_next_steps"
                       engagementId={engagementId}
                       summaryId={globalSummary.id}
-                      readOnly={isAdmin}
+                      readOnly={isAdmin || globalSummary.approved}
                       onUpdate={(updated) => setGlobalSummary({ ...globalSummary, recommended_next_steps: updated })}
                     />
                   )}
@@ -947,7 +947,7 @@ function ScoreDetail({
             <span className="text-base font-semibold text-gray-900">{comp?.name}</span>
           </div>
           {/* Approval toggle in detail panel (consultant only) */}
-          {!isAdmin && score.rating !== "not_rated" && (
+          {!isAdmin && (score.rating !== "not_rated" || isApproved) && (
             <button
               onClick={() => onToggleApproval(!isApproved)}
               disabled={loading === `approve-${score.id}`}
@@ -1004,7 +1004,7 @@ function ScoreDetail({
             <FileQuestion className="w-6 h-6 text-amber-400 flex-shrink-0" />
             <div>
               <p className="text-sm font-medium text-amber-700">No Evidence Mapped</p>
-              <p className="text-xs text-amber-600 mt-0.5">Upload or map evidence to this component to enable AI assessment.</p>
+              <p className="text-xs text-amber-600 mt-0.5">Upload or map evidence to this component to enable assessment.</p>
             </div>
           </div>
         )}
@@ -1017,7 +1017,7 @@ function ScoreDetail({
             <ul className="space-y-1.5">
               {score.strengths.map((s, i) => (
                 <li key={i} className="text-sm text-gray-600 pl-4 relative before:content-['+'] before:absolute before:left-0 before:text-emerald-500 before:font-semibold">
-                  <EditableListItem value={s} readOnly={isAdmin} onSave={(v) => patchListItem("strengths", score.strengths!, i, v)} />
+                  <EditableListItem value={s} readOnly={isAdmin || isApproved} onSave={(v) => patchListItem("strengths", score.strengths!, i, v)} />
                 </li>
               ))}
             </ul>
@@ -1032,7 +1032,7 @@ function ScoreDetail({
             <ul className="space-y-1.5">
               {score.gaps.map((g, i) => (
                 <li key={i} className="text-sm text-gray-600 pl-4 relative before:content-['-'] before:absolute before:left-0 before:text-amber-500 before:font-semibold">
-                  <EditableListItem value={g} readOnly={isAdmin} onSave={(v) => patchListItem("gaps", score.gaps!, i, v)} />
+                  <EditableListItem value={g} readOnly={isAdmin || isApproved} onSave={(v) => patchListItem("gaps", score.gaps!, i, v)} />
                 </li>
               ))}
             </ul>
@@ -1046,18 +1046,18 @@ function ScoreDetail({
             <ul className="space-y-1.5">
               {score.contradictions.map((c, i) => (
                 <li key={i} className="text-sm text-gray-600 bg-red-50 p-2 rounded">
-                  <EditableListItem value={c} onSave={(v) => patchListItem("contradictions", score.contradictions!, i, v)} />
+                  <EditableListItem value={c} readOnly={isApproved} onSave={(v) => patchListItem("contradictions", score.contradictions!, i, v)} />
                 </li>
               ))}
             </ul>
           </div>
         )}
 
-        {/* AI Rationale - hidden for school_admin role, exposes internal tooling details */}
+        {/* Rationale - hidden for school_admin role */}
         {!isAdmin && score.ai_rationale && (
           <div>
             <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">
-              AI Rationale
+              Rationale
               <AIFeedback
                 engagementId={engagementId}
                 targetType="component_score"
@@ -1069,11 +1069,11 @@ function ScoreDetail({
               <EditableText
                 value={score.ai_rationale}
                 multiline
+                readOnly={isAdmin || isApproved}
                 className="text-sm text-gray-600"
                 onSave={(v) => patchScore("ai_rationale", v)}
               />
             </div>
-            <p className="text-[10px] text-gray-400 mt-1">Model: {score.model_used}</p>
           </div>
         )}
 
@@ -1086,7 +1086,7 @@ function ScoreDetail({
               {score.suggested_actions.map((a, i) => (
                 <li key={i} className="text-sm text-gray-600 flex items-start gap-2">
                   <span className="w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
-                  <EditableListItem value={a} className="flex-1" readOnly={isAdmin} onSave={(v) => patchListItem("suggested_actions", score.suggested_actions!, i, v)} />
+                  <EditableListItem value={a} className="flex-1" readOnly={isAdmin || isApproved} onSave={(v) => patchListItem("suggested_actions", score.suggested_actions!, i, v)} />
                 </li>
               ))}
             </ul>
