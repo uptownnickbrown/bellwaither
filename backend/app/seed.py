@@ -1,7 +1,10 @@
 """Seed data: SQF framework + demo engagement for Lincoln Innovation Academy."""
 
+import json
+import os
 import uuid
 from datetime import datetime, timedelta
+from pathlib import Path
 
 from sqlalchemy import select
 
@@ -13,7 +16,17 @@ from app.models.evidence import Evidence, EvidenceExtraction, EvidenceMapping, E
 from app.models.framework import Component, CriterionType, Dimension, SuccessCriterion
 from app.models.messaging import Message, MessageThread, ThreadType
 from app.models.activity import ActivityLog
-from app.models.scoring import ComponentScore, RatingLevel, ScoreStatus
+from app.models.scoring import ComponentScore, DimensionSummary, GlobalSummary, RatingLevel, ScoreStatus
+
+FIXTURES_PATH = Path(__file__).parent / "fixtures" / "ai_assessments.json"
+
+
+def _load_fixtures() -> dict | None:
+    """Load pre-generated AI assessment fixtures if available."""
+    if FIXTURES_PATH.is_file():
+        with open(FIXTURES_PATH) as f:
+            return json.load(f)
+    return None
 
 # Fixed UUIDs for demo data consistency
 ENGAGEMENT_ID = uuid.UUID("10000000-0000-0000-0000-000000000001")
@@ -702,6 +715,238 @@ SQF_FRAMEWORK = [
     },
 ]
 
+# Evidence data used by seed and generate_fixtures script
+# Each entry: (filename, evidence_type, uploader, summary, key_findings, mapped_component_codes)
+EVIDENCE_DATA = [
+    ("School_Improvement_Plan_Goals_Tracker_2024-2025.csv", EvidenceType.SPREADSHEET, "Lead Consultant",
+     "School improvement plan tracking 10 strategic goals aligned to SQF dimensions with baseline metrics, targets, mid-year actuals, status indicators, key strategies, and responsible leads.",
+     ["10 strategic goals mapped to SQF dimensions with measurable targets",
+      "Reading proficiency goal: 55% target vs 52% mid-year actual (on track)",
+      "Math proficiency goal: 45% target vs 39% mid-year actual (behind)",
+      "Teacher retention target of 87% with mid-year tracking at 84%",
+      "Family engagement satisfaction target of 80% currently at 78%",
+      "4 goals on track, 3 in progress, 2 behind, 1 at risk"],
+     ["1A", "1B", "1C", "5A", "5D"]),
+    ("Professional_Development_Log_2024-2025.csv", EvidenceType.SPREADSHEET, "Data Steward",
+     "Complete log of 27 professional development sessions from August 2024 to March 2025, covering topics from curriculum alignment to culturally responsive teaching, trauma-informed practices, and data-driven instruction.",
+     ["27 PD sessions conducted across the school year",
+      "Topics include differentiation, data-driven instruction, culturally responsive teaching, and trauma-informed practices",
+      "Mix of whole-staff, grade-band, and department-specific sessions",
+      "External facilitators used for specialized topics like culturally responsive teaching",
+      "Average session length of 2-3 hours with both full-day and after-school formats"],
+     ["4A", "4D", "2C"]),
+    ("Curriculum_Scope_and_Sequence_ELA_K-8.md", EvidenceType.DOCUMENT, "Lead Consultant",
+     "Complete K-8 ELA curriculum scope and sequence showing adopted programs (EL Education K-5, StudySync 6-8), unit structure with quarterly organization, standards mapping, and assessment integration.",
+     ["EL Education adopted for K-5 ELA, StudySync for grades 6-8",
+      "Curriculum organized into quarterly units with clear scope and sequence",
+      "Standards explicitly mapped to each unit",
+      "Writing instruction integrated across all grade levels",
+      "Supplemental materials include Fundations for phonics (K-2) and Vocabulary Workshop for middle school"],
+     ["2A", "2B"]),
+    ("Student_Behavior_and_Discipline_Data_2024-2025.csv", EvidenceType.SPREADSHEET, "Data Steward",
+     "Incident-level discipline data tracking 29 behavioral incidents through February 2025, including incident types, responses, use of restorative practices, demographic information, and outcomes.",
+     ["29 behavioral incidents recorded through February 2025",
+      "Restorative practices used in majority of incidents",
+      "Disrespect and disruption are most common incident types",
+      "Middle school grades (6-8) account for disproportionate share of incidents",
+      "Out-of-school suspensions limited to 3 cases, indicating restorative approach",
+      "Some racial disproportionality evident in referral patterns"],
+     ["3A", "3E"]),
+    ("SEL_Survey_Results_Student_Panorama_Winter_2025.csv", EvidenceType.SPREADSHEET, "School Leader",
+     "School-wide Panorama SEL survey results by grade showing 10 constructs including belonging, safety, teacher-student relationships, and engagement, with national percentile rankings and mid-year trend data.",
+     ["Sense of belonging at 72nd national percentile overall",
+      "School safety perception at 81st percentile",
+      "Teacher-student relationships rated highly at 78th percentile",
+      "Self-management scores lowest at 45th percentile",
+      "Growth mindset improved 8 points from fall to winter",
+      "Middle school belonging scores lower than elementary (58th vs 82nd percentile)"],
+     ["3A", "3B", "3C"]),
+    ("Community_Partnership_Agreements_Summary.md", EvidenceType.DOCUMENT, "Lead Consultant",
+     "Summary of 14 active community partnerships including University of Minnesota, healthcare providers, arts organizations, and social service agencies, with details on scope, impact metrics, and partnership duration.",
+     ["14 active community partnerships documented",
+      "University of Minnesota provides tutoring and student teacher placements",
+      "YMCA operates after-school program serving 95 students",
+      "Healthcare partnerships provide vision/dental screenings for all students",
+      "Arts partnerships include Minnesota Orchestra and local theater company",
+      "Several partnerships exceed 3 years showing sustained commitment"],
+     ["6A", "6B"]),
+    ("Fundraising_and_Development_Report_2024-2025.md", EvidenceType.DOCUMENT, "Data Steward",
+     "Annual fundraising and development report showing $142.8K raised YTD against $195K goal (73% to target), including annual gala results, grant portfolio, corporate matching programs, and donor retention analysis.",
+     ["$142.8K raised year-to-date against $195K annual goal",
+      "Annual gala generated $52K (largest single event)",
+      "Grant portfolio includes 6 active grants totaling $87K",
+      "Corporate matching program growing with 12 participating employers",
+      "Donor retention rate of 68% (below 75% nonprofit benchmark)",
+      "Revenue diversification remains a challenge with heavy reliance on per-pupil funding"],
+     ["9A", "9B", "9C"]),
+    ("Student_Attendance_Data_2024-2025.csv", EvidenceType.SPREADSHEET, "Data Steward",
+     "Monthly attendance data by grade (K-8) from September to December 2024, tracking daily attendance rates, chronic absence percentages, and seasonal variation patterns.",
+     ["School-wide average daily attendance of 94.2%",
+      "Chronic absenteeism rate of 12.8% (above 10% state benchmark)",
+      "Kindergarten and 6th grade have highest chronic absence rates",
+      "Attendance dips notably in November-December across all grades",
+      "K-2 attendance averages 95.1% vs 6-8 at 92.8%",
+      "Pattern suggests transition years (K, 6) need targeted attendance interventions"],
+     ["3D", "2D"]),
+    ("Staff_Satisfaction_Survey_Results_2025.csv", EvidenceType.SPREADSHEET, "School Leader",
+     "Staff satisfaction survey with 29 respondents covering leadership, professional development, collaboration, work-life balance, compensation, school culture, communication, and resource adequacy.",
+     ["29 out of 32 staff responded (91% response rate)",
+      "School culture rated highest at average 4.2/5.0",
+      "Leadership satisfaction at 3.8/5.0",
+      "Professional development satisfaction at 3.5/5.0 with notable variation",
+      "Compensation rated lowest at 2.9/5.0",
+      "Work-life balance concerns evident at 3.2/5.0",
+      "Collaboration rated 4.0/5.0 indicating strong team culture"],
+     ["4A", "4B", "4C"]),
+    ("Teacher_Evaluation_Summary_2024-2025.csv", EvidenceType.SPREADSHEET, "Lead Consultant",
+     "Formal teacher evaluation data for 21 staff members using Danielson Framework, with ratings across 4 domains, observation dates, identified growth areas, and professional development recommendations.",
+     ["21 teachers evaluated using Danielson Framework rubric",
+      "Domain 1 (Planning) average: 2.9/4.0",
+      "Domain 2 (Classroom Environment) average: 3.2/4.0 (strongest)",
+      "Domain 3 (Instruction) average: 2.7/4.0",
+      "Domain 4 (Professional Responsibilities) average: 3.0/4.0",
+      "Differentiation and questioning identified as most common growth areas",
+      "3 teachers on improvement plans"],
+     ["4A", "4C", "2C"]),
+    ("Parent_Teacher_Conference_Attendance_Fall_2024.csv", EvidenceType.SPREADSHEET, "School Leader",
+     "Fall 2024 parent-teacher conference data by teacher showing attendance rates, interpreter usage, virtual vs in-person participation, and family engagement notes across all grade levels.",
+     ["Overall conference attendance rate of 83%",
+      "Attendance ranges from 71% to 96% across classrooms",
+      "Interpreter services used in 18% of conferences",
+      "Virtual option utilized by 22% of families",
+      "K-2 attendance higher (89%) than middle school (76%)",
+      "Teachers note language barrier as primary obstacle for non-attending families"],
+     ["6A", "3B"]),
+    ("Enrollment_Trends_and_Projections_2019-2027.csv", EvidenceType.SPREADSHEET, "Data Steward",
+     "Historical enrollment data from 2019 to 2025 with projections through 2027, showing growth from 268 to 420 students with demographic breakdowns including FRL, ELL, special education, and students of color percentages.",
+     ["Enrollment grew from 268 (2019) to 420 (2025) — 57% increase over 6 years",
+      "Free/reduced lunch percentage stable at approximately 72%",
+      "ELL population growing from 18% to 23%",
+      "Special education population at 13.8% (above state average)",
+      "Declining 6th grade enrollment trend noted in recent years",
+      "Projections show enrollment plateau around 440 by 2027"],
+     ["1C", "9C"]),
+    ("Technology_Plan_and_Inventory_2024-2026.md", EvidenceType.DOCUMENT, "Analyst",
+     "Three-year technology strategic plan with vision, guiding principles, current device inventory (Chromebooks, iPads, interactive displays), infrastructure assessment, and refresh cycle plans aligned to school values.",
+     ["1:1 Chromebook program for grades 3-8, shared iPad carts for K-2",
+      "120 student Chromebooks with 18% approaching end-of-life",
+      "Interactive displays in 65% of classrooms",
+      "WiFi infrastructure rated adequate but needs upgrade for growing enrollment",
+      "Technology budget of $45K annually (below recommended per-pupil benchmarks)",
+      "Digital citizenship curriculum integrated into advisory periods"],
+     ["8A", "8B", "9A"]),
+    ("Safety_and_Emergency_Procedures_Manual.txt", EvidenceType.DOCUMENT, "School Leader",
+     "Comprehensive emergency procedures manual covering lockdown, fire, severe weather, medical emergency, bomb threat, and active threat protocols with assigned staff roles and communication procedures.",
+     ["Protocols documented for 6 emergency types",
+      "Staff roles clearly assigned for each emergency scenario",
+      "Monthly fire drills and quarterly lockdown drills mandated",
+      "Communication plan includes parent notification procedures",
+      "Manual last updated August 2024",
+      "Reunification procedures included for off-site evacuations"],
+     ["3D", "3E"]),
+    ("Communication_Plan_2024-2025.md", EvidenceType.DOCUMENT, "Lead Consultant",
+     "Strategic communications plan describing channels (ParentSquare, newsletters, conferences), stakeholder segments, language accessibility provisions, communication frequency, and message framing strategies.",
+     ["ParentSquare adopted as primary digital communication platform",
+      "Weekly newsletter distributed in English and Spanish",
+      "Communication plan identifies 5 key stakeholder groups",
+      "Social media strategy includes Facebook and Instagram with weekly posts",
+      "Translation services available for 4 languages beyond English and Spanish",
+      "Communication satisfaction data referenced showing 64% satisfaction rate"],
+     ["6A", "6B", "5C"]),
+    ("After_School_Program_Report_2024-2025.md", EvidenceType.DOCUMENT, "Analyst",
+     "YMCA partnership after-school program report showing 95 students served (22.6% of enrollment), with academic support, enrichment activities, attendance data, and fee waiver information.",
+     ["95 students enrolled (22.6% of school enrollment)",
+      "YMCA operates program with 8 staff members",
+      "Academic support component includes homework help and tutoring",
+      "Enrichment includes STEM, arts, and physical activity",
+      "61% of participants receive fee waivers",
+      "Program attendance averages 82% among enrolled students"],
+     ["6B", "3C", "2E"]),
+    ("ELL_Program_Overview_and_Data_2024-2025.md", EvidenceType.DOCUMENT, "Lead Consultant",
+     "English Language Learner program overview serving 97 students (23.1% of enrollment) across 7 home languages, with co-teaching and pull-out service delivery models, ACCESS benchmark data, and reclassification rates.",
+     ["97 ELL students representing 23.1% of enrollment",
+      "7 home languages represented with Spanish (68%) and Somali (18%) most common",
+      "Co-teaching model used in grades K-5, pull-out support for grades 6-8",
+      "ACCESS proficiency benchmark met by 34% of ELL students",
+      "Reclassification rate of 12% annually",
+      "2 certified ESL teachers plus 1 bilingual paraprofessional"],
+     ["2F", "2E", "3B"]),
+    ("Title_I_and_Federal_Funding_Compliance_Report.txt", EvidenceType.DOCUMENT, "Data Steward",
+     "Federal funding compliance report showing $148.5K Title I allocation with detailed expenditure tracking across interventions, staffing supplements, professional development, and parent engagement activities.",
+     ["Title I allocation of $148.5K for 2024-25",
+      "72% of students qualify for free/reduced lunch (schoolwide program)",
+      "Funds distributed: 45% interventions, 30% staffing, 15% PD, 10% parent engagement",
+      "Supplement-not-supplant requirements documented and met",
+      "Parent engagement set-aside of $14.8K (10% of allocation)",
+      "Compliance review passed with no findings in 2024"],
+     ["9A", "9B"]),
+    ("Wellness_Committee_Meeting_Minutes_Nov_2024.txt", EvidenceType.DOCUMENT, "School Leader",
+     "Wellness committee meeting minutes from November 2024 covering wellness policy review, physical activity minutes tracking, nutrition program updates, mental health resources, and SEL curriculum integration.",
+     ["Wellness committee includes 8 members across staff, parents, and community",
+      "Physical activity minutes exceed state minimum by 15%",
+      "School meal program participation at 78%",
+      "Mental health counselor added half-time position this year",
+      "SEL curriculum (Second Step) implemented K-8",
+      "Committee identified need for more recess time in middle school grades"],
+     ["3C", "3D"]),
+    ("Annual_School_Calendar_and_Key_Dates_2024-2025.csv", EvidenceType.SPREADSHEET, "Analyst",
+     "Master school calendar showing all significant dates including PD days, parent-teacher conferences, board meetings, community events, fundraisers, emergency drills, and state testing windows for the 2024-25 school year.",
+     ["180 instructional days scheduled (meets state minimum)",
+      "12 professional development days built into calendar",
+      "4 parent-teacher conference windows scheduled",
+      "Board meetings monthly on third Thursday",
+      "State testing windows clearly marked for spring",
+      "8 community/family events distributed across the school year"],
+     ["1C", "5B"]),
+    ("Staff_Meeting_PD_Attendance_Log_2024-2025.csv", EvidenceType.SPREADSHEET, "Data Steward",
+     "Attendance tracking for 30 staff members across 20 professional development sessions throughout the year, showing individual attendance rates ranging from 80% to 100% and session-level participation.",
+     ["30 staff members tracked across 20 PD sessions",
+      "School-wide average PD attendance rate of 92%",
+      "5 staff members have 100% attendance",
+      "Lowest individual attendance rate is 80% (4 absences)",
+      "After-school sessions have slightly lower attendance than full-day PD",
+      "No pattern of specific departments having lower attendance"],
+     ["4D", "5B"]),
+    ("Special_Education_Compliance_Report_2024-2025.md", EvidenceType.DOCUMENT, "Lead Consultant",
+     "Special education compliance report showing 58 students with IEPs (13.8% of enrollment), service delivery models, staffing levels, compliance metrics, evaluation timelines, and areas for improvement.",
+     ["58 students with IEPs (13.8% of enrollment, above state average of 14.2%)",
+      "Compliance rate of 96% for IEP meeting timelines",
+      "3 special education teachers plus 4 paraprofessionals",
+      "Inclusion rate of 72% (students in general education 80%+ of day)",
+      "Evaluation completion within 60-day timeline at 94%",
+      "Parent participation in IEP meetings at 88%",
+      "Identified need for more co-teaching training"],
+     ["2F", "2E"]),
+    ("Grade_Level_Meeting_Notes_5th_Grade_Jan_2025.txt", EvidenceType.DOCUMENT, "Analyst",
+     "Fifth grade team meeting notes from January 2025 covering student data review, intervention block planning, project-based learning unit coordination, and differentiation strategies discussion.",
+     ["Data review shows 5th grade reading at 58% proficiency",
+      "Math proficiency at 41% with specific skills gaps identified",
+      "Intervention block schedule adjusted based on winter benchmark data",
+      "PBL unit on local government planned for spring semester",
+      "Team discussed differentiation strategies for 6 students below benchmark",
+      "Collaborative planning time used effectively for cross-subject coordination"],
+     ["2C", "2D", "4D"]),
+    ("New_Teacher_Onboarding_Checklist_2024-2025.md", EvidenceType.DOCUMENT, "Lead Consultant",
+     "Comprehensive new teacher onboarding program checklist covering pre-employment preparation, building orientation, curriculum and technology setup, mentor assignment, observation schedule, and ongoing support systems.",
+     ["Structured onboarding spans first 90 days with clear milestones",
+      "Each new teacher assigned a mentor in same or adjacent grade level",
+      "Technology orientation includes LMS, assessment platforms, and communication tools",
+      "3 formal observations scheduled in first semester",
+      "Monthly check-ins with administration during first year",
+      "Onboarding feedback survey given at 30, 60, and 90 days"],
+     ["4A", "4B"]),
+    ("Board_Governance_Self_Assessment_2024.csv", EvidenceType.SPREADSHEET, "School Leader",
+     "Board self-assessment responses from 8 board members rating governance effectiveness across 10 dimensions including mission alignment, strategic oversight, financial stewardship, and community engagement.",
+     ["8 board members completed self-assessment",
+      "Mission alignment rated highest at 4.6/5.0",
+      "Strategic planning rated 4.2/5.0",
+      "Financial oversight rated 4.0/5.0",
+      "Community engagement rated lowest at 3.5/5.0",
+      "Board development and succession planning rated 3.6/5.0",
+      "Overall governance effectiveness self-rated at 4.0/5.0"],
+     ["7A", "7B", "7C"]),
+]
+
 
 async def seed_framework():
     """Seed the SQF framework into the database."""
@@ -781,91 +1026,30 @@ async def seed_demo_engagement():
         comps_result = await db.execute(select(Component).order_by(Component.code))
         comps = {c.code: c for c in comps_result.scalars().all()}
 
-        # Seed evidence items (simulated)
-        evidence_data = [
-            ("Lincoln Innovation Academy Strategic Plan 2024-2027.pdf", EvidenceType.DOCUMENT, "Lead Consultant",
-             "Three-year strategic plan outlining mission, vision, goals, and strategies. Includes 5 priority areas: academic excellence, culturally responsive teaching, family engagement, operational sustainability, and teacher development.",
-             ["Clear mission statement focused on 'preparing diverse learners for academic and life success through innovation'",
-              "Strategic plan includes 5 priority areas with measurable goals",
-              "Equity commitment is explicit throughout the document",
-              "Board approved the plan in June 2024 with stakeholder input process documented",
-              "Annual milestones defined for each priority area"],
-             ["1A", "1B", "1C", "5D"]),
-            ("Teacher Retention Data 2021-2025.xlsx", EvidenceType.SPREADSHEET, "Data Steward",
-             "Four years of teacher retention data showing retention rate of 72% in 2021-22 rising to 84% in 2024-25. Disaggregated by department, years of experience, and demographic group.",
-             ["Overall retention rate improved from 72% to 84% over 4 years",
-              "STEM teachers have lowest retention at 68%",
-              "Teachers with 3+ years experience retain at 91%",
-              "First-year teacher retention is only 65%",
-              "Retention is lower for teachers of color (76%) vs white teachers (88%)"],
-             ["4A", "4B", "4C", "4D"]),
-            ("Family Survey Results Fall 2025.pdf", EvidenceType.DOCUMENT, "School Leader",
-             "Annual family survey with 62% response rate. Overall satisfaction is 78%. Strongest areas: school safety (89%), teacher quality (85%). Areas for growth: communication (64%), parent involvement opportunities (58%).",
-             ["62% family response rate (above 50% benchmark)",
-              "Overall satisfaction at 78%, up from 73% last year",
-              "Safety rated highest at 89%",
-              "Communication satisfaction at only 64%",
-              "Only 58% feel there are adequate involvement opportunities",
-              "Spanish-speaking families report lower satisfaction (71%) than English-speaking families (82%)"],
-             ["6A", "3A", "3B", "5C"]),
-            ("2024-25 Annual Budget and Actuals.xlsx", EvidenceType.SPREADSHEET, "Data Steward",
-             "Full budget with actuals showing $4.2M total revenue, $4.1M total expenses. 68% of budget goes to personnel. Operating surplus of $98K. Cash reserves at 45 days.",
-             ["Total revenue: $4.2M (96% from per-pupil funding, 4% from grants/fundraising)",
-              "Total expenses: $4.1M with $98K operating surplus",
-              "Personnel costs are 68% of total budget",
-              "Cash reserves at 45 days (below 60-day best practice target)",
-              "Grant funding declined 15% from prior year",
-              "Special education costs running 8% over budget"],
-             ["9A", "9B", "9C"]),
-            ("Classroom Observation Summary Report Q1 2025.pdf", EvidenceType.DOCUMENT, "Lead Consultant",
-             "Summary of 24 classroom observations across K-8. Average instructional quality rating of 2.8/4.0. Strengths in classroom management and student engagement. Gaps in differentiation and higher-order questioning.",
-             ["24 observations conducted across K-8",
-              "Average quality rating: 2.8 out of 4.0",
-              "Classroom management rated highest at 3.2/4.0",
-              "Student engagement rated 3.0/4.0",
-              "Differentiation rated lowest at 2.3/4.0",
-              "Higher-order questioning rated 2.4/4.0",
-              "K-2 classrooms scored higher than 6-8 on average"],
-             ["2C", "2A", "2D"]),
-            ("Board Meeting Minutes Sep-Dec 2025.pdf", EvidenceType.DOCUMENT, "School Leader",
-             "Four months of board meeting minutes showing regular meetings with quorum. Board reviews financial reports and academic data monthly. Discussion of strategic plan progress and enrollment trends.",
-             ["Monthly board meetings held with consistent quorum",
-              "Financial reports reviewed at every meeting",
-              "Academic data presented quarterly",
-              "Board discussed declining 6th grade enrollment trend",
-              "Board approved updated family engagement policy",
-              "Committee structure includes Finance, Academic, and Governance committees"],
-             ["7A", "7B", "7C", "9B"]),
-            ("School Leader Interview Transcript - Dr. Rivera.pdf", EvidenceType.INTERVIEW, "Lead Consultant",
-             "90-minute interview with principal Dr. Rivera covering school history, current priorities, challenges, and vision. Key themes: pride in culture work, concern about math achievement, desire for stronger PD systems.",
-             ["Principal has been in role for 3 years, previously assistant principal",
-              "Cites school culture as biggest strength - 'students love being here'",
-              "Math achievement is top academic concern - 'we're not where we need to be'",
-              "PD system described as 'inconsistent' - wants more structured coaching",
-              "Concerned about retaining STEM teachers",
-              "Wants to strengthen family engagement for Spanish-speaking families",
-              "Board relationship described as 'supportive but could be more strategic'"],
-             ["5A", "5D", "4D", "2C", "6A"]),
-            ("Student Achievement Data 2022-2025.xlsx", EvidenceType.SPREADSHEET, "Data Steward",
-             "Three years of state assessment data. Reading proficiency at 52% (up from 45%). Math proficiency at 38% (flat from 37%). Achievement gaps persist for EL students and students with disabilities.",
-             ["Reading proficiency: 52% (up from 45% in 2022)",
-              "Math proficiency: 38% (essentially flat from 37% in 2022)",
-              "EL student reading: 28% (vs 52% overall)",
-              "Students with disabilities math: 15% (vs 38% overall)",
-              "Growth percentile in reading: 58th (above average)",
-              "Growth percentile in math: 44th (below average)",
-              "3rd grade reading proficiency strongest at 61%"],
-             ["2A", "2B", "2D", "2E", "2F"]),
-        ]
+        # Seed evidence items from demo_uploads/seeded/
+        evidence_data = EVIDENCE_DATA
 
         evidence_map = {}  # code -> [evidence_ids]
+        file_type_map = {
+            ".csv": "text/csv",
+            ".md": "text/markdown",
+            ".txt": "text/plain",
+            ".pdf": "application/pdf",
+            ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        }
         for fname, etype, uploader, summary, findings, comp_codes in evidence_data:
+            ext_key = os.path.splitext(fname)[1].lower()
+            fpath = f"demo_uploads/seeded/{fname}"
+            try:
+                fsize = os.path.getsize(fpath)
+            except OSError:
+                fsize = 0
             ev = Evidence(
                 engagement_id=ENGAGEMENT_ID,
                 filename=fname,
-                file_path=f"uploads/demo/{fname}",
-                file_type="application/pdf" if fname.endswith(".pdf") else "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                file_size=0,
+                file_path=fpath,
+                file_type=file_type_map.get(ext_key, "application/octet-stream"),
+                file_size=fsize,
                 evidence_type=etype,
                 title=fname.rsplit(".", 1)[0],
                 uploaded_by=uploader,
@@ -895,54 +1079,91 @@ async def seed_demo_engagement():
                         evidence_map[code] = []
                     evidence_map[code].append(str(ev.id))
 
-        # Seed component scores for several components
-        score_data = [
-            ("1A", RatingLevel.MEETING, "high", "meeting_expectations",
-             ["Clear, compelling mission statement developed with stakeholder input", "Mission/vision referenced consistently in strategic plan and board materials", "Staff demonstrate awareness of mission in interviews"],
-             ["Mission review cycle is not formalized", "Some newer staff less confident articulating mission connection to daily work"],
-             None, ["Formalize a 3-year mission/vision review cycle", "Integrate mission connection into new staff onboarding more explicitly"]),
-            ("1B", RatingLevel.DEVELOPING, "medium", "developing",
-             ["A Student Success Profile exists in the strategic plan", "Profile includes academic and character elements"],
-             ["Profile was developed with limited stakeholder input", "Limited evidence of student awareness of the profile", "Curriculum alignment to profile is not systematically documented"],
-             None, ["Conduct stakeholder engagement to refine the Student Success Profile", "Map curriculum to profile elements by grade level", "Create student-facing materials that make the profile accessible"]),
-            ("2C", RatingLevel.DEVELOPING, "high", "developing",
-             ["Classroom management is generally strong (3.2/4.0)", "Student engagement is adequate (3.0/4.0)"],
-             ["Differentiation rated 2.3/4.0 - significant room for improvement", "Higher-order questioning at 2.4/4.0", "Middle school instruction quality lower than elementary", "PD system for instruction described as inconsistent by principal"],
-             ["Strong classroom management alongside weak differentiation suggests teachers have structure but need pedagogical support"],
-             ["Implement structured coaching cycles focused on differentiation", "Adopt an observation-feedback protocol with specific look-fors", "Provide targeted PD on higher-order questioning techniques"]),
-            ("4B", RatingLevel.DEVELOPING, "medium", "developing",
-             ["Retention improved from 72% to 84% over 4 years", "Teachers with 3+ years retain at 91%"],
-             ["STEM teacher retention at 68% is a risk", "First-year retention at 65% needs improvement", "Retention gap for teachers of color (76% vs 88%)"],
-             ["Principal cites culture as strength but retention data shows inequity for teachers of color"],
-             ["Conduct stay/exit interviews with focus on STEM and teachers of color", "Redesign first-year teacher support program", "Address retention equity gap as a strategic priority"]),
-            ("9A", RatingLevel.DEVELOPING, "high", "developing",
-             ["Operating surplus of $98K shows positive financial trajectory", "Budget is balanced with revenue exceeding expenses"],
-             ["Cash reserves at 45 days below 60-day best practice", "Revenue concentration risk: 96% from per-pupil funding", "Grant funding declining 15%", "Special education costs running over budget"],
-             None, ["Build cash reserves to 60-day target within 2 years", "Develop revenue diversification strategy", "Conduct special education cost analysis to address overruns"]),
-            ("6A", RatingLevel.NEEDS_IMPROVEMENT, "high", "needs_improvement",
-             ["62% family survey response rate is above benchmark", "Overall satisfaction trending up (73% to 78%)"],
-             ["Communication satisfaction only 64%", "Involvement opportunities satisfaction only 58%", "Spanish-speaking family satisfaction 11 points below English-speaking families", "No formal family engagement strategy documented"],
-             None, ["Develop a formal family engagement strategy with equity focus", "Launch bilingual communication systems", "Create diverse parent involvement opportunities beyond traditional events"]),
-        ]
+        # Seed component scores from AI-generated fixtures (or fallback)
+        fixtures = _load_fixtures()
 
-        for code, rating, confidence, status, strengths, gaps, contradictions, actions in score_data:
-            if code in comps:
+        # Status map: confirmed (dims 1,6,9), in_review (dims 2,3,4), draft (dims 5,7,8)
+        STATUS_MAP = {
+            "1A": (ScoreStatus.CONFIRMED, True), "1B": (ScoreStatus.CONFIRMED, True), "1C": (ScoreStatus.CONFIRMED, True),
+            "2A": (ScoreStatus.IN_REVIEW, False), "2B": (ScoreStatus.IN_REVIEW, False), "2C": (ScoreStatus.IN_REVIEW, False),
+            "2D": (ScoreStatus.IN_REVIEW, False), "2E": (ScoreStatus.IN_REVIEW, False), "2F": (ScoreStatus.IN_REVIEW, False),
+            "3A": (ScoreStatus.IN_REVIEW, False), "3B": (ScoreStatus.IN_REVIEW, False), "3C": (ScoreStatus.IN_REVIEW, False),
+            "3D": (ScoreStatus.IN_REVIEW, False), "3E": (ScoreStatus.IN_REVIEW, False),
+            "4A": (ScoreStatus.IN_REVIEW, False), "4B": (ScoreStatus.IN_REVIEW, False), "4C": (ScoreStatus.IN_REVIEW, False),
+            "4D": (ScoreStatus.IN_REVIEW, False),
+            "5A": (ScoreStatus.DRAFT, False), "5B": (ScoreStatus.DRAFT, False), "5C": (ScoreStatus.DRAFT, False), "5D": (ScoreStatus.DRAFT, False),
+            "6A": (ScoreStatus.CONFIRMED, True), "6B": (ScoreStatus.CONFIRMED, True),
+            "7A": (ScoreStatus.DRAFT, False), "7B": (ScoreStatus.DRAFT, False), "7C": (ScoreStatus.DRAFT, False),
+            "8A": (ScoreStatus.DRAFT, False), "8B": (ScoreStatus.DRAFT, False),
+            "9A": (ScoreStatus.CONFIRMED, True), "9B": (ScoreStatus.CONFIRMED, True), "9C": (ScoreStatus.CONFIRMED, True),
+        }
+
+        RATING_MAP = {
+            "excelling": RatingLevel.EXCELLING,
+            "meeting_expectations": RatingLevel.MEETING,
+            "developing": RatingLevel.DEVELOPING,
+            "needs_improvement": RatingLevel.NEEDS_IMPROVEMENT,
+            "not_rated": RatingLevel.NOT_RATED,
+        }
+
+        if fixtures:
+            for code, score_data in fixtures["component_scores"].items():
+                if code not in comps or "error" in score_data:
+                    continue
+                status, approved = STATUS_MAP.get(code, (ScoreStatus.DRAFT, False))
                 score = ComponentScore(
                     engagement_id=ENGAGEMENT_ID,
                     component_id=comps[code].id,
-                    rating=rating,
-                    status=ScoreStatus.DRAFT if status == "draft" else ScoreStatus.IN_REVIEW if status == "in_review" else ScoreStatus.CONFIRMED,
-                    strengths=strengths,
-                    gaps=gaps,
-                    contradictions=contradictions,
-                    missing_evidence=None,
-                    ai_rationale=f"Based on analysis of {len(evidence_map.get(code, []))} evidence sources mapped to this component.",
-                    evidence_count=len(evidence_map.get(code, [])),
-                    confidence=confidence,
-                    suggested_actions=actions,
-                    model_used="gpt-4.1",
+                    rating=RATING_MAP.get(score_data.get("rating", "not_rated"), RatingLevel.NOT_RATED),
+                    status=status,
+                    approved=approved,
+                    strengths=score_data.get("strengths"),
+                    gaps=score_data.get("gaps"),
+                    contradictions=score_data.get("contradictions"),
+                    missing_evidence=score_data.get("missing_evidence"),
+                    ai_rationale=score_data.get("rationale", ""),
+                    evidence_count=score_data.get("evidence_count", len(evidence_map.get(code, []))),
+                    confidence=score_data.get("confidence", "low"),
+                    suggested_actions=score_data.get("suggested_actions"),
+                    model_used=score_data.get("model_used", "gpt-4.1"),
+                    reviewed_at=datetime.utcnow() - timedelta(hours=4) if approved else None,
                 )
                 db.add(score)
+
+        # Seed dimension summaries from fixtures
+        dims_result = await db.execute(select(Dimension).order_by(Dimension.number))
+        dims_by_name = {d.name: d for d in dims_result.scalars().all()}
+
+        if fixtures and "dimension_summaries" in fixtures:
+            for dim_name, ds_data in fixtures["dimension_summaries"].items():
+                if dim_name not in dims_by_name or "error" in ds_data:
+                    continue
+                ds = DimensionSummary(
+                    engagement_id=ENGAGEMENT_ID,
+                    dimension_id=dims_by_name[dim_name].id,
+                    overall_assessment=ds_data.get("overall_assessment"),
+                    patterns=ds_data.get("patterns"),
+                    compounding_risks=ds_data.get("compounding_risks"),
+                    top_opportunities=ds_data.get("top_opportunities"),
+                    leadership_attention=ds_data.get("leadership_attention"),
+                    model_used=ds_data.get("model_used", "gpt-4.1"),
+                )
+                db.add(ds)
+
+        # Seed global summary from fixtures
+        if fixtures and "global_summary" in fixtures and "error" not in fixtures["global_summary"]:
+            gs_data = fixtures["global_summary"]
+            gs = GlobalSummary(
+                engagement_id=ENGAGEMENT_ID,
+                executive_summary=gs_data.get("executive_summary"),
+                top_strengths=gs_data.get("top_strengths"),
+                critical_gaps=gs_data.get("critical_gaps"),
+                strategic_priorities=gs_data.get("strategic_priorities"),
+                resource_implications=gs_data.get("resource_implications"),
+                recommended_next_steps=gs_data.get("recommended_next_steps"),
+                model_used=gs_data.get("model_used", "gpt-4.1"),
+            )
+            db.add(gs)
 
         # Seed data requests
         data_requests = [
@@ -1080,6 +1301,10 @@ async def seed_demo_engagement():
                     content="Hi team - I've completed initial analysis of the achievement data and budget documents. Some early patterns emerging around financial sustainability and math achievement that we should discuss in our next check-in. I'll have preliminary findings to share by Friday."),
             Message(thread_id=general_thread.id, author="Tom Nakamura", role="school_admin",
                     content="Working on pulling the discipline data and PD calendar. The discipline data should be ready by tomorrow. The PD calendar may take a bit longer as our PD coordinator is compiling it."),
+            Message(thread_id=general_thread.id, author="Sarah Chen", role="consultant",
+                    content="Quick update: we've completed the initial diagnostic assessment across all 32 components with mapped evidence. Dimensions 1, 6, and 9 are confirmed. The Academic Program and Talent dimensions are in review — some interesting patterns around instructional quality and retention equity that I want to discuss with the full team."),
+            Message(thread_id=general_thread.id, author="Marcus Johnson", role="consultant",
+                    content="I've been digging into the dimension syntheses. The Finance dimension is solid but the revenue concentration risk (96% per-pupil funding) keeps showing up across multiple components. Worth flagging for the action plan. Also, the Student Culture dimension is stronger than I expected — the SEL data and restorative practices approach are real strengths."),
         ]
         for m in general_messages:
             db.add(m)
@@ -1139,42 +1364,53 @@ async def seed_demo_engagement():
         activity_entries = [
             # === Day 1 (3 days ago) — Engagement kickoff and initial uploads ===
             ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="engagement", target_label="Lincoln Innovation Academy - SQF Assessment", created_at=now - timedelta(days=3, hours=6)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Student Achievement Data 2022-2025", detail="AI extracted 7 key findings", created_at=now - timedelta(days=3, hours=5, minutes=30)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="School Leader Interview Transcript", detail="AI extracted 8 key findings", created_at=now - timedelta(days=3, hours=5, minutes=15)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="Board Meeting Minutes Sep-Dec 2025", detail="AI extracted 5 key findings", created_at=now - timedelta(days=3, hours=4, minutes=45)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="Staff Climate Survey Results 2025", detail="AI extracted 6 key findings", created_at=now - timedelta(days=3, hours=4, minutes=20)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Classroom Observation Summary Report Q1 2025", detail="AI extracted 6 key findings", created_at=now - timedelta(days=3, hours=3, minutes=50)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Family Engagement Survey 2024-25", detail="AI extracted 4 key findings", created_at=now - timedelta(days=3, hours=3, minutes=30)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="School Improvement Plan 2024-2027", detail="AI extracted 9 key findings", created_at=now - timedelta(days=3, hours=2, minutes=45)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="School Improvement Plan Goals Tracker", detail="Extracted 6 key findings", created_at=now - timedelta(days=3, hours=5, minutes=30)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Curriculum Scope and Sequence ELA K-8", detail="Extracted 5 key findings", created_at=now - timedelta(days=3, hours=5, minutes=15)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="SEL Survey Results (Panorama Winter 2025)", detail="Extracted 6 key findings", created_at=now - timedelta(days=3, hours=4, minutes=45)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="Staff Satisfaction Survey Results 2025", detail="Extracted 7 key findings", created_at=now - timedelta(days=3, hours=4, minutes=20)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Teacher Evaluation Summary 2024-25", detail="Extracted 7 key findings", created_at=now - timedelta(days=3, hours=3, minutes=50)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Community Partnership Agreements Summary", detail="Extracted 6 key findings", created_at=now - timedelta(days=3, hours=3, minutes=30)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="Communication Plan 2024-2025", detail="Extracted 6 key findings", created_at=now - timedelta(days=3, hours=2, minutes=45)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="Student Behavior and Discipline Data", detail="Extracted 6 key findings", created_at=now - timedelta(days=3, hours=2, minutes=10)),
 
-            # === Day 2 (1-2 days ago) — More uploads, AI scoring, synthesis, approvals ===
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="2024-25 Annual Budget and Actuals", detail="AI extracted 4 key findings", created_at=now - timedelta(days=2, hours=7, minutes=10)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="Title I Expenditure Report 2024-25", detail="AI extracted 3 key findings", created_at=now - timedelta(days=2, hours=6, minutes=45)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="Teacher Retention and Hiring Data 2020-2025", detail="AI extracted 5 key findings", created_at=now - timedelta(days=2, hours=6, minutes=15)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="Student Attendance and Chronic Absenteeism Report", detail="AI extracted 6 key findings", created_at=now - timedelta(days=2, hours=5, minutes=30)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="scored", target_type="component_score", target_label="1A: Mission, Vision, and Values", detail="Rated as Developing (low confidence)", created_at=now - timedelta(days=1, hours=8)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="scored", target_type="component_score", target_label="1B: Strategic Planning", detail="Rated as Needs Improvement (low confidence)", created_at=now - timedelta(days=1, hours=7, minutes=55)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="scored", target_type="component_score", target_label="2A: Academic Vision and Design", detail="Rated as Developing (medium confidence)", created_at=now - timedelta(days=1, hours=7, minutes=50)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="scored", target_type="component_score", target_label="2B: Curriculum and Assessment", detail="Rated as Developing (medium confidence)", created_at=now - timedelta(days=1, hours=7, minutes=45)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="scored", target_type="component_score", target_label="2C: Instruction", detail="Rated as Developing (medium confidence)", created_at=now - timedelta(days=1, hours=7, minutes=40)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="scored", target_type="component_score", target_label="3A: School Culture", detail="Rated as Meeting Expectations (medium confidence)", created_at=now - timedelta(days=1, hours=7, minutes=35)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="scored", target_type="component_score", target_label="4A: Talent Strategy", detail="Rated as Needs Improvement (low confidence)", created_at=now - timedelta(days=1, hours=7, minutes=30)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="generated", target_type="dimension_summary", target_label="1. Organizational Purpose", detail="Synthesized across 3 components", created_at=now - timedelta(days=1, hours=6)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="generated", target_type="dimension_summary", target_label="2. Academic Program Quality", detail="Synthesized across 5 components", created_at=now - timedelta(days=1, hours=5, minutes=50)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="generated", target_type="dimension_summary", target_label="3. Culture, Climate, and Student Support", detail="Synthesized across 4 components", created_at=now - timedelta(days=1, hours=5, minutes=40)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian AI", action="generated", target_type="global_summary", target_label="Executive Summary", detail="Synthesized across 9 dimensions", created_at=now - timedelta(days=1, hours=5)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="approved", target_type="component_score", target_label="1A: Mission, Vision, and Values", detail="Confirmed AI rating of Developing", created_at=now - timedelta(days=1, hours=3, minutes=30)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="approved", target_type="component_score", target_label="2C: Instruction", detail="Confirmed AI rating of Developing", created_at=now - timedelta(days=1, hours=3, minutes=15)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="edited", target_type="component_score", target_label="2A: Academic Vision and Design", detail="Upgraded from Developing to Meeting Expectations with added rationale", created_at=now - timedelta(days=1, hours=2, minutes=45)),
+            # === Day 2 (2 days ago) — More uploads, batch scoring ===
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="Fundraising and Development Report", detail="Extracted 6 key findings", created_at=now - timedelta(days=2, hours=7, minutes=10)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="Title I and Federal Funding Compliance Report", detail="Extracted 6 key findings", created_at=now - timedelta(days=2, hours=6, minutes=45)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="Special Education Compliance Report", detail="Extracted 7 key findings", created_at=now - timedelta(days=2, hours=6, minutes=15)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="Student Attendance Data 2024-25", detail="Extracted 6 key findings", created_at=now - timedelta(days=2, hours=5, minutes=30)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Board Governance Self-Assessment 2024", detail="Extracted 7 key findings", created_at=now - timedelta(days=2, hours=5)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian", action="scored", target_type="component_score", target_label="Batch assessment: 32 components scored", detail="Assessed all components with mapped evidence", created_at=now - timedelta(days=1, hours=8)),
 
-            # === Day 3 (today) — Data requests, action items, messages, score edits ===
+            # === Day 2 (1 day ago) — Dimension synthesis and global summary ===
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian", action="generated", target_type="dimension_summary", target_label="1. Organizational Purpose", detail="Synthesized across 3 components", created_at=now - timedelta(days=1, hours=7)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian", action="generated", target_type="dimension_summary", target_label="2. Academic Program", detail="Synthesized across 6 components", created_at=now - timedelta(days=1, hours=6, minutes=55)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian", action="generated", target_type="dimension_summary", target_label="3. Student Culture", detail="Synthesized across 5 components", created_at=now - timedelta(days=1, hours=6, minutes=50)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian", action="generated", target_type="dimension_summary", target_label="4. Talent", detail="Synthesized across 4 components", created_at=now - timedelta(days=1, hours=6, minutes=45)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian", action="generated", target_type="dimension_summary", target_label="5. Leadership", detail="Synthesized across 4 components", created_at=now - timedelta(days=1, hours=6, minutes=40)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian", action="generated", target_type="dimension_summary", target_label="6. External Engagement", detail="Synthesized across 2 components", created_at=now - timedelta(days=1, hours=6, minutes=35)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian", action="generated", target_type="dimension_summary", target_label="7. Governance", detail="Synthesized across 3 components", created_at=now - timedelta(days=1, hours=6, minutes=30)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian", action="generated", target_type="dimension_summary", target_label="8. Operations", detail="Synthesized across 2 components", created_at=now - timedelta(days=1, hours=6, minutes=25)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian", action="generated", target_type="dimension_summary", target_label="9. Finance", detail="Synthesized across 3 components", created_at=now - timedelta(days=1, hours=6, minutes=20)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian", action="generated", target_type="global_summary", target_label="Executive Summary", detail="Synthesized across 9 dimensions", created_at=now - timedelta(days=1, hours=6)),
+
+            # === Day 2 (1 day ago) — Consultant review and approvals ===
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="approved", target_type="component_score", target_label="1A: Mission, Vision, and Values", detail="Confirmed rating", created_at=now - timedelta(days=1, hours=4, minutes=30)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="approved", target_type="component_score", target_label="1B: Student Success Profile", detail="Confirmed rating", created_at=now - timedelta(days=1, hours=4, minutes=25)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="approved", target_type="component_score", target_label="1C: School/Program Model", detail="Confirmed rating", created_at=now - timedelta(days=1, hours=4, minutes=20)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="approved", target_type="component_score", target_label="6A: Caregiver Engagement", detail="Confirmed rating of Developing", created_at=now - timedelta(days=1, hours=3, minutes=45)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="approved", target_type="component_score", target_label="6B: Community Partnerships", detail="Confirmed rating of Meeting Expectations", created_at=now - timedelta(days=1, hours=3, minutes=40)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Marcus Johnson", action="approved", target_type="component_score", target_label="9A: Financial Health", detail="Confirmed rating of Developing", created_at=now - timedelta(days=1, hours=3)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Marcus Johnson", action="approved", target_type="component_score", target_label="9B: Financial Management and Controls", detail="Confirmed rating", created_at=now - timedelta(days=1, hours=2, minutes=55)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Marcus Johnson", action="approved", target_type="component_score", target_label="9C: Financial Planning", detail="Confirmed rating", created_at=now - timedelta(days=1, hours=2, minutes=50)),
+
+            # === Day 3 (today) — Data requests, action items, messages ===
             ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Marcus Johnson", action="created", target_type="data_request", target_label="Disaggregated Discipline Data 2024-25", detail="Assigned to Tom Nakamura (High priority)", created_at=now - timedelta(hours=6, minutes=30)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Marcus Johnson", action="created", target_type="data_request", target_label="SPED Compliance and IEP Timeliness Report", detail="Assigned to Dr. Angela Rivera (Medium priority)", created_at=now - timedelta(hours=6, minutes=10)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="data_request", target_label="Current PD Calendar and Agendas", detail="Assigned to Dr. Angela Rivera (High priority)", created_at=now - timedelta(hours=6, minutes=10)),
             ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="action_item", target_label="Strengthen Instructional Coaching and PD System", detail="Priority 1 - Owner: Dr. Angela Rivera", created_at=now - timedelta(hours=5, minutes=15)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="action_item", target_label="Develop Data-Driven Culture with Regular Assessment Cycles", detail="Priority 2 - Owner: Tom Nakamura", created_at=now - timedelta(hours=5)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="message", target_label="Next steps and site visit planning", detail="Sent in Assessment Discussion thread", created_at=now - timedelta(hours=3, minutes=45)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="edited", target_type="component_score", target_label="3A: School Culture", detail="Added additional evidence citations from climate survey", created_at=now - timedelta(hours=2, minutes=20)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="edited", target_type="component_score", target_label="4A: Talent Strategy", detail="Updated rationale text with retention data context", created_at=now - timedelta(hours=1, minutes=10)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="action_item", target_label="Develop Formal Family Engagement Strategy", detail="Priority 2 - Owner: Marcus Johnson", created_at=now - timedelta(hours=5)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="message", target_label="Site visit planning and next steps", detail="Sent in Leadership Team Prep thread", created_at=now - timedelta(hours=3, minutes=45)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Marcus Johnson", action="edited", target_type="component_score", target_label="4A: Talent Philosophy", detail="Added consultant notes on retention equity concerns", created_at=now - timedelta(hours=2, minutes=20)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="edited", target_type="component_score", target_label="2C: Instruction", detail="Added observation protocol context to rationale", created_at=now - timedelta(hours=1, minutes=10)),
         ]
         for a in activity_entries:
             db.add(a)
