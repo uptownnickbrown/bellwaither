@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import type { DataRequest, Comment, UserRole } from "@/lib/types";
 import { STATUS_CONFIG, PRIORITY_CONFIG } from "@/lib/types";
 import { getDataRequests, getComments, createComment, createDataRequest } from "@/lib/api";
@@ -25,10 +25,20 @@ export default function DataRequestsView({ engagementId, role, onNavigate, navTa
   const [newComment, setNewComment] = useState("");
   const [showCreate, setShowCreate] = useState(false);
 
+  // Track pending nav target so loadRequests can pick the right default
+  const navTargetRef = useRef(navTargetId);
+  navTargetRef.current = navTargetId;
+
   const loadRequests = useCallback(() => {
     getDataRequests(engagementId).then((r) => {
       setRequests(r);
-      if (!selectedRequest && r.length > 0) setSelectedRequest(r[0]);
+      if (!selectedRequest && r.length > 0) {
+        if (navTargetRef.current) {
+          const target = r.find((req) => req.id === navTargetRef.current);
+          if (target) { setSelectedRequest(target); return; }
+        }
+        setSelectedRequest(r[0]);
+      }
     });
   }, [engagementId]);
 
@@ -161,7 +171,7 @@ export default function DataRequestsView({ engagementId, role, onNavigate, navTa
                     </button>
                   )}
                   <button
-                    onClick={() => onNavigate?.("messages")}
+                    onClick={() => onNavigate?.("messages", selectedRequest.id)}
                     className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 hover:underline font-medium transition"
                   >
                     View in Messages

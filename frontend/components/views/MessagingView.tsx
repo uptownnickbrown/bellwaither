@@ -204,6 +204,10 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
   // ── Polling for live-feel updates ───────────────────────────────────────
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Track pending nav target so loadThreads can pick the right default
+  const navTargetRef = useRef(navTargetId);
+  navTargetRef.current = navTargetId;
+
   const loadThreads = useCallback(() => {
     getThreads(engagementId).then((t) => {
       setThreads(t);
@@ -211,6 +215,11 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
         if (prev) {
           const updated = t.find((th) => th.id === prev.id);
           if (updated) return updated;
+        }
+        // If there's a pending nav target, select that thread directly
+        if (navTargetRef.current) {
+          const target = t.find((th) => th.id === navTargetRef.current || th.reference_id === navTargetRef.current);
+          if (target) return target;
         }
         const general = t.find((th) => th.thread_type === "general");
         return general || t[0] || null;
