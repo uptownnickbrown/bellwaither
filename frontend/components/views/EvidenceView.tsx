@@ -154,7 +154,7 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-lg font-bold text-gray-900">Evidence Repository</h1>
-          <p className="text-sm text-gray-500">{evidence.length} documents uploaded · AI extraction enabled</p>
+          <p className="text-sm text-gray-500">{evidence.length} documents uploaded</p>
         </div>
         <div className="flex items-center gap-2">
           {role === "consultant" && (
@@ -316,11 +316,10 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
 
               {extraction ? (
                 <div className="p-5 space-y-5">
-                  {/* AI Extraction Badge */}
+                  {/* Extraction Badge */}
                   <div className="flex items-center gap-2 bg-indigo-50 rounded-lg px-3 py-2">
                     <Sparkles className="w-4 h-4 text-indigo-600" />
-                    <span className="text-xs font-medium text-indigo-700">AI Extraction</span>
-                    <span className="text-xs text-indigo-500 ml-auto">Model: {extraction.model_used}</span>
+                    <span className="text-xs font-medium text-indigo-700">Extracted Summary</span>
                   </div>
 
                   {/* Summary */}
@@ -389,7 +388,7 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
                   {selectedEvidence.processing_status === "processing" ? (
                     <>
                       <div className="w-8 h-8 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-3" />
-                      <p className="text-sm text-gray-500">AI is processing this document...</p>
+                      <p className="text-sm text-gray-500">Processing this document...</p>
                     </>
                   ) : selectedEvidence.processing_status === "failed" ? (
                     <>
@@ -409,7 +408,7 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
             <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
               <FileText className="w-12 h-12 text-gray-200 mx-auto mb-3" />
               <h3 className="text-sm font-medium text-gray-700 mb-1">Select evidence to view details</h3>
-              <p className="text-xs text-gray-400">Click on any document to see AI-extracted findings and metadata.</p>
+              <p className="text-xs text-gray-400">Click on any document to see extracted findings and metadata.</p>
             </div>
           )}
         </div>

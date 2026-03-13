@@ -183,10 +183,7 @@ export default function DocumentPreviewModal({ evidence, engagementId, onClose }
                     className="w-full flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 transition"
                   >
                     <Sparkles className="w-4 h-4 text-indigo-600" />
-                    <span className="text-sm font-semibold text-indigo-800">AI Summary & Key Findings</span>
-                    {extraction.model_used && (
-                      <span className="text-[10px] text-indigo-500 ml-1">({extraction.model_used})</span>
-                    )}
+                    <span className="text-sm font-semibold text-indigo-800">Summary & Key Findings</span>
                     <span className="ml-auto">
                       {aiSectionOpen
                         ? <ChevronUp className="w-4 h-4 text-indigo-400" />

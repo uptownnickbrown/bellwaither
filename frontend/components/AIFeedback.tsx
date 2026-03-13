@@ -59,7 +59,7 @@ export default function AIFeedback({
             ? "text-emerald-600"
             : "text-gray-300 hover:text-emerald-500"
         } ${rating === "down" ? "opacity-30" : ""} disabled:pointer-events-none`}
-        title="Good AI output"
+        title="Helpful"
       >
         <ThumbsUp className="w-3 h-3" />
       </button>
@@ -71,7 +71,7 @@ export default function AIFeedback({
             ? "text-red-500"
             : "text-gray-300 hover:text-red-400"
         } ${rating === "up" ? "opacity-30" : ""} disabled:pointer-events-none`}
-        title="Poor AI output"
+        title="Not helpful"
       >
         <ThumbsDown className="w-3 h-3" />
       </button>

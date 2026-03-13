@@ -150,7 +150,7 @@ export default function EngagementWorkspace({ engagement, framework, engagements
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            AI Copilot
+            Copilot
           </button>
 
           {/* User Avatar */}

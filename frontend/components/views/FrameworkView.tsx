@@ -288,10 +288,10 @@ function ComponentDetail({ component, score, engagementId, role = "consultant", 
                 </ul>
               </div>
             )}
-            {/* AI Rationale (consultant only -- hidden from school admins) */}
+            {/* Rationale (consultant only -- hidden from school admins) */}
             {!isAdmin && score.ai_rationale && (
               <div className="pt-3 border-t border-gray-100">
-                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">AI Rationale</h4>
+                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Rationale</h4>
                 <div className="bg-gray-50 p-3 rounded-lg">
                   <EditableText
                     value={score.ai_rationale}

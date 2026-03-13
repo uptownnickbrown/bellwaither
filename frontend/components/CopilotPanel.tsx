@@ -216,7 +216,7 @@ export default function CopilotPanel({ engagementId, schoolName, context, role, 
             <Sparkles className="w-4 h-4 text-indigo-600" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-gray-800">AI Copilot</h3>
+            <h3 className="text-sm font-semibold text-gray-800">Copilot</h3>
             <p className="text-[10px] text-gray-400">Context: {context} · {schoolName}</p>
           </div>
         </div>
@@ -306,7 +306,7 @@ export default function CopilotPanel({ engagementId, schoolName, context, role, 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !loading && handleSend()}
-            placeholder="Ask the AI Copilot..."
+            placeholder="Ask Meridian..."
             disabled={loading}
             className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
           />
