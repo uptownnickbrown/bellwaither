@@ -1,0 +1,1462 @@
+{
+  "generated_at": "2026-03-13T16:37:38.850566",
+  "school_name": "Lincoln Innovation Academy",
+  "component_scores": {
+    "1A": {
+      "rating": "not_rated",
+      "confidence": "low",
+      "strengths": [
+        "The School_Improvement_Plan_Goals_Tracker_2024-2025.csv demonstrates that the school has established strategic goals aligned to SQF dimensions, with measurable targets and regular progress tracking."
+      ],
+      "gaps": [
+        "There is no direct evidence in the School_Improvement_Plan_Goals_Tracker_2024-2025.csv that the mission, vision, and values are clearly articulated in written documents or communications.",
+        "No evidence that leadership regularly references the mission/vision in decision-making or communications.",
+        "No evidence that the mission/vision are reviewed and refreshed with stakeholder input on a regular cycle.",
+        "No evidence that staff, families, or students can articulate the mission or connect it to daily work.",
+        "No evidence that key decisions and resource allocations are explicitly aligned with the stated mission."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Written documentation of the school's mission, vision, and values (e.g., handbooks, website, communications).",
+        "Artifacts or transcripts showing leadership referencing mission/vision in meetings or communications.",
+        "Evidence of stakeholder engagement in reviewing/updating the mission/vision (e.g., meeting minutes, surveys).",
+        "Surveys or interviews with staff, families, and students demonstrating understanding of the mission and its connection to daily work.",
+        "Documentation or rationale showing how key decisions and resource allocations align with the mission."
+      ],
+      "rationale": "The only evidence provided, the School_Improvement_Plan_Goals_Tracker_2024-2025.csv, shows that the school has set strategic goals with measurable targets and tracks progress, which suggests some alignment with organizational purpose. However, there is no direct evidence that the mission, vision, and values are clearly articulated or communicated, nor that they are referenced in decision-making or regularly reviewed with stakeholder input. Additionally, there is no evidence that staff, families, or students can articulate the mission or see its connection to their daily work, nor that key decisions are explicitly aligned with the mission. As such, there is insufficient evidence to rate this component, and additional documentation is needed to assess alignment with the SQF success criteria.",
+      "suggested_actions": [
+        "Provide written documentation of the school's mission, vision, and values (e.g., handbooks, website, official communications).",
+        "Share examples of leadership communications or meeting minutes where the mission/vision are referenced in decision-making.",
+        "Document the process and frequency for reviewing and refreshing the mission/vision with stakeholder input.",
+        "Collect and share survey or interview data from staff, families, and students regarding their understanding of the school's mission and its relevance to daily work.",
+        "Provide evidence showing how resource allocations and key decisions are explicitly tied to the mission and values."
+      ],
+      "follow_up_requests": [
+        "School handbook or website excerpt stating the mission, vision, and values.",
+        "Recent leadership communications or meeting minutes referencing the mission/vision.",
+        "Documentation of stakeholder engagement in reviewing/updating the mission/vision.",
+        "Survey/interview data from staff, families, and students about the mission/vision.",
+        "Decision-making artifacts showing alignment of resource allocation to the mission."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 1
+    },
+    "1B": {
+      "rating": "not_rated",
+      "confidence": "low",
+      "strengths": [
+        "The School_Improvement_Plan_Goals_Tracker_2024-2025.csv demonstrates that the school has established measurable strategic goals aligned to SQF dimensions, including student proficiency and engagement targets."
+      ],
+      "gaps": [
+        "There is no direct evidence in the School_Improvement_Plan_Goals_Tracker_2024-2025.csv of a codified Student Success Profile, stakeholder input into such a profile, alignment of the profile to curriculum/instruction/support systems, or opportunities for student reflection on the profile.",
+        "No evidence is provided regarding staff or student understanding of the profile, nor of student work or assessment artifacts demonstrating progress toward profile elements."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Documentation of a codified Student Success Profile (e.g., the profile itself, stakeholder meeting notes, or policy documents)",
+        "Evidence of stakeholder input into the development of the profile (e.g., meeting minutes, survey results)",
+        "Artifacts or documentation showing alignment of the profile to curriculum, instruction, and support systems",
+        "Examples of student reflection opportunities related to the profile",
+        "Staff and student interviews or surveys demonstrating understanding and use of the profile",
+        "Samples of student work or assessment artifacts tied to profile elements"
+      ],
+      "rationale": "The only evidence provided, the School_Improvement_Plan_Goals_Tracker_2024-2025.csv, outlines strategic goals and progress metrics aligned to the SQF but does not reference or provide documentation of a Student Success Profile. There is no mention of a codified profile, stakeholder engagement in its development, or its integration into curriculum, instruction, or student reflection practices. Additionally, there is no evidence regarding staff or student understanding of the profile or artifacts demonstrating progress toward its elements. As such, there is insufficient evidence to rate this component against the success criteria, and the rating is 'not_rated' with low confidence.",
+      "suggested_actions": [
+        "Develop and codify a Student Success Profile with input from diverse stakeholders.",
+        "Document the alignment of the Student Success Profile to curriculum, instruction, and support systems.",
+        "Establish and record regular opportunities for students to reflect on their progress toward the profile.",
+        "Collect and analyze staff and student feedback on the profile and its impact on practice.",
+        "Gather and review student work and assessment artifacts that demonstrate progress toward profile elements."
+      ],
+      "follow_up_requests": [
+        "Provide the codified Student Success Profile document.",
+        "Share evidence of stakeholder engagement in developing the profile (e.g., meeting notes, surveys).",
+        "Submit documentation or artifacts showing how the profile is integrated into curriculum and instruction.",
+        "Provide examples of student reflection activities related to the profile.",
+        "Share staff and student survey/interview data regarding their understanding and use of the profile.",
+        "Submit samples of student work or assessment artifacts aligned to profile elements."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 1
+    },
+    "1C": {
+      "rating": "not_rated",
+      "confidence": "low",
+      "strengths": [
+        "The School_Improvement_Plan_Goals_Tracker_2024-2025.csv demonstrates that the school has set measurable strategic goals aligned to SQF dimensions, indicating some intentionality in planning and tracking progress.",
+        "Annual_School_Calendar_and_Key_Dates_2024-2025.csv shows a structured schedule with built-in professional development, family engagement events, and compliance with instructional day requirements."
+      ],
+      "gaps": [
+        "There is no direct documentation of the school's program model, its rationale, or how it is tied to the mission (no mission statement, model description, or rationale present in any evidence).",
+        "No evidence is provided regarding the intentional design or coherence of key model elements such as pedagogy, instructional approach, or daily structure.",
+        "There is no documentation or stakeholder feedback demonstrating that stakeholders can articulate what makes the model distinctive.",
+        "No evidence is provided that the program model is regularly evaluated for effectiveness or alignment beyond general goal tracking.",
+        "There is no explicit evidence that the model supports equitable outcomes for all student groups, only enrollment and demographic data."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "A clear, documented description of the school/program model and its rationale tied to the mission.",
+        "Artifacts or documents showing intentional design of schedule, structure, and pedagogy (e.g., bell schedules, instructional frameworks, curriculum maps).",
+        "Evidence of regular evaluation of the program model for effectiveness (e.g., program review reports, stakeholder surveys, meeting minutes).",
+        "Stakeholder interviews or survey data showing understanding of what makes the model distinctive.",
+        "Analysis or evidence demonstrating the model's impact on equitable outcomes for all student groups."
+      ],
+      "rationale": "The available evidence (School_Improvement_Plan_Goals_Tracker_2024-2025.csv, Enrollment_Trends_and_Projections_2019-2027.csv, and Annual_School_Calendar_and_Key_Dates_2024-2025.csv) demonstrates that the school is tracking strategic goals, enrollment, and operational scheduling. However, none of these documents provide a clear description of the school/program model, its rationale, or how it is intentionally designed and aligned to the mission. There is also no evidence of regular evaluation of the model itself, nor is there documentation or stakeholder feedback about what makes the model distinctive. While the improvement plan shows some alignment to SQF and the calendar reflects operational planning, these do not substitute for explicit evidence of a coherent, mission-driven program model. Therefore, there is insufficient evidence to rate this component.",
+      "suggested_actions": [
+        "Develop and document a clear description of the school/program model, including its rationale and how it aligns with the school's mission.",
+        "Articulate and publish key elements of the model (schedule, structure, pedagogy) and ensure they are intentionally designed and coherent.",
+        "Implement regular evaluation processes for the program model, including stakeholder feedback and analysis of effectiveness.",
+        "Gather and present evidence (e.g., surveys, focus groups) demonstrating that stakeholders can articulate what makes the model distinctive.",
+        "Analyze and document how the model supports equitable outcomes for all student groups, using disaggregated performance and engagement data."
+      ],
+      "follow_up_requests": [
+        "School/program model documentation and rationale statement.",
+        "Artifacts showing intentional design of schedule, structure, and pedagogy (e.g., bell schedule, instructional framework, curriculum maps).",
+        "Reports or meeting minutes from regular program model evaluations.",
+        "Stakeholder survey or interview data about understanding of the model.",
+        "Evidence or analysis demonstrating the model's impact on equitable outcomes."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 3
+    },
+    "2A": {
+      "rating": "not_rated",
+      "confidence": "low",
+      "strengths": [
+        "The Curriculum_Scope_and_Sequence_ELA_K-8.md document demonstrates a well-organized and standards-aligned ELA curriculum for grades K-8, with clear unit structures and assessment integration.",
+        "Adoption of research-based programs (EL Education for K-5, StudySync for 6-8) and supplemental supports (Fundations, Vocabulary Workshop) suggests attention to instructional coherence and foundational skills."
+      ],
+      "gaps": [
+        "No evidence is provided regarding the documentation or articulation of the school's overall academic vision or its alignment to a Student Success Profile.",
+        "There is no information about how the instructional design is implemented across other subjects or whether it is coherent schoolwide.",
+        "No evidence is available regarding inclusivity or how the academic program serves diverse learners.",
+        "There is no data or qualitative evidence on teacher understanding of the academic vision, classroom implementation, or student outcomes."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "A documented academic vision statement and Student Success Profile.",
+        "Evidence of how the academic vision shapes instructional design and practice across all subjects and grades.",
+        "Artifacts or data showing how the program is inclusive and serves diverse learners (e.g., supports for English learners, students with disabilities, advanced learners).",
+        "Teacher interviews or surveys about their understanding and implementation of the academic vision.",
+        "Classroom observation data demonstrating consistent implementation of the instructional design.",
+        "Student outcomes data aligned to the academic vision."
+      ],
+      "rationale": "While the Curriculum_Scope_and_Sequence_ELA_K-8.md document provides strong evidence of a coherent, standards-aligned ELA curriculum with research-based materials, it does not address the broader success criteria for this component. Specifically, there is no evidence regarding the school's academic vision, its alignment to a Student Success Profile, or how the instructional design is implemented across subjects and grades. There is also no information about inclusivity for diverse learners, teacher understanding, classroom practice, or student outcomes. As such, the available evidence is insufficient to rate this component, and additional documentation and data are needed to make a confident assessment.",
+      "suggested_actions": [
+        "Document and share the school's academic vision and its alignment with a Student Success Profile.",
+        "Provide evidence of how the academic vision informs instructional design across all subjects and grade levels.",
+        "Collect and present data or artifacts demonstrating how the academic program is inclusive and supports diverse learners.",
+        "Gather teacher feedback or interview data on their understanding and implementation of the academic vision.",
+        "Compile classroom observation data and student outcomes aligned to the academic vision."
+      ],
+      "follow_up_requests": [
+        "School academic vision statement and Student Success Profile.",
+        "Documentation or artifacts showing instructional design coherence across all subjects and grades.",
+        "Evidence of supports for diverse learners (e.g., intervention plans, differentiated instruction guides).",
+        "Teacher interview/survey data about the academic vision and instructional design.",
+        "Classroom observation reports and student outcomes data."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 1
+    },
+    "2B": {
+      "rating": "not_rated",
+      "confidence": "low",
+      "strengths": [
+        "The Curriculum_Scope_and_Sequence_ELA_K-8.md document demonstrates that high-quality, standards-aligned curricular materials (EL Education for K-5, StudySync for 6-8) have been adopted for ELA, with explicit standards mapping and integration of writing instruction."
+      ],
+      "gaps": [
+        "There is no evidence regarding teacher training or ongoing support for curriculum implementation (no mention of professional development, coaching, or support structures in Curriculum_Scope_and_Sequence_ELA_K-8.md).",
+        "No information is provided about regular curriculum review for quality, alignment, or cultural relevance.",
+        "There is no evidence about teacher confidence, fidelity of curriculum use, classroom observations, or student work reflecting engagement with rigorous content."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Documentation or data on teacher training and ongoing support for curriculum implementation (e.g., PD agendas, coaching logs, teacher feedback).",
+        "Evidence of regular curriculum review processes and outcomes (e.g., meeting notes, review rubrics, revision logs).",
+        "Teacher survey or interview data regarding confidence and fidelity to the curriculum.",
+        "Classroom observation reports showing curriculum use and adaptation.",
+        "Samples of student work demonstrating engagement with rigorous, grade-level content."
+      ],
+      "rationale": "The only evidence provided, Curriculum_Scope_and_Sequence_ELA_K-8.md, confirms that the school has adopted high-quality, standards-aligned ELA curricular materials for grades K-8 and has a clear scope and sequence with standards mapping. However, there is no evidence addressing the other core actions or progress indicators, such as teacher training, ongoing support, curriculum review, or implementation fidelity. Without documentation or data on these aspects, it is not possible to determine how well the curriculum is being implemented or its impact on instructional practice and student learning. Therefore, a rating cannot be assigned at this time.",
+      "suggested_actions": [
+        "Collect and review evidence of teacher training and ongoing support for curriculum implementation (e.g., PD schedules, attendance records, coaching feedback).",
+        "Document and share the process and frequency of curriculum review for quality, alignment, and cultural relevance.",
+        "Gather teacher feedback on curriculum confidence and fidelity through surveys or interviews.",
+        "Conduct and summarize classroom observations focused on curriculum implementation.",
+        "Compile and analyze samples of student work to assess engagement with rigorous, grade-level content."
+      ],
+      "follow_up_requests": [
+        "Professional development and coaching records related to curriculum implementation.",
+        "Documentation of curriculum review cycles and any resulting changes.",
+        "Teacher survey or interview data on curriculum confidence and fidelity.",
+        "Recent classroom observation reports focused on curriculum use.",
+        "Representative samples of student work from multiple grade levels."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 1
+    },
+    "2C": {
+      "rating": "developing",
+      "confidence": "medium",
+      "strengths": [
+        "Professional_Development_Log_2024-2025.csv documents 27 professional development sessions, including targeted topics such as differentiation, data-driven instruction, and culturally responsive teaching, indicating a commitment to building instructional capacity.",
+        "Grade_Level_Meeting_Notes_5th_Grade_Jan_2025.txt shows evidence of collaborative planning and discussion of differentiation strategies for students below benchmark, as well as responsive adjustments to intervention blocks based on data.",
+        "Teacher_Evaluation_Summary_2024-2025.csv demonstrates that regular classroom observations are conducted for all 21 teachers using the Danielson Framework, with actionable feedback and growth areas identified."
+      ],
+      "gaps": [
+        "Teacher_Evaluation_Summary_2024-2025.csv shows that Domain 3 (Instruction) has the lowest average rating (2.7/4.0), with differentiation and questioning noted as common growth areas, suggesting inconsistent implementation of effective instructional practices.",
+        "No direct evidence of a clear, school-wide instructional framework defining expectations for effective teaching; PD topics are broad but do not confirm the existence or consistent use of a framework.",
+        "No student perception data is provided regarding whether instruction is challenging, relevant, or supportive.",
+        "Observation data does not include specific metrics on student engagement or thinking, only aggregate teacher ratings."
+      ],
+      "contradictions": [
+        "While Professional_Development_Log_2024-2025.csv indicates strong PD coverage on differentiation, Teacher_Evaluation_Summary_2024-2025.csv lists differentiation as a common growth area, suggesting a gap between PD content and classroom practice."
+      ],
+      "missing_evidence": [
+        "Documentation or description of a clear instructional framework outlining expectations for effective teaching.",
+        "Observation data with specific metrics on student engagement and cognitive demand.",
+        "Student survey data on instructional challenge, relevance, and support.",
+        "Examples of differentiated lesson plans or classroom artifacts."
+      ],
+      "rationale": "The available evidence points to a school with a robust professional development program (Professional_Development_Log_2024-2025.csv) and regular teacher observations (Teacher_Evaluation_Summary_2024-2025.csv), both of which align with the core actions of this component. However, the average rating for Domain 3 (Instruction) is only 2.7/4.0, and differentiation is repeatedly cited as a growth area, indicating that instructional quality and differentiation are not yet consistent across classrooms. The Grade_Level_Meeting_Notes_5th_Grade_Jan_2025.txt provides some evidence of responsive planning and differentiation at the team level, but this is limited to one grade and does not confirm school-wide practice. Critically, there is no direct evidence of a clear instructional framework or student perception data, and observation data lacks detail on student engagement and thinking. Therefore, while foundational systems are in place, inconsistent implementation and missing evidence on key success criteria result in a 'developing' rating.",
+      "suggested_actions": [
+        "Develop and communicate a clear, school-wide instructional framework that defines expectations for effective teaching and is referenced in PD and observations.",
+        "Enhance classroom observation protocols to include specific metrics on student engagement and cognitive demand.",
+        "Collect and analyze student perception data regarding the challenge, relevance, and supportiveness of instruction.",
+        "Provide targeted coaching and follow-up support on differentiation strategies, especially for teachers identified as needing growth in this area.",
+        "Share and discuss exemplar lesson plans and instructional practices school-wide to model effective differentiation."
+      ],
+      "follow_up_requests": [
+        "A copy or summary of the school's instructional framework.",
+        "Recent classroom observation forms or data that include student engagement and thinking metrics.",
+        "Student survey results or focus group summaries on instructional experiences.",
+        "Sample differentiated lesson plans or instructional artifacts from multiple grade levels."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 3
+    },
+    "2D": {
+      "rating": "developing",
+      "confidence": "medium",
+      "strengths": [
+        "According to the Grade_Level_Meeting_Notes_5th_Grade_Jan_2025.txt, teachers are engaging in regular data review (e.g., 'Data review shows 5th grade reading at 58% proficiency', 'Math proficiency at 41% with specific skills gaps identified') and adjusting intervention block schedules based on winter benchmark data.",
+        "The same meeting notes indicate collaborative planning and discussion of differentiation strategies for students below benchmark, suggesting some use of data to adjust instruction."
+      ],
+      "gaps": [
+        "There is no evidence from either source of a comprehensive assessment system that includes diagnostic, formative, and summative measures across the school.",
+        "No documentation of regular, school-wide data analysis cycles built into the calendar is provided.",
+        "No evidence that leaders use assessment data to make school-wide instructional decisions (Grade_Level_Meeting_Notes_5th_Grade_Jan_2025.txt is grade-specific).",
+        "No evidence that students understand their own learning progress and goals."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "School-wide assessment calendar or schedule showing regular data analysis cycles.",
+        "Documentation of diagnostic, formative, and summative assessments used at multiple grade levels.",
+        "Evidence of leadership team data analysis and resulting instructional decisions.",
+        "Artifacts or student interviews demonstrating student understanding of their own progress and goals."
+      ],
+      "rationale": "The available evidence, primarily from Grade_Level_Meeting_Notes_5th_Grade_Jan_2025.txt, demonstrates that teachers in at least one grade level regularly review student data and adjust instructional plans, such as modifying intervention blocks and discussing differentiation for students below benchmark. This aligns with some success criteria, particularly around teacher data use and instructional adjustment. However, there is no evidence of a comprehensive, school-wide assessment system, regular data analysis cycles embedded in the school calendar, or leadership-driven instructional decisions based on assessment data. Additionally, there is no indication that students are engaged in understanding their own progress. The Student_Attendance_Data_2024-2025.csv provides valuable context about attendance but does not address academic data and assessment practices. Due to these significant gaps and the grade-specific (not school-wide) scope of the evidence, the rating is 'developing' with medium confidence.",
+      "suggested_actions": [
+        "Develop and document a comprehensive assessment system that includes diagnostic, formative, and summative measures for all grade levels.",
+        "Establish and share a school-wide data analysis calendar to ensure regular review cycles at both the teacher and leadership levels.",
+        "Provide professional development for teachers and leaders on effective data use for instructional decision-making.",
+        "Implement systems for students to track and reflect on their own learning progress and set goals.",
+        "Ensure that leadership teams regularly review assessment data and communicate resulting instructional adjustments to staff."
+      ],
+      "follow_up_requests": [
+        "School-wide assessment calendar and protocols for data analysis cycles.",
+        "Sample assessment tools and data reports from multiple grade levels.",
+        "Leadership team meeting notes or action plans demonstrating use of assessment data for instructional decisions.",
+        "Student-facing materials or survey/interview data showing student awareness of their learning progress."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 2
+    },
+    "2E": {
+      "rating": "developing",
+      "confidence": "medium",
+      "strengths": [
+        "The after-school program provides both academic support (homework help and tutoring) and enrichment (STEM, arts, physical activity) to 22.6% of students, with 61% receiving fee waivers, indicating some equitable access (After_School_Program_Report_2024-2025.md).",
+        "ELL students (23.1% of enrollment) receive targeted support through co-teaching and pull-out models, with multiple languages represented and annual reclassification data tracked (ELL_Program_Overview_and_Data_2024-2025.md).",
+        "Special education services are delivered with high compliance (96% IEP meeting timelines, 94% evaluation completion), and a strong inclusion rate (72% of students with IEPs in general education 80%+ of the day), suggesting effective implementation for students with IEPs (Special_Education_Compliance_Report_2024-2025.md)."
+      ],
+      "gaps": [
+        "There is no explicit evidence of a schoolwide, tiered RTI/MTSS system for academic intervention; supports appear to be programmatic (ELL, SPED, after-school) rather than universally tiered (no mention in any document).",
+        "No evidence is provided regarding regular monitoring and adjustment of intervention effectiveness for the general student population (no data on progress monitoring cycles, intervention review meetings, or staff feedback in any document).",
+        "Enrichment and acceleration opportunities are limited to after-school participants (22.6% of students); there is no evidence of in-school enrichment or acceleration accessible to all students (After_School_Program_Report_2024-2025.md).",
+        "No direct evidence that staff can describe the intervention system or their roles, nor that all student groups have equitable access to in-school enrichment (no staff survey/interview data or program rosters by subgroup)."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Documentation or description of a schoolwide RTI/MTSS framework, including tiers, universal screening, and intervention protocols.",
+        "Progress monitoring data for students receiving interventions outside of ELL/SPED (e.g., reading/math intervention groups, growth metrics).",
+        "Evidence of in-school enrichment or acceleration opportunities available to all students, not just after-school participants.",
+        "Staff survey or interview data demonstrating understanding of the intervention system and their roles.",
+        "Disaggregated participation data for enrichment and intervention by student subgroup."
+      ],
+      "rationale": "The available evidence demonstrates that the school offers targeted academic support and enrichment through after-school programming (serving 22.6% of students, with fee waivers supporting some equity per After_School_Program_Report_2024-2025.md), and that ELL and special education students receive services with high compliance and some progress tracking (ELL_Program_Overview_and_Data_2024-2025.md; Special_Education_Compliance_Report_2024-2025.md). However, there is no direct evidence of a comprehensive, schoolwide tiered intervention system (RTI/MTSS) or of regular monitoring and adjustment of intervention effectiveness for the general population. Enrichment and acceleration appear limited to after-school participants, with no indication of universal access during the school day. Additionally, there is no evidence that staff can articulate the intervention system or that all student groups have equitable access to enrichment. Thus, while some criteria are partially met through programmatic supports, the lack of a cohesive, schoolwide approach and missing progress monitoring data warrant a 'developing' rating.",
+      "suggested_actions": [
+        "Develop and document a comprehensive RTI/MTSS framework with clear tiers, universal screening, and intervention protocols for all students.",
+        "Implement regular progress monitoring for all students receiving interventions, and establish data review cycles to adjust supports as needed.",
+        "Expand enrichment and acceleration opportunities to be accessible to all students during the school day, not just through after-school programs.",
+        "Collect and analyze participation data for interventions and enrichment by student subgroup to ensure equitable access.",
+        "Provide staff training on the intervention system and clarify roles; gather staff feedback to assess understanding and implementation fidelity."
+      ],
+      "follow_up_requests": [
+        "Schoolwide RTI/MTSS documentation (framework, flowcharts, intervention menus).",
+        "Progress monitoring data and intervention effectiveness reports for general education students.",
+        "Descriptions or schedules of in-school enrichment and acceleration opportunities.",
+        "Staff survey or interview results regarding their understanding of intervention and enrichment systems.",
+        "Disaggregated data on enrichment/intervention participation by race/ethnicity, ELL, SPED, and socioeconomic status."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 3
+    },
+    "2F": {
+      "rating": "meeting_expectations",
+      "confidence": "high",
+      "strengths": [
+        "ELL_Program_Overview_and_Data_2024-2025.md documents a robust ELL program serving 23.1% of students with both co-teaching (K-5) and pull-out (6-8) models, indicating specialized programs and services are in place.",
+        "Special_Education_Compliance_Report_2024-2025.md shows 58 students with IEPs (13.8% of enrollment), with a 96% compliance rate for IEP meeting timelines and 94% evaluation completion within 60 days, demonstrating strong compliance and current documentation.",
+        "Inclusion practices are evident, with a 72% inclusion rate (students in general education 80%+ of the day) per Special_Education_Compliance_Report_2024-2025.md.",
+        "Both reports indicate collaboration: co-teaching models are used for ELL (K-5) and there is a noted need for more co-teaching training in special education, suggesting collaboration is present and being strengthened."
+      ],
+      "gaps": [
+        "ELL_Program_Overview_and_Data_2024-2025.md notes only 34% of ELL students met ACCESS proficiency benchmarks and a 12% annual reclassification rate, indicating limited growth for ELs on appropriate measures.",
+        "Special_Education_Compliance_Report_2024-2025.md identifies a need for more co-teaching training for special education staff, suggesting collaboration with general education teachers could be further improved.",
+        "No direct evidence from either document regarding family satisfaction with services for special populations."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Direct classroom observation data to confirm inclusion practices beyond reported rates.",
+        "Student-level growth data for students with disabilities (e.g., progress on IEP goals or standardized assessments).",
+        "Family satisfaction survey results or qualitative feedback for both ELL and special education services."
+      ],
+      "rationale": "Based on the ELL_Program_Overview_and_Data_2024-2025.md, the school provides specialized ELL services through co-teaching and pull-out models, serving a diverse linguistic population with certified staff. The Special_Education_Compliance_Report_2024-2025.md documents strong compliance (96% IEP timelines, 94% evaluations) and a high inclusion rate (72%), indicating that specialized programs are in place and compliance is robust. Collaboration is evident in the co-teaching models and ongoing training needs. However, only 34% of ELL students met ACCESS benchmarks and the reclassification rate is modest, suggesting growth outcomes for ELs are an area for improvement. There is no direct evidence of family satisfaction or student growth for students with disabilities. Overall, most core actions are met and practice is strong, but some progress indicators (student growth, family satisfaction) lack evidence or show room for improvement, resulting in a 'meeting_expectations' rating.",
+      "suggested_actions": [
+        "Collect and analyze student growth data for students with disabilities (e.g., IEP goal attainment, standardized test scores).",
+        "Gather and review family satisfaction data for both ELL and special education services through surveys or focus groups.",
+        "Increase professional development and co-teaching training for both ELL and special education staff to strengthen collaboration.",
+        "Monitor and address ELL student progress to improve ACCESS proficiency rates and reclassification outcomes.",
+        "Conduct classroom observations focused on inclusion practices for both ELL and special education students."
+      ],
+      "follow_up_requests": [
+        "Student growth data for students with disabilities (progress on IEP goals, standardized assessments).",
+        "Family satisfaction survey results or qualitative feedback for special populations.",
+        "Classroom observation summaries or reports focused on inclusion practices.",
+        "Professional development records related to co-teaching and collaboration."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 2
+    },
+    "3A": {
+      "rating": "developing",
+      "confidence": "medium",
+      "strengths": [
+        "Restorative practices are used in the majority of behavioral incidents, as shown in Student_Behavior_and_Discipline_Data_2024-2025.csv, indicating intentional design of culture systems aligned with a restorative philosophy.",
+        "School safety and sense of belonging are rated highly (81st and 72nd national percentiles, respectively) in SEL_Survey_Results_Student_Panorama_Winter_2025.csv, suggesting positive school climate trends.",
+        "Teacher-student relationships are strong, with a 78th percentile ranking in the SEL survey (SEL_Survey_Results_Student_Panorama_Winter_2025.csv)."
+      ],
+      "gaps": [
+        "There is no direct evidence of a documented culture vision or explicit alignment with the school mission in the provided artifacts.",
+        "Culture expectations and vision are not shown to be consistently communicated to all stakeholders; no evidence from handbooks, communications, or stakeholder interviews is present.",
+        "Middle school students report significantly lower sense of belonging (58th percentile vs 82nd for elementary) per SEL_Survey_Results_Student_Panorama_Winter_2025.csv, indicating inconsistent experience of positive culture.",
+        "Behavioral data shows some racial disproportionality in referrals (Student_Behavior_and_Discipline_Data_2024-2025.csv), which may conflict with equitable culture goals."
+      ],
+      "contradictions": [
+        "While restorative practices are reportedly used in most incidents (Student_Behavior_and_Discipline_Data_2024-2025.csv), the presence of racial disproportionality in referrals suggests inconsistent realization of equitable culture vision."
+      ],
+      "missing_evidence": [
+        "A written culture vision statement and documentation of its alignment with the school mission.",
+        "Artifacts or records demonstrating how culture expectations are communicated to students, staff, and families (e.g., handbooks, newsletters, meeting agendas).",
+        "Qualitative data (focus groups, interviews) showing whether students and staff can articulate the culture vision and expectations."
+      ],
+      "rationale": "The available evidence demonstrates that restorative practices are embedded in behavioral responses (Student_Behavior_and_Discipline_Data_2024-2025.csv), and climate survey results indicate generally positive trends in safety, belonging, and teacher-student relationships (SEL_Survey_Results_Student_Panorama_Winter_2025.csv). However, there is no direct evidence of a documented culture vision or its communication to stakeholders, which is a core action for this component. Additionally, the lower sense of belonging among middle school students and the presence of racial disproportionality in behavioral referrals highlight inconsistencies in the implementation and impact of culture systems. Because some, but not all, success criteria are met and implementation appears uneven, especially across grade levels and demographic groups, the rating is 'developing.' Confidence is medium due to the lack of direct evidence on vision documentation and communication.",
+      "suggested_actions": [
+        "Develop and formally document a clear culture vision statement aligned with the school mission.",
+        "Implement regular, multi-channel communication of culture vision and expectations to all stakeholders (students, staff, families).",
+        "Address disparities in sense of belonging and behavioral referrals, particularly for middle school students and racially minoritized groups.",
+        "Collect and analyze qualitative feedback from students and staff on their understanding of the culture vision and expectations.",
+        "Monitor and publicly share progress on culture goals and behavioral equity."
+      ],
+      "follow_up_requests": [
+        "Provide the school's written culture vision statement and documentation of its alignment with the mission.",
+        "Share artifacts (e.g., handbooks, newsletters, meeting notes) that demonstrate how culture expectations are communicated.",
+        "Submit results from focus groups or interviews with students and staff about their understanding of the school's culture vision and expectations."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 2
+    },
+    "3B": {
+      "rating": "meeting_expectations",
+      "confidence": "medium",
+      "strengths": [
+        "According to the SEL_Survey_Results_Student_Panorama_Winter_2025.csv, teacher-student relationships are rated at the 78th national percentile, indicating that most students feel positively about their relationships with adults.",
+        "The same survey shows a strong sense of belonging (72nd percentile) and perception of school safety (81st percentile), suggesting a generally positive student culture.",
+        "Parent_Teacher_Conference_Attendance_Fall_2024.csv shows an overall high family engagement rate (83% attendance), with interpreter services provided for 18% of conferences, demonstrating efforts to connect with diverse families."
+      ],
+      "gaps": [
+        "SEL_Survey_Results_Student_Panorama_Winter_2025.csv reveals lower belonging scores for middle school students (58th percentile) compared to elementary (82nd percentile), indicating inconsistency in student culture and relationships across grade levels.",
+        "ELL_Program_Overview_and_Data_2024-2025.md notes that only 34% of ELL students meet ACCESS proficiency benchmarks and only 12% are reclassified annually, suggesting that language barriers may hinder some students' ability to fully participate in peer and adult relationships.",
+        "No direct evidence is provided regarding specific structures for adult-student relationship building (e.g., advisory programs), nor are there observations or qualitative data about staff modeling relationship-building skills or peer relationship opportunities."
+      ],
+      "contradictions": [
+        "While overall survey data suggest strong relationships and belonging, the disparity between elementary and middle school belonging (SEL_Survey_Results_Student_Panorama_Winter_2025.csv) indicates uneven implementation of relationship-building practices."
+      ],
+      "missing_evidence": [
+        "Documentation or descriptions of specific structures (e.g., advisory, mentoring programs) designed to foster adult-student relationships.",
+        "Observation data or qualitative reports (e.g., classroom walkthroughs, student focus groups) showing how staff model and teach relationship-building skills.",
+        "Evidence of regular, structured opportunities for students to build peer relationships (e.g., peer mentoring, group projects, clubs).",
+        "Climate data disaggregated by demographic groups to assess equity in relationship experiences."
+      ],
+      "rationale": "The SEL_Survey_Results_Student_Panorama_Winter_2025.csv provides strong quantitative evidence that most students feel known and valued by adults, with teacher-student relationships at the 78th percentile and overall belonging at the 72nd percentile. However, the data also reveal a significant gap for middle school students, whose sense of belonging is notably lower (58th percentile) than that of elementary students (82nd percentile), pointing to inconsistent implementation across grade levels. The ELL_Program_Overview_and_Data_2024-2025.md highlights a substantial ELL population and some support structures, but also points to language barriers that may impede relationship-building for these students. Parent_Teacher_Conference_Attendance_Fall_2024.csv demonstrates strong family engagement and efforts to reduce language barriers, but does not directly address student peer relationships or adult-student relationship structures. There is no direct evidence of advisory or similar structures, nor observational data on staff modeling relationship-building. Therefore, while most success criteria are partially met, the lack of direct evidence for core structures and observed practices, as well as disparities across subgroups, leads to a 'meeting_expectations' rating with medium confidence.",
+      "suggested_actions": [
+        "Implement or document specific structures (e.g., advisory, mentoring) to systematically foster adult-student relationships, especially in middle school.",
+        "Collect and review observation data to assess how staff model and teach relationship-building skills in classrooms.",
+        "Develop and track regular opportunities for students to build peer relationships, such as peer mentoring, collaborative projects, or social-emotional learning groups.",
+        "Disaggregate climate and relationship data by demographic groups (e.g., ELL status, grade level) to identify and address inequities.",
+        "Provide targeted support and professional development for staff in middle school grades to strengthen student belonging and relationships."
+      ],
+      "follow_up_requests": [
+        "Descriptions or documentation of advisory or other adult-student relationship-building structures.",
+        "Classroom observation reports or walkthrough summaries focusing on relationship-building practices.",
+        "Student focus group or interview data about peer and adult relationships.",
+        "Climate survey data disaggregated by demographic groups (e.g., ELL, grade level, race/ethnicity)."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 3
+    },
+    "3C": {
+      "rating": "developing",
+      "confidence": "medium",
+      "strengths": [
+        "Students report a strong sense of belonging overall, with the SEL_Survey_Results_Student_Panorama_Winter_2025.csv showing a 72nd national percentile for sense of belonging and 81st percentile for school safety.",
+        "Teacher-student relationships are rated highly (78th percentile) per the SEL_Survey_Results_Student_Panorama_Winter_2025.csv, indicating positive student culture.",
+        "The After_School_Program_Report_2024-2025.md demonstrates inclusive practices with 61% of after-school program participants receiving fee waivers, and a diverse set of enrichment activities offered.",
+        "Wellness_Committee_Meeting_Minutes_Nov_2024.txt shows the presence of a wellness committee with staff, parent, and community representation, and implementation of an SEL curriculum (Second Step) K-8."
+      ],
+      "gaps": [
+        "Community-building routines and traditions are not explicitly described or evidenced in any document; there is no mention of regular rituals, assemblies, or school-wide events that reinforce school identity or values.",
+        "Participation in after-school programs is relatively low (22.6% of enrollment), as per After_School_Program_Report_2024-2025.md, suggesting limited reach of community-building opportunities.",
+        "Middle school students report significantly lower sense of belonging (58th percentile vs 82nd for elementary) according to SEL_Survey_Results_Student_Panorama_Winter_2025.csv, indicating inconsistent student culture across grade levels.",
+        "No evidence provided regarding visibility of school identity in physical spaces or student artifacts."
+      ],
+      "contradictions": [
+        "While overall belonging is strong, the SEL_Survey_Results_Student_Panorama_Winter_2025.csv reveals a notable gap between elementary and middle school students' sense of belonging, suggesting uneven implementation of community-building practices."
+      ],
+      "missing_evidence": [
+        "Documentation of regular community-building routines (e.g., advisory, morning meetings, assemblies) and their frequency.",
+        "Descriptions or artifacts of school traditions, rituals, or events that reinforce identity and values.",
+        "Photos or inventories of physical spaces and student artifacts that display school identity.",
+        "Participation rates for school-wide community events (not just after-school programs).",
+        "Qualitative feedback from students and families about inclusivity and celebration of diversity."
+      ],
+      "rationale": "The available evidence indicates some strengths in student culture, particularly in overall sense of belonging (72nd percentile nationally) and strong teacher-student relationships (78th percentile), as shown in SEL_Survey_Results_Student_Panorama_Winter_2025.csv. The After_School_Program_Report_2024-2025.md highlights inclusive practices within the after-school program, but its reach is limited to 22.6% of students. The Wellness_Committee_Meeting_Minutes_Nov_2024.txt confirms the presence of an SEL curriculum and a wellness committee, but does not detail specific community-building routines or traditions. Notably, there is a significant gap in belonging between elementary and middle school students, and no evidence of visible school identity or widespread community practices. Thus, while some criteria are met, implementation is inconsistent and key aspects are missing, warranting a 'developing' rating.",
+      "suggested_actions": [
+        "Document and implement regular community-building routines (e.g., advisory periods, school-wide assemblies) and ensure they are scheduled consistently across all grade levels.",
+        "Establish and celebrate school traditions and rituals that reinforce school identity and values, and ensure these are inclusive of all student groups.",
+        "Increase outreach and accessibility of after-school and community programs to serve a larger proportion of students, especially in middle school.",
+        "Display school identity and student work prominently in physical spaces and common areas.",
+        "Collect and analyze participation data for all community events and solicit qualitative feedback from students and families regarding inclusivity and sense of belonging."
+      ],
+      "follow_up_requests": [
+        "Schedules or descriptions of regular community-building routines and their implementation across grade levels.",
+        "Artifacts or documentation of school traditions, rituals, or community events.",
+        "Photos or inventories of physical spaces and student artifacts that reflect school identity.",
+        "Participation data for whole-school events (not just after-school programs).",
+        "Student and family qualitative feedback on inclusivity and celebration of diversity."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 3
+    },
+    "3D": {
+      "rating": "developing",
+      "confidence": "medium",
+      "strengths": [
+        "The Wellness_Committee_Meeting_Minutes_Nov_2024.txt confirms that an evidence-based SEL curriculum (Second Step) is implemented school-wide for grades K-8.",
+        "The same minutes indicate active oversight of SEL and wellness by a cross-functional committee, suggesting some level of organizational commitment.",
+        "A mental health counselor position was added this year, indicating increased support for student well-being (Wellness_Committee_Meeting_Minutes_Nov_2024.txt)."
+      ],
+      "gaps": [
+        "There is no direct evidence that staff are trained in SEL practices or that SEL is integrated into instruction beyond curriculum adoption (no mention of PD or classroom integration in Wellness_Committee_Meeting_Minutes_Nov_2024.txt).",
+        "No evidence is provided that SEL competencies are assessed or monitored (no mention of assessment tools, progress monitoring, or student outcomes in any document).",
+        "Student_Attendance_Data_2024-2025.csv shows a chronic absenteeism rate of 12.8%, above the 10% state benchmark, and higher rates in transition grades, suggesting SEL outcomes may not be strong for all students."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Documentation or data on staff SEL training (agendas, sign-ins, PD materials).",
+        "Classroom observation reports or walkthrough data showing SEL integration in instruction.",
+        "SEL competency assessment data or progress monitoring reports.",
+        "Student survey or climate data reflecting SEL outcomes."
+      ],
+      "rationale": "According to the Wellness_Committee_Meeting_Minutes_Nov_2024.txt, the school has implemented the Second Step SEL curriculum across all grades (K-8), meeting the criterion for a school-wide evidence-based SEL approach. The addition of a mental health counselor and the presence of a wellness committee further support a commitment to student well-being. However, there is no evidence that staff have been trained in SEL practices or that SEL is being integrated into daily instruction, as there are no references to professional development or classroom practices. Critically, there is also no evidence that SEL competencies are being assessed or monitored, nor is there any data on student SEL growth or classroom-level SEL integration. The Student_Attendance_Data_2024-2025.csv reveals a chronic absenteeism rate above the state benchmark, which may indicate SEL or climate challenges, especially in transition years. Due to these significant gaps in evidence for several core actions and progress indicators, the component is rated as 'developing.'",
+      "suggested_actions": [
+        "Provide documentation of staff training on SEL practices, including PD agendas and attendance records.",
+        "Implement and document regular assessment of SEL competencies (e.g., student self-report surveys, teacher ratings, or other validated tools).",
+        "Conduct and share classroom observation data that specifically tracks SEL integration into instruction.",
+        "Develop a system for monitoring and reporting on SEL outcomes, including student growth in SEL competencies and climate survey results.",
+        "Target SEL and attendance interventions for transition years (K and 6th grade) where chronic absenteeism is highest."
+      ],
+      "follow_up_requests": [
+        "Professional development records or materials related to SEL training for staff.",
+        "Classroom observation summaries or walkthrough reports focused on SEL practices.",
+        "SEL assessment data or progress monitoring reports showing student growth.",
+        "Recent student or staff climate survey results relevant to SEL."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 3
+    },
+    "3E": {
+      "rating": "developing",
+      "confidence": "medium",
+      "strengths": [
+        "According to Student_Behavior_and_Discipline_Data_2024-2025.csv, restorative practices were used in the majority of the 29 recorded behavioral incidents, indicating a commitment to non-punitive responses.",
+        "Out-of-school suspensions were limited to 3 cases out of 29 incidents (Student_Behavior_and_Discipline_Data_2024-2025.csv), suggesting exclusionary discipline is used sparingly."
+      ],
+      "gaps": [
+        "Student_Behavior_and_Discipline_Data_2024-2025.csv shows some racial disproportionality in referral patterns, indicating equity concerns in the application of the behavior management system.",
+        "There is no direct evidence provided of a documented behavior management system with progressive responses; the data spreadsheet shows responses but not the underlying policy or system.",
+        "No evidence is provided regarding staff consistency in applying behavior expectations or students’ perceptions of fairness.",
+        "No documentation or data is provided regarding regular review of discipline data for equity and effectiveness."
+      ],
+      "contradictions": [
+        "While restorative practices are used in most cases (Student_Behavior_and_Discipline_Data_2024-2025.csv), the presence of racial disproportionality in referrals suggests inconsistent equity in implementation."
+      ],
+      "missing_evidence": [
+        "A copy of the documented behavior management system or policy outlining progressive responses.",
+        "Evidence of regular review of discipline data for equity and effectiveness (e.g., meeting notes, data review protocols).",
+        "Survey or interview data reflecting student understanding and perceptions of fairness.",
+        "Evidence of staff training or monitoring for consistent application of behavior expectations."
+      ],
+      "rationale": "The Student_Behavior_and_Discipline_Data_2024-2025.csv provides evidence that restorative practices are the primary response to behavioral issues and that exclusionary discipline is rare, meeting some core actions and progress indicators. However, the same data reveals racial disproportionality in referrals, indicating equity concerns. There is no direct evidence of a documented behavior management system with progressive responses, nor is there evidence that discipline data is regularly reviewed for equity and effectiveness. Additionally, there is no information about staff consistency or student perceptions. The Safety_and_Emergency_Procedures_Manual.txt is not relevant to behavior management. Given these gaps, the component is rated as 'developing' with medium confidence, as some success criteria are met but implementation is inconsistent and key evidence is missing.",
+      "suggested_actions": [
+        "Develop and share a clear, documented behavior management system with progressive responses.",
+        "Establish regular reviews of discipline data with an explicit focus on equity and effectiveness, and document these reviews.",
+        "Implement staff training and monitoring to ensure consistent application of behavior expectations.",
+        "Collect and analyze student feedback on their understanding of the behavior system and perceptions of its fairness.",
+        "Address and monitor racial disproportionality in referrals through targeted interventions."
+      ],
+      "follow_up_requests": [
+        "Request the written behavior management system or policy document.",
+        "Request documentation of discipline data review meetings or protocols.",
+        "Request student and staff survey results or focus group summaries on perceptions of the behavior system.",
+        "Request evidence of staff training on behavior management and restorative practices."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 2
+    },
+    "4A": {
+      "rating": "developing",
+      "confidence": "medium",
+      "strengths": [
+        "The Professional_Development_Log_2024-2025.csv demonstrates a robust and varied PD program, with 27 sessions covering key instructional and cultural topics, indicating a commitment to staff growth and development.",
+        "The New_Teacher_Onboarding_Checklist_2024-2025.md outlines a comprehensive onboarding process, including mentorship, structured milestones, and regular feedback, supporting new staff integration and early development.",
+        "Staff_Satisfaction_Survey_Results_2025.csv shows high ratings for school culture (4.2/5.0) and collaboration (4.0/5.0), suggesting a positive environment that may help with retention and alignment to school values."
+      ],
+      "gaps": [
+        "No explicit documentation of a talent philosophy or statement aligning talent practices to the school mission or model was found in any evidence provided.",
+        "Desired staff competencies and dispositions are not clearly defined in the available documents; while the Danielson Framework is used for evaluation (Teacher_Evaluation_Summary_2024-2025.csv), it is not clear if this is the school's own talent philosophy or merely an evaluation tool.",
+        "There is no direct evidence that hiring, development, or retention decisions are systematically informed by a stated talent philosophy or set of competencies."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "A documented talent philosophy or vision statement explicitly linked to the school mission and model.",
+        "Written definitions of desired staff competencies and dispositions.",
+        "Artifacts showing how hiring decisions are aligned to stated talent criteria (e.g., interview rubrics, job postings referencing the philosophy).",
+        "Evidence that leaders can articulate the talent philosophy and its connection to school success (e.g., leadership interview transcripts, meeting notes).",
+        "Staff communications or surveys referencing understanding of growth expectations and career development pathways."
+      ],
+      "rationale": "While the Professional_Development_Log_2024-2025.csv and New_Teacher_Onboarding_Checklist_2024-2025.md demonstrate strong practices in staff development and onboarding, there is no direct evidence of a documented talent philosophy or explicit articulation of desired staff competencies and dispositions. The Teacher_Evaluation_Summary_2024-2025.csv shows use of the Danielson Framework for evaluation, but it is unclear if this reflects the school's unique talent philosophy or is simply an external rubric. The Staff_Satisfaction_Survey_Results_2025.csv indicates a positive culture and some satisfaction with professional development, but does not address staff understanding of growth expectations or career development in relation to a talent philosophy. Therefore, while some foundational practices are present, key elements of the success criteria—especially documentation, alignment, and explicit use of a talent philosophy in decision-making—are missing or unproven, warranting a 'developing' rating.",
+      "suggested_actions": [
+        "Develop and formally document a talent philosophy that is explicitly aligned with the school mission and instructional model.",
+        "Define and publish a clear set of desired staff competencies and dispositions, and ensure these are referenced in hiring, evaluation, and development materials.",
+        "Revise hiring and onboarding materials (e.g., job postings, interview rubrics) to reference and operationalize the talent philosophy.",
+        "Provide professional development for leaders on articulating and implementing the talent philosophy in all talent-related decisions.",
+        "Survey staff specifically about their understanding of growth expectations and career pathways as related to the talent philosophy."
+      ],
+      "follow_up_requests": [
+        "A copy of the school's documented talent philosophy or vision statement.",
+        "Artifacts from the hiring process (e.g., interview guides, job descriptions) showing alignment to the talent philosophy.",
+        "Leadership meeting notes or interview transcripts demonstrating leaders' articulation of the talent philosophy.",
+        "Staff communications or survey results referencing understanding of growth expectations and career development.",
+        "Documentation or rubrics defining staff competencies and dispositions."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 4
+    },
+    "4B": {
+      "rating": "developing",
+      "confidence": "medium",
+      "strengths": [
+        "According to the Staff_Satisfaction_Survey_Results_2025.csv, staff report strong collaboration (average 4.0/5.0) and a highly rated school culture (4.2/5.0), indicating effective structures for staff community-building.",
+        "The New_Teacher_Onboarding_Checklist_2024-2025.md details a robust onboarding process, including mentor assignment and regular check-ins, which supports new staff integration and professional community."
+      ],
+      "gaps": [
+        "Staff_Satisfaction_Survey_Results_2025.csv reveals concerns about work-life balance (3.2/5.0) and compensation (2.9/5.0), suggesting that staff well-being and retention risk factors are present.",
+        "There is no direct evidence in either source that staff input is systematically valued or incorporated into school decisions.",
+        "No data is provided on teacher retention rates relative to comparison schools."
+      ],
+      "contradictions": [
+        "While collaboration and school culture are rated highly (Staff_Satisfaction_Survey_Results_2025.csv), work-life balance and compensation are rated significantly lower, indicating a disconnect between positive culture and staff well-being."
+      ],
+      "missing_evidence": [
+        "Teacher retention data relative to comparison schools.",
+        "Qualitative evidence (e.g., staff focus group transcripts or open-ended survey responses) describing staff perceptions of input into decision-making.",
+        "Documentation or examples of how staff input has been incorporated into school decisions.",
+        "Additional survey data or exit interview summaries specifically addressing staff engagement and well-being."
+      ],
+      "rationale": "The evidence demonstrates that intentional structures for staff collaboration and community-building are in place, as shown by high ratings for collaboration (4.0/5.0) and school culture (4.2/5.0) in the Staff_Satisfaction_Survey_Results_2025.csv, and a comprehensive onboarding process described in the New_Teacher_Onboarding_Checklist_2024-2025.md. However, concerns about work-life balance (3.2/5.0) and compensation (2.9/5.0) indicate that staff well-being is not being fully supported. There is no direct evidence that staff input is valued and incorporated into decisions, nor is there any data on teacher retention rates. The available evidence partially meets the success criteria, but significant gaps remain, particularly around staff well-being and shared decision-making. Therefore, the component is rated as 'developing' with medium confidence.",
+      "suggested_actions": [
+        "Collect and analyze teacher retention data and compare it to similar schools to assess staff stability.",
+        "Implement and document formal processes for soliciting and incorporating staff input into school decisions.",
+        "Address work-life balance concerns by reviewing workload expectations and exploring flexible scheduling or additional support.",
+        "Conduct follow-up focus groups or interviews to better understand staff well-being challenges and gather actionable feedback.",
+        "Review compensation structures and communicate transparently about any plans to address staff concerns."
+      ],
+      "follow_up_requests": [
+        "Teacher retention data for the past 3 years, including comparison to peer schools.",
+        "Documentation or examples of staff input being incorporated into decision-making (e.g., meeting minutes, policy changes).",
+        "Qualitative feedback from staff (focus group notes, open-ended survey responses) about culture, collaboration, and well-being.",
+        "Exit interview summaries or reports from departing staff."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 2
+    },
+    "4C": {
+      "rating": "not_rated",
+      "confidence": "low",
+      "strengths": [
+        "Staff_Satisfaction_Survey_Results_2025.csv shows a high response rate (91%) and strong ratings for school culture (4.2/5.0) and collaboration (4.0/5.0), suggesting a generally positive staff environment."
+      ],
+      "gaps": [
+        "No direct evidence provided regarding recruitment strategies, diversity or competitiveness of applicant pools, or the presence of a structured onboarding program.",
+        "No data on hiring processes, such as use of rigorous selection criteria or performance tasks.",
+        "No information on new hire preparedness, onboarding experiences, or first-year retention rates."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Recruitment strategy documentation or job posting samples demonstrating outreach to diverse, mission-aligned candidates.",
+        "Applicant pool demographic and competitiveness data.",
+        "Hiring process artifacts (e.g., interview rubrics, performance task samples).",
+        "Onboarding program materials or schedules.",
+        "Survey or interview data from new hires about onboarding and preparedness.",
+        "First-year teacher/staff retention data."
+      ],
+      "rationale": "The available evidence (Staff_Satisfaction_Survey_Results_2025.csv and Teacher_Evaluation_Summary_2024-2025.csv) provides insight into overall staff satisfaction and teacher evaluation outcomes, but does not address the core actions or progress indicators for Recruitment, Hiring, and Onboarding. There is no information about recruitment strategies, applicant pool diversity, hiring process rigor, or onboarding structures. Additionally, there is no data on new hire experiences or retention rates. Without direct evidence for any of the success criteria, a rating cannot be assigned for this component.",
+      "suggested_actions": [
+        "Collect and review documentation of recruitment strategies and outreach efforts, with attention to diversity and mission alignment.",
+        "Gather data on applicant pool demographics and competitiveness for recent hiring cycles.",
+        "Provide artifacts from the hiring process, such as interview protocols and performance tasks.",
+        "Share onboarding program materials and schedules.",
+        "Survey or interview new hires about their onboarding experience and preparedness.",
+        "Compile and analyze first-year staff retention data."
+      ],
+      "follow_up_requests": [
+        "Recruitment and hiring process documentation (including job postings, outreach plans, interview rubrics, and performance tasks).",
+        "Applicant pool demographic data for recent hiring cycles.",
+        "Onboarding program materials and new hire feedback.",
+        "First-year retention rates for staff hired in the past 1-2 years."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 2
+    },
+    "4D": {
+      "rating": "developing",
+      "confidence": "medium",
+      "strengths": [
+        "The Professional_Development_Log_2024-2025.csv documents a robust schedule of 27 PD sessions covering a wide range of relevant topics such as curriculum alignment, culturally responsive teaching, and trauma-informed practices, indicating a coherent PD plan aligned with school goals.",
+        "PD sessions are diverse in format (whole-staff, grade-band, department-specific) and utilize external facilitators for specialized topics, as shown in Professional_Development_Log_2024-2025.csv.",
+        "Staff_Meeting_PD_Attendance_Log_2024-2025.csv shows high staff engagement with an average PD attendance rate of 92%, suggesting strong participation and buy-in."
+      ],
+      "gaps": [
+        "There is no direct evidence of regular coaching and feedback cycles being embedded in the school model; none of the provided documents reference coaching frequency, structure, or outcomes.",
+        "No documentation or data is provided regarding the teacher evaluation system, its fairness, transparency, or its correlation with student achievement.",
+        "There is no evidence from teachers (e.g., surveys or qualitative feedback) indicating whether PD is perceived as relevant or impactful on their practice."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Documentation or data on coaching cycles, including frequency, structure, and teacher growth outcomes.",
+        "Artifacts or summaries of the teacher evaluation process and results, including how it drives growth and accountability.",
+        "Teacher feedback or survey data on PD relevance and impact.",
+        "Evidence linking evaluation outcomes to student achievement data."
+      ],
+      "rationale": "The Professional_Development_Log_2024-2025.csv demonstrates that the school has a well-structured and comprehensive PD plan, with sessions that align to key instructional priorities such as differentiation and culturally responsive teaching. High attendance rates (92% average) per Staff_Meeting_PD_Attendance_Log_2024-2025.csv further support strong staff engagement. However, there is no evidence regarding the presence or effectiveness of coaching and feedback cycles, nor any information about the teacher evaluation system or its impact on growth and accountability. Additionally, there is no data on teacher perceptions of PD relevance or its effect on instructional practice. Without evidence for these core actions and progress indicators, the component cannot be rated higher than 'developing.' Confidence is medium due to the clear strengths in PD planning and participation, but significant gaps in coaching, evaluation, and outcome data.",
+      "suggested_actions": [
+        "Implement and document regular coaching and feedback cycles, including logs of coaching sessions and teacher growth data.",
+        "Develop and share a transparent teacher evaluation system, and collect data on its implementation and outcomes.",
+        "Administer teacher surveys or focus groups to gather feedback on PD relevance and impact.",
+        "Track and analyze the relationship between teacher evaluation outcomes and student achievement data.",
+        "Include qualitative evidence (e.g., teacher testimonials, reflection logs) to demonstrate the impact of PD and coaching on instructional practice."
+      ],
+      "follow_up_requests": [
+        "Coaching logs or schedules showing frequency and focus of coaching cycles.",
+        "Teacher evaluation rubrics, process documentation, and summary data for the current year.",
+        "Teacher survey results or qualitative feedback on PD effectiveness.",
+        "Data or analysis linking teacher evaluation outcomes to student achievement metrics."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 3
+    },
+    "5A": {
+      "rating": "not_rated",
+      "confidence": "low",
+      "strengths": [],
+      "gaps": [
+        "No direct evidence provided regarding organizational chart, leadership team structure, or distribution of leadership roles (per School_Improvement_Plan_Goals_Tracker_2024-2025.csv)."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Organizational chart showing roles, reporting lines, and responsibilities",
+        "Documentation of leadership team structure and decision-making processes",
+        "Staff survey or interview data on role clarity and communication",
+        "Evidence of distributed leadership (e.g., meeting minutes, leadership team rosters)"
+      ],
+      "rationale": "The only evidence provided is the School_Improvement_Plan_Goals_Tracker_2024-2025.csv, which details strategic goals, metrics, and responsible leads for each goal. While this demonstrates that specific individuals are assigned to strategic objectives, it does not provide information about the overall organizational structure, reporting lines, or how leadership is distributed. There is no organizational chart, nor is there evidence about staff perceptions of role clarity or leadership team effectiveness. As such, there is insufficient evidence to assess this component against the SQF success criteria.",
+      "suggested_actions": [
+        "Provide a current organizational chart with roles, reporting lines, and responsibilities.",
+        "Submit documentation describing the leadership team structure and decision-making protocols.",
+        "Collect and share staff survey data regarding clarity of roles and leadership communication.",
+        "Demonstrate how leadership responsibilities are distributed to avoid bottlenecks."
+      ],
+      "follow_up_requests": [
+        "Current organizational chart",
+        "Leadership team meeting agendas/minutes",
+        "Staff survey or interview data on role clarity and leadership",
+        "Descriptions of decision-making processes and accountability structures"
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 1
+    },
+    "5B": {
+      "rating": "not_rated",
+      "confidence": "low",
+      "strengths": [
+        "The Annual_School_Calendar_and_Key_Dates_2024-2025.csv demonstrates strong planning and transparency regarding key dates for school operations, including board meetings and community events.",
+        "The Staff_Meeting_PD_Attendance_Log_2024-2025.csv shows high staff participation in professional development, with a school-wide average PD attendance rate of 92%."
+      ],
+      "gaps": [
+        "There is no direct evidence in either document regarding how decision rights are defined, how stakeholder input is gathered for key decisions, or how decisions are communicated with rationale.",
+        "No documentation or data is provided about staff or stakeholder perceptions of the fairness or efficiency of decision-making processes."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Documentation outlining decision-making structures and roles (e.g., organizational chart, decision matrix, governance policies).",
+        "Records or summaries of stakeholder input processes (e.g., meeting minutes, survey results, focus group notes).",
+        "Examples of communications to staff or families explaining decisions and rationales.",
+        "Staff or stakeholder survey data on perceptions of decision-making transparency and fairness."
+      ],
+      "rationale": "The provided evidence (Annual_School_Calendar_and_Key_Dates_2024-2025.csv and Staff_Meeting_PD_Attendance_Log_2024-2025.csv) demonstrates strong operational planning and staff engagement in professional development, but does not address the core actions or progress indicators for decision-making structures. There is no information about how decisions are made, who has decision rights, whether stakeholder input is systematically gathered, or how decisions and their rationales are communicated. Without evidence directly addressing these criteria, it is not possible to rate this component. Additional documentation and stakeholder feedback are needed to assess alignment with the School Quality Framework's expectations for decision-making structures.",
+      "suggested_actions": [
+        "Develop and share a clear decision-making matrix or policy document outlining who decides what and how.",
+        "Implement and document systematic processes for gathering stakeholder input on key decisions (e.g., surveys, focus groups, advisory committees).",
+        "Ensure all major decisions are communicated to staff and families with clear explanations of rationale.",
+        "Collect and analyze staff and stakeholder feedback on the perceived fairness and transparency of decision-making processes."
+      ],
+      "follow_up_requests": [
+        "Organizational chart or governance documents specifying decision rights.",
+        "Recent examples of stakeholder input collection and how it influenced decisions.",
+        "Communications (emails, newsletters, meeting minutes) showing how decisions and rationales are shared.",
+        "Survey or interview data on staff and stakeholder perceptions of decision-making."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 2
+    },
+    "5C": {
+      "rating": "not_rated",
+      "confidence": "low",
+      "strengths": [
+        "The Communication_Plan_2024-2025.md details the establishment of clear communication channels (ParentSquare, newsletters, social media) and norms for different stakeholder groups, indicating intentional planning for information dissemination.",
+        "Language accessibility is addressed, with translation services available for six languages, supporting accessible communication for diverse staff and families."
+      ],
+      "gaps": [
+        "There is no evidence in Communication_Plan_2024-2025.md regarding internal meeting structures, frequency, or how meetings ensure alignment and information sharing among staff.",
+        "No information is provided about how communication systems are evaluated or improved based on staff feedback, beyond a single satisfaction data point.",
+        "The plan references a 64% satisfaction rate but does not specify whether this reflects staff perceptions, nor does it provide qualitative feedback or trends over time."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Artifacts or schedules documenting regular internal staff meetings and their structure.",
+        "Staff survey results or qualitative feedback specifically addressing whether staff feel well-informed and perceive meetings as productive.",
+        "Documentation or examples of how communication systems have been evaluated and improved in response to feedback.",
+        "Evidence that information reaches all staff in a timely and accessible manner (e.g., communication logs, staff testimonials)."
+      ],
+      "rationale": "Based solely on Communication_Plan_2024-2025.md, there is evidence of clear external communication channels and attention to language accessibility, which partially aligns with the success criteria for establishing communication norms. However, there is no direct evidence regarding internal communication structures such as regular staff meetings, alignment practices, or mechanisms for evaluating and improving internal communication based on feedback. The referenced 64% satisfaction rate is not clearly attributed to staff or internal communications. Without evidence on meeting structures, staff perceptions, or feedback-driven improvement, it is not possible to accurately assess the component against the full set of success criteria.",
+      "suggested_actions": [
+        "Collect and review documentation of internal staff meeting schedules, agendas, and attendance records.",
+        "Administer or analyze staff surveys specifically targeting perceptions of internal communication effectiveness and meeting productivity.",
+        "Establish and document a process for regularly evaluating and improving internal communication systems based on staff feedback.",
+        "Gather and review examples of how information is disseminated to all staff, including accommodations for accessibility.",
+        "Track and analyze communication satisfaction data over time, disaggregated by staff role."
+      ],
+      "follow_up_requests": [
+        "Internal meeting calendars, agendas, and attendance logs.",
+        "Recent staff survey results or focus group summaries addressing internal communications.",
+        "Documentation of communication system evaluations and resulting improvements.",
+        "Examples of internal communication (emails, memos, announcements) and evidence of timely delivery to all staff."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 1
+    },
+    "5D": {
+      "rating": "developing",
+      "confidence": "low",
+      "strengths": [
+        "The School_Improvement_Plan_Goals_Tracker_2024-2025.csv documents the existence of a multi-year strategic plan with 10 strategic goals aligned to SQF dimensions, each with measurable targets, baseline metrics, and status indicators.",
+        "The tracker includes mid-year actuals for key metrics such as reading and math proficiency, teacher retention, and family engagement, demonstrating some ongoing monitoring of progress."
+      ],
+      "gaps": [
+        "There is no evidence in School_Improvement_Plan_Goals_Tracker_2024-2025.csv regarding the development process of the strategic plan, specifically whether broad stakeholder input was solicited.",
+        "The evidence does not address whether progress against strategic goals is regularly reported to the broader school community.",
+        "There is no information about how staff connect their work to strategic priorities or how resource allocation decisions are aligned with the plan."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Documentation or narrative describing the stakeholder engagement process in developing the strategic plan.",
+        "Artifacts or communications showing regular reporting of progress to staff, families, or the board.",
+        "Staff surveys or interviews demonstrating understanding of and connection to strategic priorities.",
+        "Evidence of resource allocation decisions (budgets, staffing plans) explicitly tied to strategic goals."
+      ],
+      "rationale": "Based on the School_Improvement_Plan_Goals_Tracker_2024-2025.csv, there is clear evidence that a multi-year strategic plan exists with measurable goals, strategies, and metrics, and that progress is being tracked at least mid-year (e.g., reading proficiency at 52% vs. 55% target, math at 39% vs. 45% target). However, the evidence does not address whether the plan was developed with broad stakeholder input, nor does it show how progress is reported or how staff and resources are aligned to the plan. Without documentation of stakeholder engagement, reporting practices, or staff/resource alignment, only some of the core actions and progress indicators are met. Therefore, the rating is 'developing' with low confidence due to the limited scope of evidence.",
+      "suggested_actions": [
+        "Document and share the process used to solicit stakeholder input in the development of the strategic plan.",
+        "Establish and archive regular reporting mechanisms (e.g., newsletters, board presentations) to communicate progress on strategic goals to all stakeholders.",
+        "Conduct staff surveys or focus groups to assess understanding of and alignment with strategic priorities.",
+        "Align budget and resource allocation documentation to strategic goals and make this explicit in planning artifacts.",
+        "Develop a system for tracking and sharing how staff work and resource decisions support strategic priorities."
+      ],
+      "follow_up_requests": [
+        "Narrative or meeting notes detailing stakeholder engagement in strategic plan development.",
+        "Samples of communications or reports that share progress on strategic goals with the school community.",
+        "Staff survey or interview data showing awareness of and connection to strategic priorities.",
+        "Budget or resource allocation documents linked to strategic plan goals."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 1
+    },
+    "6A": {
+      "rating": "developing",
+      "confidence": "medium",
+      "strengths": [
+        "The Communication_Plan_2024-2025.md documents a multi-channel approach to family-school communication, including ParentSquare, newsletters, social media, and translation services in six languages, demonstrating accessibility and frequency.",
+        "Parent_Teacher_Conference_Attendance_Fall_2024.csv shows a strong overall parent-teacher conference attendance rate of 83%, with interpreter services utilized in 18% of conferences and virtual options accessed by 22% of families, indicating efforts to reach diverse families.",
+        "Community_Partnership_Agreements_Summary.md details 14 sustained community partnerships, including those providing direct services to families and students, which may indirectly support family engagement and school-community ties."
+      ],
+      "gaps": [
+        "No direct evidence that families have meaningful roles in school decisions or student learning; none of the documents reference family advisory groups, decision-making committees, or co-creation opportunities.",
+        "Family survey data on engagement and satisfaction is limited; Communication_Plan_2024-2025.md references a 64% satisfaction rate with communication, but there is no broader or disaggregated engagement/satisfaction data.",
+        "Participation rates by demographic group are only partially addressed; while interpreter usage and attendance by grade are noted in Parent_Teacher_Conference_Attendance_Fall_2024.csv, there is no breakdown by race/ethnicity, socioeconomic status, or other demographics."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Family engagement or climate survey data disaggregated by demographic group, including questions about feeling welcomed, respected, and heard.",
+        "Documentation or examples of families participating in school decision-making (e.g., advisory councils, committees, co-design processes).",
+        "Qualitative evidence (focus groups, interviews) reflecting family perceptions of engagement, respect, and influence."
+      ],
+      "rationale": "The evidence demonstrates that the school has a documented, multi-channel family communication strategy (per Communication_Plan_2024-2025.md) and is making efforts to ensure accessibility through translation and virtual options (Parent_Teacher_Conference_Attendance_Fall_2024.csv). Conference attendance is robust overall, with targeted supports for non-English-speaking families. However, there is no evidence that families have meaningful roles in school decision-making or student learning, which is a core success criterion. Additionally, while a 64% communication satisfaction rate is referenced, there is no comprehensive or disaggregated family engagement or satisfaction data, nor evidence that families broadly feel welcomed, respected, and heard. Community partnerships are strong (Community_Partnership_Agreements_Summary.md), but these do not substitute for direct family engagement in school governance or learning. As a result, the component is rated 'developing' because some criteria are met (notably communication channels and partial accessibility), but implementation is inconsistent and key elements are missing.",
+      "suggested_actions": [
+        "Establish and document formal opportunities for families to participate in school decision-making (e.g., family advisory council, parent representatives on committees).",
+        "Administer a comprehensive family engagement survey, disaggregated by demographic group, to assess perceptions of being welcomed, respected, and heard.",
+        "Increase communication satisfaction by soliciting regular feedback from families on preferred channels and topics.",
+        "Develop and publicize opportunities for families to contribute to student learning (e.g., classroom volunteers, curriculum nights, co-curricular planning).",
+        "Track and analyze family participation rates by demographic group to identify and address disparities."
+      ],
+      "follow_up_requests": [
+        "Recent family engagement or climate survey results, including disaggregated data on engagement and satisfaction.",
+        "Documentation of family involvement in school decision-making processes (e.g., meeting minutes, council rosters).",
+        "Qualitative data (focus group summaries, interview transcripts) on family perceptions of engagement and respect."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 3
+    },
+    "6B": {
+      "rating": "meeting_expectations",
+      "confidence": "high",
+      "strengths": [
+        "The Community_Partnership_Agreements_Summary.md documents 14 active partnerships, including with the University of Minnesota (tutoring, student teacher placements), YMCA (after-school program), healthcare providers (vision/dental screenings), and arts organizations (Minnesota Orchestra, local theater company), demonstrating a breadth of strategic partnerships aligned with student needs and the school mission.",
+        "Several partnerships are noted as exceeding 3 years in duration (Community_Partnership_Agreements_Summary.md), indicating sustained commitment and likely well-defined agreements.",
+        "The YMCA after-school program serves 95 students (22.6% of enrollment), with academic support, enrichment, and high participation rates (82% attendance), as detailed in After_School_Program_Report_2024-2025.md, showing tangible student opportunities and benefits.",
+        "Healthcare partnerships provide screenings for all students (Community_Partnership_Agreements_Summary.md), directly addressing student health needs and leveraging community resources."
+      ],
+      "gaps": [
+        "There is no direct evidence in the provided documents that partnership agreements explicitly define mutual expectations and outcomes; the summary lists scope and impact metrics but does not provide agreement language or details (Community_Partnership_Agreements_Summary.md).",
+        "No evidence is provided regarding partner satisfaction or formal feedback from partners about the quality of relationships or outcomes.",
+        "There is no comprehensive mapping of broader community resources or an explicit gap analysis to show how partnerships were selected to fill specific needs."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Copies or excerpts of actual partnership agreements showing defined mutual expectations and outcomes.",
+        "Formal partner feedback or satisfaction survey results.",
+        "A community resource map or needs assessment demonstrating how partnerships address identified gaps.",
+        "Evidence of student or family feedback on the impact of partnerships beyond participation and attendance data."
+      ],
+      "rationale": "The evidence from Community_Partnership_Agreements_Summary.md and After_School_Program_Report_2024-2025.md demonstrates that the school maintains a robust set of partnerships with a variety of organizations, each aligned with student needs (e.g., tutoring, health screenings, enrichment). Tangible student benefits are evident, such as 95 students served by the YMCA after-school program and universal access to health screenings. Several partnerships are sustained over multiple years, suggesting strong relationships. However, there is no direct evidence that partnership agreements explicitly define mutual expectations and outcomes, nor is there documentation of partner satisfaction or a formal mapping of community resources to needs. As a result, while most core actions and progress indicators are met, the absence of evidence on agreement specificity and partner feedback prevents an 'excelling' rating. The confidence in this rating is high, as the available evidence is clear and directly relevant, but some important documentation is missing.",
+      "suggested_actions": [
+        "Collect and review partnership agreements to ensure mutual expectations and outcomes are clearly defined and documented.",
+        "Implement a formal partner satisfaction survey or structured feedback process to assess the quality and impact of partnerships.",
+        "Develop and maintain a comprehensive community resource map and needs assessment to systematically identify partnership opportunities and gaps.",
+        "Solicit and document student and family feedback on the impact and value of partnership-driven programs.",
+        "Regularly review partnership outcomes against agreed-upon metrics and share results with stakeholders."
+      ],
+      "follow_up_requests": [
+        "Provide copies or summaries of partnership agreements that specify mutual expectations and desired outcomes.",
+        "Share results from any partner satisfaction surveys or feedback mechanisms.",
+        "Submit a community resource map or needs assessment demonstrating how partnerships address identified gaps.",
+        "Provide evidence of student and/or family feedback on partnership programs."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 3
+    },
+    "7A": {
+      "rating": "not_rated",
+      "confidence": "low",
+      "strengths": [
+        "According to Board_Governance_Self_Assessment_2024.csv, board members self-rate mission alignment and strategic planning relatively highly (4.6/5.0 and 4.2/5.0 respectively), indicating some perceived strength in governance fundamentals."
+      ],
+      "gaps": [
+        "Board_Governance_Self_Assessment_2024.csv does not provide direct evidence regarding board actions on student outcomes, performance data review, or accountability measures.",
+        "There is no evidence in Board_Governance_Self_Assessment_2024.csv that board agendas include student outcomes or that performance data is regularly reviewed."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Board meeting agendas or minutes showing regular review of student outcomes and performance data.",
+        "Documentation of board actions taken in response to underperformance.",
+        "Evidence that board members can articulate school performance relative to goals (e.g., interview transcripts, survey responses).",
+        "Artifacts demonstrating how accountability is balanced with support for school leadership."
+      ],
+      "rationale": "The only evidence provided, Board_Governance_Self_Assessment_2024.csv, consists of board member self-ratings on general governance dimensions such as mission alignment and strategic planning, but does not address the specific success criteria for this component. There is no direct evidence that the board sets clear expectations for student outcomes, regularly reviews performance data, or takes action when expectations are not met. Additionally, there is no documentation of board agendas, minutes, or other artifacts that would demonstrate a focus on student outcomes or performance accountability. As such, there is insufficient evidence to rate this component against the SQF criteria.",
+      "suggested_actions": [
+        "Collect and review board meeting agendas and minutes for the past 12 months to identify frequency and depth of student outcome and performance data discussions.",
+        "Gather documentation or examples of board actions taken in response to underperformance.",
+        "Survey or interview board members specifically about their understanding of school performance relative to established goals.",
+        "Develop a process for systematically including student outcomes and performance review in board agendas."
+      ],
+      "follow_up_requests": [
+        "Board meeting agendas and minutes from the past academic year.",
+        "Any board presentations or reports on student performance data.",
+        "Documentation of board decisions or actions related to school performance or leadership support.",
+        "Interviews or survey responses from board members regarding their understanding of school performance and accountability processes."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 1
+    },
+    "7B": {
+      "rating": "not_rated",
+      "confidence": "low",
+      "strengths": [],
+      "gaps": [
+        "No direct evidence of a formal school leader evaluation process, criteria, or alignment with school performance data (Board_Governance_Self_Assessment_2024.csv)",
+        "No evidence regarding board support or development opportunities for the school leader (Board_Governance_Self_Assessment_2024.csv)",
+        "No information on leader compensation, retention strategies, or leadership stability (Board_Governance_Self_Assessment_2024.csv)",
+        "No data on school leader perceptions of support or fairness in evaluation (Board_Governance_Self_Assessment_2024.csv)"
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Formal documentation of the school leader evaluation process and criteria",
+        "Records or descriptions of board-provided support and professional development for the school leader",
+        "Leader compensation and retention policy documents",
+        "School leader survey/interview data on support and evaluation",
+        "Leader tenure and turnover data",
+        "Recent leader evaluation results and their alignment with school performance outcomes"
+      ],
+      "rationale": "The only available evidence, the Board_Governance_Self_Assessment_2024.csv, provides general board self-ratings on governance effectiveness but does not address any of the specific success criteria for component 7B. There is no mention of a formal leader evaluation process, criteria, or how evaluation results align with school performance. Additionally, there is no evidence of ongoing board support, leader development opportunities, compensation or retention strategies, or leadership stability. Without direct evidence on these points, it is not possible to accurately assess this component. Therefore, the component is rated as 'not_rated' due to insufficient evidence.",
+      "suggested_actions": [
+        "Collect and review documentation of the formal school leader evaluation process, including criteria and timelines",
+        "Gather evidence of board-provided support and professional development opportunities for the leader",
+        "Obtain leader compensation and retention strategy documents",
+        "Survey or interview the school leader regarding their perceptions of support and evaluation fairness",
+        "Compile data on leader tenure and turnover to assess stability"
+      ],
+      "follow_up_requests": [
+        "Formal leader evaluation policy and recent evaluation reports",
+        "Records of board-leader development activities or support initiatives",
+        "Leader compensation and retention policy documentation",
+        "School leader survey/interview responses regarding support and evaluation",
+        "Leader tenure and turnover data for the past 3-5 years"
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 1
+    },
+    "7C": {
+      "rating": "not_rated",
+      "confidence": "low",
+      "strengths": [
+        "Board members self-rate overall governance effectiveness at 4.0/5.0, indicating a generally positive perception of board functioning (Board_Governance_Self_Assessment_2024.csv).",
+        "Mission alignment and strategic planning are rated highly at 4.6/5.0 and 4.2/5.0 respectively, suggesting board members feel aligned with the school's mission and engaged in strategic oversight (Board_Governance_Self_Assessment_2024.csv)."
+      ],
+      "gaps": [
+        "Community engagement and board development/succession planning are rated lowest at 3.5/5.0 and 3.6/5.0, indicating possible weaknesses in these areas (Board_Governance_Self_Assessment_2024.csv)."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Board bylaws and governance policy documents to verify documentation and adherence.",
+        "Evidence of committee structures and their effectiveness (e.g., committee charters, meeting minutes).",
+        "Documentation or data on board composition, including skills and diversity metrics.",
+        "Attendance records and minutes to assess meeting productivity and attendance.",
+        "Evidence of compliance with legal and authorizer requirements."
+      ],
+      "rationale": "The only available evidence is the Board_Governance_Self_Assessment_2024.csv, which provides board members' subjective ratings of governance effectiveness across several dimensions. While these ratings suggest generally positive perceptions, self-assessment alone is insufficient to verify the core actions and progress indicators for Board Structures. There is no direct evidence of documented bylaws, governance policies, committee structures, board composition management, or compliance with legal requirements. Without these artifacts, it is not possible to fully assess whether the board's structures and practices meet the SQF success criteria. Therefore, the component cannot be rated at this time.",
+      "suggested_actions": [
+        "Provide current board bylaws and governance policy documents.",
+        "Submit evidence of committee structures, such as committee charters and recent meeting minutes.",
+        "Share a board roster with information on member skills, backgrounds, and diversity.",
+        "Provide board meeting attendance records and sample minutes.",
+        "Document how the board ensures compliance with legal and authorizer requirements."
+      ],
+      "follow_up_requests": [
+        "Board bylaws and governance policies.",
+        "Committee structure documentation and recent committee meeting minutes.",
+        "Board composition data (skills, backgrounds, diversity).",
+        "Board meeting attendance logs and minutes.",
+        "Evidence of compliance with legal and authorizer requirements."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 1
+    },
+    "8A": {
+      "rating": "not_rated",
+      "confidence": "low",
+      "strengths": [
+        "The Technology_Plan_and_Inventory_2024-2026.md outlines a clear 1:1 Chromebook program for grades 3-8 and shared iPad carts for K-2, demonstrating intentional device allocation.",
+        "The plan includes a device inventory and refresh cycle, indicating forward planning for technology sustainability.",
+        "Interactive displays are present in 65% of classrooms, showing investment in instructional technology.",
+        "Digital citizenship curriculum is integrated into advisory periods, reflecting attention to responsible technology use."
+      ],
+      "gaps": [
+        "The Technology_Plan_and_Inventory_2024-2026.md notes that WiFi infrastructure is only rated 'adequate' and requires upgrades to support growing enrollment.",
+        "The annual technology budget ($45K) is below recommended per-pupil benchmarks, which may limit the ability to maintain or upgrade infrastructure.",
+        "No information is provided about integration or maintenance of core data systems (SIS, LMS, assessment platforms).",
+        "There is no mention of data governance or cybersecurity practices in the provided evidence.",
+        "No evidence is presented regarding staff perceptions of system reliability, ease of use, or technology support/downtime."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Documentation or description of SIS, LMS, and assessment system integration and maintenance.",
+        "Policies or protocols related to data governance and cybersecurity.",
+        "Staff or student survey data about technology reliability, usability, and support.",
+        "Records or logs of technology downtime and support tickets.",
+        "Evidence that data is accessible and used for decision-making at all levels."
+      ],
+      "rationale": "Based solely on the Technology_Plan_and_Inventory_2024-2026.md, there is evidence of thoughtful device management, a refresh cycle, and some infrastructure planning. However, the document does not address key success criteria for this component, such as integration and maintenance of core data systems (SIS, LMS, assessment), data governance, or cybersecurity practices. There is also no evidence regarding staff or student experiences with technology reliability or support, nor about the accessibility and use of data for decision-making. Without these critical elements, it is not possible to accurately rate this component. Confidence is low due to the narrow scope of the evidence provided.",
+      "suggested_actions": [
+        "Provide documentation on the integration and maintenance of core data systems (SIS, LMS, assessment platforms).",
+        "Share policies or evidence of data governance and cybersecurity practices.",
+        "Collect and present staff and student feedback on technology reliability, usability, and support.",
+        "Submit records of technology downtime and support ticket resolution.",
+        "Demonstrate how data is made accessible and used for decision-making at various organizational levels."
+      ],
+      "follow_up_requests": [
+        "Copies or summaries of SIS, LMS, and assessment system integration protocols.",
+        "Data governance and cybersecurity policy documents.",
+        "Recent staff and student technology satisfaction surveys or focus group summaries.",
+        "Technology support logs or downtime reports from the past 12 months.",
+        "Examples of data dashboards or reports used by staff for decision-making."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 1
+    },
+    "8B": {
+      "rating": "not_rated",
+      "confidence": "low",
+      "strengths": [
+        "The Technology_Plan_and_Inventory_2024-2026.md demonstrates intentional planning for technology infrastructure, including a device refresh cycle and budget allocation for technology needs.",
+        "A 1:1 Chromebook program for grades 3-8 and shared iPad carts for K-2 indicate attention to supporting learning spaces with technology."
+      ],
+      "gaps": [
+        "No evidence is provided regarding the overall facilities maintenance and improvement plan, safety systems and protocols, or the broader physical environment beyond technology.",
+        "There is no information about safety incident frequency, staff/student perceptions of safety, or the condition of non-technology-related facilities."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Facilities maintenance and improvement plan documentation",
+        "Safety systems and protocol documentation (fire drills, emergency procedures, etc.)",
+        "Student and staff surveys or reports on physical safety and facility condition",
+        "Data on safety incidents and their management",
+        "Descriptions or photos of learning space design and maintenance beyond technology"
+      ],
+      "rationale": "The only evidence provided, Technology_Plan_and_Inventory_2024-2026.md, focuses exclusively on technology infrastructure, device inventory, and related planning. While this demonstrates intentionality in supporting digital learning environments, it does not address the broader physical environment, facilities maintenance, or safety protocols required by the success criteria for component 8B. There is no information about safety systems, facility condition, or stakeholder perceptions of safety. As such, there is insufficient evidence to rate this component, and additional documentation is needed to assess compliance with the School Quality Framework.",
+      "suggested_actions": [
+        "Provide documentation of the school's facilities maintenance and improvement plan, including funding sources and schedules.",
+        "Share records or protocols for safety systems (e.g., fire drills, emergency preparedness, building security).",
+        "Collect and submit recent student and staff survey data on perceptions of physical safety and facility condition.",
+        "Submit incident logs or summaries showing frequency and management of safety incidents.",
+        "Provide descriptions, photos, or plans illustrating intentional design and maintenance of learning spaces beyond technology."
+      ],
+      "follow_up_requests": [
+        "Facilities maintenance and improvement plan document",
+        "Safety systems and emergency protocol documentation",
+        "Recent student and staff survey results on safety and facility condition",
+        "Safety incident logs or summaries",
+        "Photos or descriptions of classroom and common area design/maintenance"
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 1
+    },
+    "9A": {
+      "rating": "developing",
+      "confidence": "medium",
+      "strengths": [
+        "The school demonstrates strong grant management and compliance, as shown by the Title I_and_Federal_Funding_Compliance_Report.txt, which documents a $148.5K allocation, detailed expenditure tracking, and a successful compliance review with no findings in 2024.",
+        "The Fundraising_and_Development_Report_2024-2025.md shows active efforts to diversify revenue, including a growing corporate matching program (12 employers) and a grant portfolio with 6 active grants totaling $87K.",
+        "Annual fundraising efforts are robust, with $142.8K raised YTD and a major event (annual gala) generating $52K, per Fundraising_and_Development_Report_2024-2025.md."
+      ],
+      "gaps": [
+        "Revenue diversification remains a challenge, with heavy reliance on per-pupil funding noted in Fundraising_and_Development_Report_2024-2025.md.",
+        "Donor retention rate is 68%, which is below the 75% nonprofit benchmark, as cited in Fundraising_and_Development_Report_2024-2025.md.",
+        "There is no direct evidence of financial reserves, cash position, or net asset status, nor is there documentation of regular monitoring of key financial health metrics or comparison to benchmarks."
+      ],
+      "contradictions": [
+        "While the school is actively pursuing diversified revenue streams (grants, gala, corporate matching), the same report (Fundraising_and_Development_Report_2024-2025.md) explicitly states that revenue diversification remains a challenge, indicating limited progress despite efforts."
+      ],
+      "missing_evidence": [
+        "Board policy on financial reserves and current reserve levels",
+        "Statement of financial position (balance sheet) showing net assets and cash reserves",
+        "Multi-year revenue and expense trends (at least 3 years)",
+        "Regular financial health metric monitoring reports and benchmark comparisons"
+      ],
+      "rationale": "The available evidence, particularly from Fundraising_and_Development_Report_2024-2025.md, demonstrates active fundraising and some diversification efforts (grants, corporate matching, gala), but also clearly states that revenue diversification remains a challenge and donor retention is below benchmark. The Title_I_and_Federal_Funding_Compliance_Report.txt shows strong compliance and effective use of federal funds, which is a positive indicator for financial management. However, there is no evidence provided regarding the school’s financial reserves, cash position, net assets, or regular monitoring of financial health metrics—all of which are core to the success criteria for this component. Without these, it is not possible to confirm that the school meets expectations for financial health. Thus, the rating is 'developing': some criteria are met (active fundraising, compliance, some diversification), but key elements (reserves, financial monitoring, multi-year trends) are missing or not addressed.",
+      "suggested_actions": [
+        "Provide board policy on financial reserves and current reserve levels, and ensure reserves are maintained per policy.",
+        "Share a recent statement of financial position (balance sheet) to document net assets and cash reserves.",
+        "Compile and review multi-year (3+ years) revenue and expense trends to assess stability or growth.",
+        "Implement and document regular monitoring of key financial health metrics (e.g., days cash on hand, current ratio) and compare to sector benchmarks.",
+        "Develop a plan to further diversify revenue streams and improve donor retention to meet or exceed benchmarks."
+      ],
+      "follow_up_requests": [
+        "Board-approved financial reserve policy and most recent reserve report",
+        "Latest audited financial statements or balance sheet",
+        "Three-year revenue and expense trend analysis",
+        "Sample financial dashboard or report showing regular monitoring of key metrics and benchmark comparisons"
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 3
+    },
+    "9B": {
+      "rating": "not_rated",
+      "confidence": "low",
+      "strengths": [
+        "According to the Fundraising_and_Development_Report_2024-2025.md, the school demonstrates active fundraising and development efforts, with $142.8K raised YTD and a diversified grant portfolio.",
+        "The Title_I_and_Federal_Funding_Compliance_Report.txt shows strong compliance with federal funding requirements, including detailed expenditure tracking and a passed compliance review with no findings in 2024."
+      ],
+      "gaps": [
+        "There is no evidence provided regarding the existence or implementation of comprehensive financial policies and procedures, internal controls (such as separation of duties or approval workflows), or regular reconciliation.",
+        "No documentation or results of independent annual audits are present in the provided evidence.",
+        "There is no information on monthly financial reporting to leadership or the board, nor on the qualifications or training of financial staff."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Board-approved financial policies and procedures manual",
+        "Internal control documentation (e.g., workflow charts, segregation of duties matrix)",
+        "Recent independent audit report and management letter",
+        "Sample monthly financial reports reviewed by leadership/board",
+        "Resumes or certifications for financial staff"
+      ],
+      "rationale": "The available evidence from the Fundraising_and_Development_Report_2024-2025.md and the Title_I_and_Federal_Funding_Compliance_Report.txt demonstrates strong fundraising practices and federal funding compliance, including detailed tracking and a clean compliance review. However, there is no evidence addressing the core financial management and controls criteria: documented policies and procedures, internal controls, annual independent audits, or monthly financial reporting. Additionally, there is no information regarding staff qualifications or training in financial management. Because the evidence does not address the majority of the success criteria for this component, a rating cannot be assigned at this time.",
+      "suggested_actions": [
+        "Provide a copy of the school's financial policies and procedures manual, including internal controls.",
+        "Submit the most recent independent audit report and any management letter.",
+        "Share sample monthly financial reports reviewed by leadership and the board.",
+        "Document the qualifications and training of staff responsible for financial management.",
+        "Describe the approval workflows and reconciliation processes in place."
+      ],
+      "follow_up_requests": [
+        "Board-approved financial policies and procedures manual",
+        "Recent independent audit report and management letter",
+        "Sample monthly financial reports",
+        "Documentation of internal controls and approval workflows",
+        "Resumes or certifications for financial staff"
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 2
+    },
+    "9C": {
+      "rating": "not_rated",
+      "confidence": "low",
+      "strengths": [
+        "Enrollment_Trends_and_Projections_2019-2027.csv provides robust multi-year enrollment projections, which is a foundational input for financial planning and scenario analysis.",
+        "Fundraising_and_Development_Report_2024-2025.md details diversified fundraising efforts and donor analysis, which supports understanding of revenue streams and informs financial planning."
+      ],
+      "gaps": [
+        "No evidence provided of multi-year financial projections or models (e.g., pro forma statements, scenario planning) as required by the core actions.",
+        "No documentation of annual budgets, their alignment to strategic plan priorities, or how resource allocation decisions are made.",
+        "No evidence of monthly budget-to-actual monitoring, variance analysis, or how financial performance is tracked and managed.",
+        "No explicit linkage between budget decisions and strategic priorities in the provided evidence."
+      ],
+      "contradictions": [],
+      "missing_evidence": [
+        "Multi-year financial projection documents (budgets, pro formas, scenario analyses)",
+        "Annual budget documents showing alignment to strategic plan priorities",
+        "Monthly budget-to-actual reports with variance analysis",
+        "Documentation or meeting minutes showing how resource allocation decisions are linked to strategic priorities"
+      ],
+      "rationale": "While the Enrollment_Trends_and_Projections_2019-2027.csv provides strong data on enrollment trends and projections, and the Fundraising_and_Development_Report_2024-2025.md offers insight into fundraising performance and revenue diversification challenges, there is no direct evidence of the core financial planning practices required by this component. Specifically, there are no multi-year financial projections, annual budgets, or budget monitoring artifacts provided. There is also no documentation showing how budgets align with strategic priorities or how resource allocation decisions are made and tracked. As such, it is not possible to accurately assess the extent to which the school meets the SQF success criteria for Financial Planning. Additional evidence is needed to make a valid rating.",
+      "suggested_actions": [
+        "Develop and share multi-year financial projection documents that incorporate enrollment, staffing, and programmatic scenarios.",
+        "Provide annual budget documents that explicitly show alignment with strategic plan priorities.",
+        "Implement and document monthly budget-to-actual monitoring with variance analysis.",
+        "Establish a process and documentation for linking resource allocation decisions to strategic priorities.",
+        "Regularly review and update financial plans to reflect changing enrollment and fundraising realities."
+      ],
+      "follow_up_requests": [
+        "Multi-year financial projections or pro forma statements for at least the next 3 years.",
+        "Annual budget documents for the current and previous year, with notes on alignment to strategic plan priorities.",
+        "Monthly or quarterly budget-to-actual reports with variance analysis.",
+        "Meeting minutes or memos showing how resource allocation decisions are made in relation to strategic priorities."
+      ],
+      "model_used": "gpt-4.1",
+      "evidence_count": 2
+    }
+  },
+  "dimension_summaries": {
+    "Organizational Purpose": {
+      "overall_assessment": "The Organizational Purpose dimension currently lacks sufficient evidence across all three components—Mission, Vision, and Values; Student Success Profile; and School/Program Model—to demonstrate alignment with SQF success criteria. While the school has established strategic goals, tracks progress, and maintains operational structures such as an annual calendar, there is no direct documentation or clear articulation of foundational elements such as the mission, vision, values, or a codified student success profile. Furthermore, there is no evidence that these foundational elements are referenced in decision-making, regularly reviewed with stakeholder input, or understood by staff, students, and families. The absence of explicit program model documentation, rationale, and stakeholder feedback further underscores a lack of coherence and intentionality in how the school's purpose is communicated and enacted. As a result, all components are rated 'not_rated' with low confidence, indicating a significant need for foundational work in this dimension.",
+      "patterns": [
+        "Lack of direct documentation or articulation of foundational elements (mission, vision, values, student success profile, program model) across all components.",
+        "Strategic goals and progress tracking exist, but are not explicitly linked to a clearly stated organizational purpose.",
+        "No evidence of stakeholder engagement or understanding regarding the school's core purpose or model.",
+        "Operational planning (calendar, enrollment tracking) is present, but not tied to a broader mission or program rationale."
+      ],
+      "compounding_risks": [
+        "The absence of a clearly articulated mission, vision, and values increases the risk that strategic goals and operational decisions are not meaningfully aligned to a shared organizational purpose.",
+        "Without a codified student success profile or program model, there is a risk that instructional practices, resource allocation, and stakeholder engagement are fragmented and lack coherence.",
+        "Lack of stakeholder understanding and input into foundational documents compounds the risk of misalignment between leadership intentions and community needs or expectations."
+      ],
+      "top_opportunities": [
+        "Develop and clearly articulate the school's mission, vision, and values in accessible formats, and ensure they are referenced in decision-making and communications.",
+        "Codify a Student Success Profile that defines the skills, knowledge, and dispositions students are expected to develop, with input from key stakeholders.",
+        "Document and communicate the school/program model, including its rationale, distinctive features, and alignment to the mission and student success profile.",
+        "Establish regular cycles for reviewing and refreshing foundational documents with broad stakeholder engagement."
+      ],
+      "leadership_attention": [
+        "Prioritize the development and communication of a clear, compelling mission, vision, and values statement.",
+        "Engage staff, families, and students in the creation and understanding of a Student Success Profile.",
+        "Document and share the rationale and distinctive elements of the school/program model, ensuring alignment with the mission and student success profile.",
+        "Implement structures for ongoing review and stakeholder input into foundational documents to ensure relevance and coherence."
+      ],
+      "model_used": "gpt-4.1"
+    },
+    "Academic Program": {
+      "overall_assessment": "The Academic Program dimension demonstrates foundational strengths in curriculum adoption, professional development, and compliance for special populations, but lacks coherence and consistency in vision, implementation, and schoolwide systems. While the ELA curriculum is standards-aligned and research-based, there is no evidence of a broader academic vision or its alignment to a Student Success Profile, nor is there documentation of curriculum quality or implementation across all subjects. Instructional practice is supported by regular professional development and teacher observations, but effective instruction—particularly differentiation—remains inconsistent, and there is no clear instructional framework guiding practice schoolwide. Data use and assessment practices show pockets of effective grade-level collaboration, but lack a comprehensive, schoolwide system for assessment, data analysis, and instructional adjustment. Academic intervention and enrichment are provided through targeted programs (ELL, SPED, after-school), but there is no evidence of a universal, tiered system accessible to all students, and enrichment is limited in reach. Support for special populations is robust in compliance and inclusion, but student growth outcomes, especially for ELLs, indicate room for improvement.\n\nOverall, the academic program is characterized by strong programmatic supports and compliance for specific groups, but lacks the cohesive, schoolwide systems and vision necessary for consistent, high-quality instruction and equitable access to intervention and enrichment. Addressing these gaps will be critical to improving instructional quality, student outcomes, and equity across the school.",
+      "patterns": [
+        "Strong programmatic supports and compliance for ELL and special education populations, with evidence of inclusion and targeted services.",
+        "Adoption of high-quality, standards-aligned ELA curricular materials, but lack of evidence for curriculum quality or implementation in other subjects.",
+        "Professional development and teacher observations are regular and structured, but instructional quality—especially differentiation—is inconsistent.",
+        "Data use and instructional adjustment occur at the grade level, but there is no evidence of a comprehensive, schoolwide assessment and data system.",
+        "Academic intervention and enrichment are available through specific programs, but not universally accessible or systematically monitored."
+      ],
+      "compounding_risks": [
+        "The absence of a clear, articulated academic vision and instructional framework increases the risk that curriculum, instruction, and intervention efforts are fragmented and lack coherence.",
+        "Inconsistent implementation of effective instructional practices (especially differentiation) may limit the impact of otherwise strong curriculum and professional development systems.",
+        "Lack of a comprehensive, schoolwide assessment and data system undermines the ability to monitor student progress, adjust instruction, and ensure interventions are effective for all students.",
+        "Limited access to in-school enrichment and universal intervention increases the risk of inequitable opportunities for students not served by after-school or targeted programs."
+      ],
+      "top_opportunities": [
+        "Develop and communicate a clear, schoolwide academic vision and instructional framework aligned to a Student Success Profile.",
+        "Establish a comprehensive, schoolwide assessment and data system that includes regular cycles of data analysis and instructional adjustment.",
+        "Strengthen and monitor the implementation of effective instructional practices, with a focus on differentiation and student engagement.",
+        "Design and implement a universal, tiered system of academic intervention and in-school enrichment to ensure equitable access for all students."
+      ],
+      "leadership_attention": [
+        "Articulate and align the school's academic vision and instructional framework across all subjects and grade levels.",
+        "Build and embed a comprehensive assessment and data use system to drive instructional improvement and monitor student progress schoolwide.",
+        "Prioritize professional development and coaching on effective, differentiated instruction, and monitor implementation through observations and feedback.",
+        "Expand and systematize academic intervention and enrichment opportunities to ensure all students, including those not in targeted programs, have equitable access to support and challenge."
+      ],
+      "model_used": "gpt-4.1"
+    },
+    "Student Culture": {
+      "overall_assessment": "The Student Culture dimension at this school demonstrates several foundational strengths, particularly in the use of restorative practices for behavior management, strong teacher-student relationships, and a generally positive climate as reflected in national percentile rankings for safety and belonging. The adoption of a school-wide SEL curriculum and the presence of a wellness committee further indicate a commitment to student well-being. Family engagement is also robust, with high parent-teacher conference attendance and language support for diverse families. \n\nHowever, the implementation of student culture systems is inconsistent and lacks key structural elements. There is no documented or clearly communicated culture vision, and community-building routines or traditions are not evident. Significant disparities exist between elementary and middle school students in their sense of belonging, and there are equity concerns in behavioral referrals and ELL student integration. SEL practices are not fully embedded into daily instruction, nor are SEL competencies assessed or monitored. The behavior management system, while restorative in intent, lacks documentation and regular equity review. These gaps suggest that while the school is meeting expectations in some areas, it is developing in others, and targeted leadership action is needed to ensure a coherent, equitable, and consistently positive student culture.",
+      "patterns": [
+        "Restorative practices and SEL are present but not fully embedded or consistently implemented across all grades and student groups.",
+        "Positive climate indicators (safety, belonging, relationships) are strong overall but mask significant disparities, especially for middle school and ELL students.",
+        "Documentation and communication of core systems (culture vision, behavior management, community-building routines) are lacking or absent.",
+        "Equity concerns, particularly racial disproportionality in discipline and lower ELL engagement, recur across multiple components.",
+        "Family engagement is a relative strength, but student-facing structures for relationship-building and community identity are underdeveloped."
+      ],
+      "compounding_risks": [
+        "The absence of a documented and communicated culture vision amplifies inconsistencies in SEL, behavior management, and community-building practices.",
+        "Disparities in sense of belonging and engagement for middle school and ELL students increase the risk of chronic absenteeism and disengagement.",
+        "Lack of regular review of discipline data for equity may perpetuate or worsen disproportionality in behavioral referrals.",
+        "Limited reach of after-school and community-building programs may exacerbate gaps in student connection and school identity, particularly for vulnerable groups."
+      ],
+      "top_opportunities": [
+        "Develop and communicate a clear, equity-centered culture vision aligned with the school mission and ensure it is understood by all stakeholders.",
+        "Strengthen and document community-building routines, rituals, and visible symbols of school identity to foster belonging across all grade levels.",
+        "Implement systems for regular assessment and monitoring of SEL competencies and ensure staff are trained to integrate SEL into daily instruction.",
+        "Establish regular, equity-focused reviews of behavioral data and ensure the behavior management system is clearly documented and consistently applied."
+      ],
+      "leadership_attention": [
+        "Prioritize the creation and communication of a comprehensive student culture vision that addresses equity and is aligned with the school mission.",
+        "Address disparities in sense of belonging and engagement for middle school and ELL students through targeted supports and inclusive practices.",
+        "Ensure SEL is fully embedded into instructional practice, with staff training and competency monitoring.",
+        "Document and review the behavior management system for consistency and equity, and act on data to address disproportionality.",
+        "Expand and promote community-building opportunities to reach a broader range of students and reinforce a cohesive school identity."
+      ],
+      "model_used": "gpt-4.1"
+    },
+    "Talent": {
+      "overall_assessment": "The Talent dimension at this school demonstrates foundational strengths in staff development, onboarding, and collaboration, as evidenced by a robust professional development (PD) program, high PD attendance, and positive staff culture ratings. The school provides a comprehensive onboarding process for new teachers and structures for staff community-building, which contribute to a generally positive environment. However, there are significant gaps in the explicit articulation and alignment of talent philosophy, the systematic incorporation of staff input, and the presence of rigorous recruitment, hiring, and coaching practices. Staff well-being is an area of concern, with lower ratings for work-life balance and compensation. The absence of documented talent philosophy, clear staff competencies, and evidence of coaching and evaluation systems limits the school's ability to strategically manage and develop talent. Overall, the dimension is rated as 'developing,' with most components meeting some but not all success criteria, and one component (Recruitment, Hiring, and Onboarding) lacking sufficient evidence to rate.",
+      "patterns": [
+        "Strong structures for professional development and onboarding are present across multiple components.",
+        "Positive staff culture and collaboration are consistent themes, as reflected in survey data.",
+        "There is a lack of explicit documentation and alignment of talent philosophy and desired staff competencies.",
+        "Systematic processes for incorporating staff input into decision-making are missing.",
+        "Evidence for coaching, feedback, and rigorous recruitment/hiring practices is absent or insufficient."
+      ],
+      "compounding_risks": [
+        "The absence of a clear, documented talent philosophy amplifies the risk that PD, evaluation, and hiring practices are not strategically aligned, potentially undermining staff development and retention.",
+        "Weaknesses in staff well-being (work-life balance and compensation) combined with a lack of systematic staff input may increase the risk of attrition and disengagement.",
+        "The lack of evidence for rigorous recruitment and onboarding processes, when combined with unclear staff competencies, increases the risk of hiring mismatches and insufficient support for new staff."
+      ],
+      "top_opportunities": [
+        "Develop and document a clear talent philosophy that defines desired staff competencies and aligns all talent practices (hiring, onboarding, PD, evaluation).",
+        "Establish systematic processes for gathering and incorporating staff input into school decisions to improve engagement and well-being.",
+        "Strengthen and document coaching and feedback cycles to support ongoing teacher growth and accountability.",
+        "Address staff well-being concerns, particularly around work-life balance and compensation, to improve retention and satisfaction."
+      ],
+      "leadership_attention": [
+        "Prioritize the development and communication of a comprehensive talent philosophy aligned with the school's mission and instructional model.",
+        "Implement mechanisms for regular staff input and feedback to inform decision-making and address well-being concerns.",
+        "Review and enhance recruitment, hiring, and onboarding processes to ensure rigor, alignment, and support for new staff.",
+        "Establish and monitor coaching and evaluation systems to ensure they are fair, transparent, and growth-oriented."
+      ],
+      "model_used": "gpt-4.1"
+    },
+    "Leadership": {
+      "overall_assessment": "The Leadership dimension currently lacks sufficient evidence across most components to demonstrate strong alignment with the School Quality Framework (SQF). While there are signs of intentional planning—such as the existence of a multi-year strategic plan with measurable goals and the establishment of communication channels—critical gaps remain in demonstrating effective organizational structure, transparent decision-making, and robust internal communication practices. The only component rated above 'not rated' is Strategic Planning, which is assessed as 'developing' due to evidence of goal-setting and progress tracking, but lacks documentation of stakeholder engagement and alignment of staff and resources. The remaining components are not rated due to insufficient or indirect evidence, particularly regarding how leadership roles are structured, how decisions are made and communicated, and how internal communications support alignment and improvement.",
+      "patterns": [
+        "Evidence is largely procedural or output-focused (e.g., plans, trackers) rather than demonstrating processes or stakeholder engagement.",
+        "There is a consistent lack of documentation regarding stakeholder input and feedback mechanisms across components.",
+        "Most components reference planning and assignment of responsibilities, but do not provide insight into the effectiveness or inclusiveness of these processes.",
+        "Operational transparency (e.g., calendars, attendance logs) is present, but does not extend to core leadership functions such as decision-making or internal communications."
+      ],
+      "compounding_risks": [
+        "The absence of clear organizational structure and decision-making processes increases the risk of misalignment, role confusion, and inefficiency.",
+        "Weaknesses in internal communication may exacerbate gaps in strategic plan implementation, as staff may not be fully informed or aligned with priorities.",
+        "Lack of stakeholder engagement in both planning and decision-making could lead to low buy-in, missed perspectives, and decreased effectiveness of improvement efforts."
+      ],
+      "top_opportunities": [
+        "Document and clarify the organizational structure, including leadership roles, reporting lines, and distribution of responsibilities.",
+        "Establish and communicate clear decision-making structures, including how input is gathered from stakeholders and how decisions are communicated with rationale.",
+        "Strengthen internal communication systems, ensuring regular, structured meetings and feedback loops that support alignment and continuous improvement.",
+        "Enhance stakeholder engagement in strategic planning and reporting, ensuring that staff and community voices inform priorities and progress updates."
+      ],
+      "leadership_attention": [
+        "Prioritize documenting and sharing the school's organizational structure and leadership team roles.",
+        "Develop and implement clear decision-making protocols with transparent communication of decisions and rationales.",
+        "Create or improve regular internal communication structures (e.g., staff meetings, updates) and establish mechanisms for staff feedback.",
+        "Engage staff and stakeholders in the strategic planning process and provide regular updates on progress toward goals."
+      ],
+      "model_used": "gpt-4.1"
+    },
+    "External Engagement": {
+      "overall_assessment": "The External Engagement dimension demonstrates a school that is proactive in establishing communication channels with families and building robust community partnerships. There is clear evidence of multi-channel outreach, translation services, and high parent-teacher conference attendance, as well as a diverse set of long-standing partnerships that provide direct benefits to students, such as after-school programs and health screenings. However, there are notable gaps in the depth of family engagement, particularly regarding shared decision-making and the collection of comprehensive, disaggregated feedback from families. Community partnerships are well-aligned with student needs and sustained over time, but lack formalized mutual expectations and partner feedback mechanisms. Overall, the school is meeting expectations in leveraging external resources and maintaining communication, but falls short in empowering families as true partners in school governance and in systematically evaluating the effectiveness and satisfaction of its partnerships.",
+      "patterns": [
+        "Strong emphasis on accessibility and breadth in both family communication and community partnerships.",
+        "Sustained relationships with external organizations and consistent delivery of student-facing services.",
+        "Gaps in collecting and using stakeholder feedback (families and partners) to inform improvement.",
+        "Limited evidence of stakeholder (especially family) involvement in decision-making or co-creation."
+      ],
+      "compounding_risks": [
+        "The lack of meaningful family engagement in decision-making, combined with limited feedback collection, may result in missed opportunities to address family needs or build trust, potentially undermining the impact of otherwise strong communication efforts.",
+        "Absence of formalized expectations and feedback mechanisms with community partners could lead to misalignment of goals or declining partnership quality over time, especially if not regularly reviewed in light of student needs."
+      ],
+      "top_opportunities": [
+        "Establish formal structures for family input and shared decision-making (e.g., advisory councils, co-creation committees).",
+        "Implement regular, disaggregated family engagement and satisfaction surveys to better understand and address the needs of all demographic groups.",
+        "Formalize partnership agreements to include explicit mutual expectations, defined outcomes, and feedback mechanisms.",
+        "Conduct a comprehensive mapping of community resources and needs to strategically target future partnerships."
+      ],
+      "leadership_attention": [
+        "Prioritize creating and supporting mechanisms for meaningful family involvement in school decisions and student learning.",
+        "Develop and administer comprehensive, disaggregated feedback tools for families and community partners.",
+        "Review and revise partnership agreements to ensure clarity of expectations, outcomes, and opportunities for partner input.",
+        "Ensure that all external engagement efforts are regularly evaluated for impact and inclusivity, with adjustments made based on stakeholder feedback."
+      ],
+      "model_used": "gpt-4.1"
+    },
+    "Governance": {
+      "overall_assessment": "The Governance dimension currently lacks sufficient evidence to demonstrate effective practices across all assessed components. The only available data comes from a board self-assessment, which provides subjective ratings on general governance areas such as mission alignment, strategic planning, and overall effectiveness. While these ratings are generally positive, they do not provide objective or documented evidence of board actions, structures, or processes related to accountability for school success, leader support and evaluation, or board structures. As a result, all components in this dimension are rated as 'not_rated' due to insufficient evidence to assess alignment with School Quality Framework (SQF) criteria. \n\nThis lack of documentation and objective evidence presents a significant challenge for governance transparency and effectiveness. Without clear records of board actions, policies, leader evaluation processes, or structural practices, it is not possible to verify that the board is fulfilling its responsibilities in supporting school success, holding leadership accountable, or maintaining effective governance structures. This represents a foundational gap that could undermine the school's ability to sustain high performance and continuous improvement.",
+      "patterns": [
+        "Reliance on board self-assessment as the sole source of evidence across all components.",
+        "Absence of objective documentation (e.g., board agendas, minutes, policies, evaluation tools) to support governance claims.",
+        "General positive self-perception of governance effectiveness, but lack of external validation or evidence of impact.",
+        "Consistent gaps in evidence related to accountability, leader evaluation, and board structural practices."
+      ],
+      "compounding_risks": [
+        "Lack of documented accountability processes increases the risk that the board is not effectively monitoring or driving student outcomes.",
+        "Absence of formal leader evaluation and support mechanisms may lead to unaddressed leadership challenges, instability, or misalignment with school goals.",
+        "Weaknesses in board structure and succession planning, combined with insufficient documentation, could result in governance instability or compliance issues.",
+        "Reliance on self-assessment without external or objective evidence may mask underlying governance weaknesses and hinder improvement efforts."
+      ],
+      "top_opportunities": [
+        "Establish and document clear board accountability processes focused on student outcomes, including regular review of performance data and responsive actions.",
+        "Develop and implement a formal school leader evaluation process aligned with school goals and performance data, and document support and development strategies for leadership.",
+        "Strengthen board structures by documenting bylaws, governance policies, committee roles, and succession planning processes.",
+        "Improve transparency and evidence collection by maintaining comprehensive records of board meetings, decisions, and governance activities."
+      ],
+      "leadership_attention": [
+        "Prioritize the development and documentation of board accountability processes and regular performance data review.",
+        "Implement and document a formal leader evaluation and support system.",
+        "Establish and maintain clear governance structures, including documented policies, bylaws, and succession plans.",
+        "Shift from reliance on self-assessment to evidence-based governance practices, ensuring all key actions and decisions are documented and accessible."
+      ],
+      "model_used": "gpt-4.1"
+    },
+    "Operations": {
+      "overall_assessment": "The Operations dimension currently lacks sufficient evidence to be rated, as both the Technology and Data Infrastructure and Physical Environment components are not rated due to limited and narrowly focused documentation. The only evidence provided centers on the school's technology plan, which demonstrates intentional device allocation, a refresh cycle, and some budget planning for technology. However, there is a notable absence of information regarding broader operational systems, such as facilities maintenance, safety protocols, data governance, and the integration or reliability of core data systems. This lack of comprehensive evidence prevents a full understanding of the school's operational strengths and areas for improvement. The narrow focus on technology, without corresponding evidence for physical environment or data systems, suggests potential blind spots in operational planning and risk management.",
+      "patterns": [
+        "Evidence is narrowly focused on technology infrastructure, with little to no information on broader operational systems.",
+        "Intentional planning is present for technology devices and refresh cycles, but not for other critical operational areas.",
+        "Key operational domains such as data governance, cybersecurity, facilities maintenance, and safety protocols are unaddressed in the current evidence."
+      ],
+      "compounding_risks": [
+        "Limited technology budget and only 'adequate' WiFi infrastructure could exacerbate operational challenges as enrollment grows.",
+        "Absence of data governance and cybersecurity practices increases vulnerability to data breaches or system failures, especially as technology use expands.",
+        "Lack of evidence on facilities maintenance and safety protocols may compound risks if technology infrastructure is prioritized over basic physical and safety needs."
+      ],
+      "top_opportunities": [
+        "Expand operational documentation to include facilities maintenance plans, safety protocols, and stakeholder perceptions of the physical environment.",
+        "Develop and document comprehensive data governance and cybersecurity policies.",
+        "Assess and address the adequacy of the technology budget and infrastructure to support current and future enrollment."
+      ],
+      "leadership_attention": [
+        "Prioritize a comprehensive review and documentation of all operational systems, including facilities, safety, and data management.",
+        "Address gaps in data governance and cybersecurity to protect school data and ensure system reliability.",
+        "Evaluate and adjust the technology budget and infrastructure planning to ensure sustainability and scalability."
+      ],
+      "model_used": "gpt-4.1"
+    },
+    "Finance": {
+      "overall_assessment": "The Finance dimension demonstrates a mixed picture, with some strengths in fundraising, grant management, and compliance, but significant gaps in core financial management, controls, and planning. The school shows evidence of active fundraising efforts, a growing grant portfolio, and strong compliance with federal funding requirements, as documented in the Title I and Fundraising reports. However, there is a notable lack of evidence for foundational financial practices such as the existence of financial reserves, regular financial monitoring, internal controls, independent audits, and multi-year financial planning. These missing elements are critical for ensuring long-term financial sustainability and effective resource allocation. The absence of documented policies, procedures, and regular financial reporting further limits the school's ability to proactively manage financial risks and align resources with strategic priorities. Overall, while the school exhibits some positive practices, the lack of comprehensive financial infrastructure and planning processes presents a significant area for improvement.",
+      "patterns": [
+        "Strong compliance and effective management of federal and grant funds across components.",
+        "Active and diversified fundraising efforts are present, but revenue diversification remains a challenge.",
+        "Consistent lack of evidence for foundational financial management practices (e.g., policies, internal controls, audits).",
+        "Absence of documented financial planning processes, including multi-year projections and budget monitoring."
+      ],
+      "compounding_risks": [
+        "Weaknesses in financial management and controls (lack of policies, audits, and reporting) amplify the risks posed by limited revenue diversification and below-benchmark donor retention.",
+        "The absence of financial planning and monitoring processes increases the risk that compliance and fundraising gains will not translate into long-term financial health or strategic resource allocation.",
+        "Reliance on per-pupil funding, without robust financial planning or reserves, leaves the school vulnerable to enrollment fluctuations and external funding changes."
+      ],
+      "top_opportunities": [
+        "Develop and implement comprehensive financial policies and internal controls, including regular independent audits.",
+        "Establish robust financial planning processes, including multi-year projections, annual budgets, and budget-to-actual monitoring.",
+        "Increase efforts to diversify revenue streams and improve donor retention to reduce reliance on per-pupil funding.",
+        "Regularly monitor and report on key financial health metrics, such as reserves, cash position, and net assets."
+      ],
+      "leadership_attention": [
+        "Prioritize the development and documentation of financial management policies, internal controls, and audit processes.",
+        "Implement structured financial planning and monitoring practices, ensuring alignment with strategic priorities.",
+        "Address revenue diversification and donor retention to mitigate funding risks.",
+        "Establish regular financial health reporting to leadership and the board to enable proactive decision-making."
+      ],
+      "model_used": "gpt-4.1"
+    }
+  },
+  "global_summary": {
+    "executive_summary": "Lincoln Innovation Academy demonstrates foundational strengths in several operational and programmatic areas, yet faces significant gaps in core systems and coherence that limit its ability to deliver on its mission and sustain improvement. The school excels in compliance and targeted supports for special populations, robust family communication, and the establishment of community partnerships that directly benefit students. Professional development and onboarding for staff are well-structured, and there is a positive climate reflected in both staff and student survey data, particularly in safety and belonging at the elementary level.\n\nHowever, the absence of clearly articulated and documented foundational elements—such as the school’s mission, vision, values, student success profile, and program model—creates a lack of alignment across academic, cultural, and operational systems. This foundational gap is compounded by inconsistent implementation of instructional and student culture practices, limited schoolwide systems for assessment and intervention, and insufficient documentation of leadership, governance, and financial management processes. While there are pockets of strong practice, particularly in compliance and targeted programming, the lack of coherence and transparency across dimensions increases the risk of fragmentation and inequitable outcomes.\n\nLeadership and governance structures are underdeveloped, with little evidence of stakeholder engagement, transparent decision-making, or systematic board oversight. Financial management, while compliant in grant administration, lacks foundational controls, planning, and reporting necessary for long-term sustainability. Operational systems are narrowly focused on technology, with little attention to facilities, safety, or data governance, exposing the school to potential risks as it grows.\n\nTo move from compliance and isolated strengths to a high-functioning, mission-driven organization, Lincoln Innovation Academy must prioritize the articulation and alignment of its core purpose and systems, strengthen schoolwide practices in instruction and culture, and establish robust structures for leadership, governance, and financial stewardship. These efforts will be critical to ensuring equitable access, sustainable growth, and continuous improvement in student outcomes.",
+    "model_used": "gpt-4.1"
+  }
+}

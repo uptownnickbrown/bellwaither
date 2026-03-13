@@ -1,6 +1,10 @@
+from pathlib import Path
 
 from pydantic import model_validator
 from pydantic_settings import BaseSettings
+
+# Look for .env in CWD first, then project root (parent of backend/)
+_ENV_FILES = [f for f in [Path(".env"), Path(__file__).resolve().parent.parent.parent / ".env"] if f.is_file()]
 
 
 class Settings(BaseSettings):
@@ -16,7 +20,7 @@ class Settings(BaseSettings):
 
     cors_origins: list[str] = ["http://localhost:3000"]
 
-    model_config = {"env_file": ".env", "protected_namespaces": ("settings_",)}
+    model_config = {"env_file": _ENV_FILES, "protected_namespaces": ("settings_",)}
 
     @model_validator(mode="after")
     def fix_database_url_scheme(self) -> "Settings":
