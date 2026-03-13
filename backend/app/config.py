@@ -1,4 +1,5 @@
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings
 
 
@@ -16,6 +17,18 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:3000"]
 
     model_config = {"env_file": ".env", "protected_namespaces": ("settings_",)}
+
+    @model_validator(mode="after")
+    def fix_database_url_scheme(self) -> "Settings":
+        if self.database_url.startswith("postgresql://"):
+            self.database_url = self.database_url.replace(
+                "postgresql://", "postgresql+asyncpg://", 1
+            )
+        elif self.database_url.startswith("postgres://"):
+            self.database_url = self.database_url.replace(
+                "postgres://", "postgresql+asyncpg://", 1
+            )
+        return self
 
 
 settings = Settings()
