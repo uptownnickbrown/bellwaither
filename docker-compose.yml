@@ -28,7 +28,6 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app
-      - ./demo_uploads:/demo_uploads
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   frontend:

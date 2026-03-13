@@ -1701,7 +1701,7 @@ async def export_assessment_pdf(
 
 # ---- Demo Documents Download ----
 
-DEMO_UPLOADS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "..", "demo_uploads")
+DEMO_UPLOADS_DIR = "demo_uploads/samples"
 
 @router.get("/demo-documents")
 async def download_demo_documents():
