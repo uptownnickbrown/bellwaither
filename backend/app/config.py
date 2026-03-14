@@ -1,0 +1,38 @@
+from pathlib import Path
+
+from pydantic import model_validator
+from pydantic_settings import BaseSettings
+
+# Look for .env in CWD first, then project root (parent of backend/)
+_ENV_FILES = [f for f in [Path(".env"), Path(__file__).resolve().parent.parent.parent / ".env"] if f.is_file()]
+
+
+class Settings(BaseSettings):
+    app_name: str = "Meridian API"
+    database_url: str = "postgresql+asyncpg://meridian:meridian@localhost:5432/meridian"
+    openai_api_key: str = ""
+
+    # Model routing config
+    model_synthesis: str = "gpt-4.1"      # High-level synthesis, scoring, global orchestration
+    model_extraction: str = "gpt-4.1-mini"  # Document extraction, tagging, simple chat
+    model_composition: str = "gpt-4.1"    # Report generation, action plan drafting
+    model_retrieval: str = "gpt-4.1-mini"   # Evidence retrieval, search, Q&A
+
+    cors_origins: list[str] = ["http://localhost:3000"]
+
+    model_config = {"env_file": _ENV_FILES, "protected_namespaces": ("settings_",)}
+
+    @model_validator(mode="after")
+    def fix_database_url_scheme(self) -> "Settings":
+        if self.database_url.startswith("postgresql://"):
+            self.database_url = self.database_url.replace(
+                "postgresql://", "postgresql+asyncpg://", 1
+            )
+        elif self.database_url.startswith("postgres://"):
+            self.database_url = self.database_url.replace(
+                "postgres://", "postgresql+asyncpg://", 1
+            )
+        return self
+
+
+settings = Settings()

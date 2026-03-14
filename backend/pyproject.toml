@@ -1,0 +1,24 @@
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks integration tests",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP"]
+ignore = [
+    "E501",   # line too long (handled by formatter if desired)
+    "UP007",  # Use X | Y for union types (keep Optional for clarity)
+    "UP042",  # str+Enum -> StrEnum (keep for SQLAlchemy compatibility)
+    "F403",   # star imports (used intentionally in routes.py for schemas)
+    "F405",   # names from star imports (consequence of F403)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
