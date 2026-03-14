@@ -53,6 +53,13 @@ async def _setup_database():
         await conn.run_sync(Base.metadata.drop_all)
 
 
+@pytest.fixture(scope="session", autouse=True)
+async def _dispose_engine():
+    """Dispose the async engine after all tests so the process can exit."""
+    yield
+    await engine.dispose()
+
+
 @pytest.fixture
 async def db_session() -> AsyncGenerator[AsyncSession, None]:
     """Provide a transactional async session for tests."""

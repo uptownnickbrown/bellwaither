@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from app.ai.agents.component_agent import assess_component
 from app.ai.agents.dimension_agent import synthesize_dimension
 from app.ai.agents.global_agent import generate_global_summary
-from app.seed import SQF_FRAMEWORK, EVIDENCE_DATA
+from app.seed import EVIDENCE_DATA, SQF_FRAMEWORK
 
 SCHOOL_NAME = "Lincoln Innovation Academy"
 STAGE = "diagnostic"
@@ -195,10 +195,10 @@ async def run():
         evidence_counts.append(score.get("evidence_count", 0))
 
     print(f"\nComponent scores: {len([s for s in component_scores.values() if 'error' not in s])}/{len(component_scores)}")
-    print(f"\nRating distribution:")
+    print("\nRating distribution:")
     for rating, count in sorted(ratings.items()):
         print(f"  {rating}: {count}")
-    print(f"\nConfidence distribution:")
+    print("\nConfidence distribution:")
     for conf, count in sorted(confidences.items()):
         print(f"  {conf}: {count}")
     if rationale_lengths:
@@ -212,7 +212,7 @@ async def run():
     if "error" not in global_summary:
         print(f"Global summary: OK (exec summary length: {len(global_summary.get('executive_summary', ''))} chars)")
     else:
-        print(f"Global summary: FAILED")
+        print("Global summary: FAILED")
 
     print(f"\n{'='*60}")
     print("Done!")

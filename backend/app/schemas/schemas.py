@@ -3,7 +3,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 # --- Framework ---
@@ -13,8 +13,7 @@ class SuccessCriterionResponse(BaseModel):
     text: str
     order: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ComponentResponse(BaseModel):
@@ -25,8 +24,7 @@ class ComponentResponse(BaseModel):
     evidence_guidance: str | None = None
     criteria: list[SuccessCriterionResponse] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class DimensionResponse(BaseModel):
@@ -37,8 +35,7 @@ class DimensionResponse(BaseModel):
     color: str | None = None
     components: list[ComponentResponse] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # --- Engagement ---
@@ -66,8 +63,7 @@ class EngagementResponse(BaseModel):
     description: str | None = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # --- Evidence ---
@@ -84,8 +80,7 @@ class EvidenceResponse(BaseModel):
     uploaded_at: datetime
     processing_status: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ExtractionResponse(BaseModel):
@@ -110,8 +105,7 @@ class EvidenceMappingResponse(BaseModel):
     relevance_score: float
     rationale: str | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # --- Scoring ---
@@ -150,8 +144,7 @@ class DimensionSummaryResponse(BaseModel):
     approved: bool = False
     generated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class GlobalSummaryResponse(BaseModel):
@@ -166,8 +159,7 @@ class GlobalSummaryResponse(BaseModel):
     approved: bool = False
     generated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # --- Batch/Approval Schemas ---
@@ -215,8 +207,7 @@ class DataRequestResponse(BaseModel):
     created_by: str | None = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CommentCreate(BaseModel):
@@ -233,8 +224,7 @@ class CommentResponse(BaseModel):
     content: str
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # --- Action Plans ---
@@ -246,8 +236,7 @@ class ActionPlanResponse(BaseModel):
     status: str
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ActionItemResponse(BaseModel):
@@ -262,8 +251,7 @@ class ActionItemResponse(BaseModel):
     priority_order: str | None = None
     target_date: datetime | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # --- Inline Edit Schemas ---
@@ -322,8 +310,7 @@ class ThreadResponse(BaseModel):
     last_activity: datetime | None = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class MessageCreate(BaseModel):
@@ -344,8 +331,7 @@ class MessageResponse(BaseModel):
     attachments: dict | list | None = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # --- Copilot ---
@@ -388,5 +374,4 @@ class AIFeedbackResponse(BaseModel):
     comment: str | None = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

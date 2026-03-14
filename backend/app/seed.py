@@ -10,12 +10,12 @@ from sqlalchemy import select
 
 from app.database import async_session
 from app.models.action_plan import ActionItem, ActionPlan, ItemStatus, PlanStatus
+from app.models.activity import ActivityLog
 from app.models.data_request import DataRequest, DataRequestComment, RequestPriority, RequestStatus
 from app.models.engagement import Engagement, EngagementMember, EngagementRole, EngagementStage
 from app.models.evidence import Evidence, EvidenceExtraction, EvidenceMapping, EvidenceType, ProcessingStatus
 from app.models.framework import Component, CriterionType, Dimension, SuccessCriterion
 from app.models.messaging import Message, MessageThread, ThreadType
-from app.models.activity import ActivityLog
 from app.models.scoring import ComponentScore, DimensionSummary, GlobalSummary, RatingLevel, ScoreStatus
 
 FIXTURES_PATH = Path(__file__).parent / "fixtures" / "ai_assessments.json"

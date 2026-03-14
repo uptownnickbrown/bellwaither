@@ -10,7 +10,6 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
-from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -20,8 +19,8 @@ from app.ai.agents.copilot_agent import copilot_chat
 from app.ai.agents.dimension_agent import synthesize_dimension
 from app.ai.agents.extraction_agent import extract_from_spreadsheet, extract_from_text
 from app.ai.agents.global_agent import generate_global_summary
-from app.export import generate_assessment_pdf
 from app.database import get_db
+from app.export import generate_assessment_pdf
 from app.models import (
     ActionItem,
     ActionPlan,
@@ -42,8 +41,8 @@ from app.models import (
     MessageThread,
 )
 from app.models.data_request import RequestStatus
-from app.models.messaging import ThreadType
 from app.models.evidence import EvidenceType, ProcessingStatus
+from app.models.messaging import ThreadType
 from app.models.scoring import RatingLevel, ScoreStatus
 from app.schemas.schemas import *
 from app.services.document_processor import process_document
@@ -719,7 +718,7 @@ async def batch_assess_components(
     # Get existing approved scores
     scores_result = await db.execute(
         select(ComponentScore)
-        .where(ComponentScore.engagement_id == engagement_id, ComponentScore.approved == True)
+        .where(ComponentScore.engagement_id == engagement_id, ComponentScore.approved)
     )
     approved_component_ids = {str(s.component_id) for s in scores_result.scalars().all()}
 
@@ -777,7 +776,7 @@ async def batch_synthesize_dimensions(
     # Get existing approved summaries
     existing_result = await db.execute(
         select(DimensionSummary)
-        .where(DimensionSummary.engagement_id == engagement_id, DimensionSummary.approved == True)
+        .where(DimensionSummary.engagement_id == engagement_id, DimensionSummary.approved)
     )
     approved_dim_ids = {str(s.dimension_id) for s in existing_result.scalars().all()}
 
@@ -958,7 +957,7 @@ async def synthesize_dimension_endpoint(
         .where(
             DimensionSummary.engagement_id == engagement_id,
             DimensionSummary.dimension_id == dimension_id,
-            DimensionSummary.approved == True,
+            DimensionSummary.approved,
         )
     )
     if existing_summary_result.scalars().first():
