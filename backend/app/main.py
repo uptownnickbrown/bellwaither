@@ -58,3 +58,8 @@ app.include_router(router, prefix="/api")
 @app.get("/")
 async def root():
     return {"name": "Meridian API", "version": "0.1.0", "status": "running"}
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
