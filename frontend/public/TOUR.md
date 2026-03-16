@@ -26,7 +26,7 @@ The Framework tab lets users explore Bellwether's SQF structure: 9 dimensions, 4
 
 ### Evidence Repository
 
-All source documents live here. Each document shows processing status and uploader. Hover actions reveal preview, download, and delete. Selecting a document shows its **AI extraction** — a structured summary and numbered key findings generated automatically on upload. The title, summary, and each key finding are editable in place. Mapped components are clickable links to the Framework view. Deleting evidence automatically marks any component scores that relied on it as stale.
+All source documents live here. Each document shows processing status and uploader. Hover actions reveal preview, download, and delete. Selecting a document shows its **AI extraction** — a structured summary and numbered key findings generated automatically on upload. The title, summary, and each key finding are editable in place. Mapped components are clickable links to the Framework view. Deleting evidence automatically marks any component scores that relied on it as stale. Navigating here from the Diagnostic or Framework views automatically filters the list to the relevant component, with a dismissible banner showing the active filter.
 
 <img src="screenshots/03b_evidence_detail.png" width="800" alt="Evidence detail showing AI extraction, key findings, and mapped components">
 
@@ -86,32 +86,32 @@ A contextual assistant available on every screen. It knows the current page cont
 
 <img src="screenshots/09_copilot_panel.png" width="800" alt="AI Copilot with context-aware suggestions">
 
-An **Activity Log** tab tracks all engagement actions — uploads, assessments, approvals, edits, messages — grouped by day, providing a complete audit trail.
+### Activity Log
+
+A complete audit trail of every engagement action — uploads, assessments, approvals, edits, messages — grouped by day. Useful for tracking who did what and when across the full assessment lifecycle.
+
+<img src="screenshots/08_activity_log.png" width="800" alt="Activity log showing engagement actions grouped by day">
 
 ---
 
 ## School Admin View
 
-Switching to the School Admin role (Dr. Angela Rivera, School Leader) transforms the experience. The same data is presented through a progress-and-action lens, with no AI terminology, no generation controls, and no indication that content is AI-generated or editable.
+### The School Experience
+
+Switching to the School Admin role (Dr. Angela Rivera, School Leader) transforms the interface. The same engagement data is presented through a progress-and-action lens — the school sees the current state of the assessment with clear next steps.
 
 The dashboard centers on **what the school needs to do**: a progress ring shows overall completion, and "Your Action Items" surfaces pending requests, in-progress work, and submissions under review.
 
 <img src="screenshots/10_admin_dashboard.png" width="800" alt="School admin dashboard with progress ring and action items">
 
-Assessment results are presented as clean read-only findings — no "Assess" buttons, no approval toggles. "Gaps" are relabeled as "Areas for Growth." If the assessment isn't complete, a professional "Assessment in progress" banner replaces the content. Data requests and messaging work identically for both roles.
+Assessment results are presented as clean, read-only findings. "Gaps" are relabeled as "Areas for Growth." If the assessment isn't complete, a professional "Assessment in progress" banner replaces the content. Data requests and messaging work identically for both roles.
 
-<img src="screenshots/10c_admin_scoring.png" width="800" alt="School admin assessment results — read-only with progress banner">
-
----
-
-## Cross-Navigation
-
-Every reference in the app is a working link. Component codes in Evidence navigate to Framework. Evidence counts in Diagnostic link to Evidence. Data request banners in Messages link to Data Requests. Dashboard cards and heatmap blocks deep-link to their targets.
-
-Navigating from Diagnostic or Framework to Evidence automatically filters the list to show only items mapped to that component, with a dismissible banner indicating the active filter.
+<img src="screenshots/10c_admin_scoring.png" width="800" alt="School admin assessment results with progress banner">
 
 ---
 
-## Demo Documents
+## Demo
 
-The `demo_uploads/` folder contains 29 realistic school documents (CSVs, markdown reports, and text files) covering all 9 SQF dimensions. These are not seeded in the platform — they're meant to be uploaded during a demo to show the full evidence processing pipeline in action.
+The demo engagement for **Lincoln Innovation Academy** is designed to be mid-flight — not a blank slate and not fully complete. Some components are already scored with AI-generated assessments, while others are still pending. Data requests are in various states, messaging channels have realistic conversation history, and the action plan has draft improvement items. This gives you something to explore in every tab.
+
+To try the evidence pipeline, upload files from `demo_uploads/` in the backend directory. It contains 29 realistic school documents (CSVs, markdown reports, and text files) covering all 9 SQF dimensions. Uploading triggers automatic extraction, component mapping, and evidence summarization — the same workflow a real engagement would follow.

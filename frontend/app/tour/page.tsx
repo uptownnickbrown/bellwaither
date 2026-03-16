@@ -21,6 +21,7 @@ interface TourData {
   subtitle: string;
   dividers: Map<number, string>; // section index → divider label
   sections: TourSection[];
+  closingLabel: string;
   closingText: string[];
 }
 
@@ -32,6 +33,7 @@ function parseTour(md: string): TourData {
   const dividers = new Map<number, string>();
   const subtitleLines: string[] = [];
   const closingText: string[] = [];
+  let closingLabel = "";
   let current: TourSection | null = null;
   let inHero = true;
   let pastLastSection = false;
@@ -43,8 +45,9 @@ function parseTour(md: string): TourData {
     // h2 = section dividers or closing sections
     if (line.startsWith("## ")) {
       const label = line.replace(/^## /, "").trim();
-      if (label === "Cross-Navigation" || label === "Demo Documents") {
+      if (label === "Demo") {
         pastLastSection = true;
+        closingLabel = label;
         continue;
       }
       inHero = false;
@@ -73,7 +76,7 @@ function parseTour(md: string): TourData {
       continue;
     }
 
-    // Closing text (Cross-Navigation, Demo Documents)
+    // Closing text (Demo section)
     if (pastLastSection) {
       if (line.trim()) closingText.push(line.trim());
       continue;
@@ -107,6 +110,7 @@ function parseTour(md: string): TourData {
     subtitle: subtitleLines.join(" "),
     dividers,
     sections,
+    closingLabel,
     closingText,
   };
 }
@@ -147,16 +151,25 @@ function FeatureSection({ section }: { section: TourSection }) {
   const imageBlocks = section.blocks.filter((b) => b.type === "image");
 
   return (
-    <div className="lg:grid lg:grid-cols-2 lg:gap-12 xl:gap-16 mb-24 lg:mb-32">
-      {/* Text — sticky on desktop */}
-      <div className="lg:sticky lg:top-24 lg:self-start mb-8 lg:mb-0">
+    <>
+      {/* Mobile: natural document order */}
+      <div className="lg:hidden mb-24">
         <h3 className="text-xl font-bold text-gray-900 mb-4">{section.title}</h3>
         <div className="space-y-4">
-          {textBlocks.map((block, i) =>
+          {section.blocks.map((block, i) =>
             block.type === "subheading" ? (
               <h4 key={i} className="text-base font-semibold text-gray-800 mt-6 mb-1">
                 {block.content}
               </h4>
+            ) : block.type === "image" ? (
+              <figure key={i} className="my-6">
+                <div className="rounded-xl overflow-hidden border border-gray-200/80 shadow-md">
+                  <img src={block.content} alt={block.alt || ""} className="w-full block" loading="lazy" />
+                </div>
+                {block.alt && (
+                  <figcaption className="text-[12px] text-gray-400 mt-2.5 text-center">{block.alt}</figcaption>
+                )}
+              </figure>
             ) : (
               <p key={i} className="text-[15px] text-gray-500 leading-relaxed">
                 <InlineMarkdown text={block.content} />
@@ -166,27 +179,38 @@ function FeatureSection({ section }: { section: TourSection }) {
         </div>
       </div>
 
-      {/* Screenshots — scroll on desktop */}
-      <div className="space-y-6">
-        {imageBlocks.map((block, i) => (
-          <figure key={i}>
-            <div className="rounded-xl overflow-hidden border border-gray-200/80 shadow-md hover:shadow-lg transition-shadow duration-300">
-              <img
-                src={block.content}
-                alt={block.alt || ""}
-                className="w-full block"
-                loading="lazy"
-              />
-            </div>
-            {block.alt && (
-              <figcaption className="text-[12px] text-gray-400 mt-2.5 text-center">
-                {block.alt}
-              </figcaption>
+      {/* Desktop: split layout with sticky text */}
+      <div className="hidden lg:grid lg:grid-cols-2 lg:gap-12 xl:gap-16 mb-32">
+        <div className="lg:sticky lg:top-24 lg:self-start">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">{section.title}</h3>
+          <div className="space-y-4">
+            {textBlocks.map((block, i) =>
+              block.type === "subheading" ? (
+                <h4 key={i} className="text-base font-semibold text-gray-800 mt-6 mb-1">
+                  {block.content}
+                </h4>
+              ) : (
+                <p key={i} className="text-[15px] text-gray-500 leading-relaxed">
+                  <InlineMarkdown text={block.content} />
+                </p>
+              )
             )}
-          </figure>
-        ))}
+          </div>
+        </div>
+        <div className="space-y-6">
+          {imageBlocks.map((block, i) => (
+            <figure key={i}>
+              <div className="rounded-xl overflow-hidden border border-gray-200/80 shadow-md hover:shadow-lg transition-shadow duration-300">
+                <img src={block.content} alt={block.alt || ""} className="w-full block" loading="lazy" />
+              </div>
+              {block.alt && (
+                <figcaption className="text-[12px] text-gray-400 mt-2.5 text-center">{block.alt}</figcaption>
+              )}
+            </figure>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -256,13 +280,13 @@ export default function TourPage() {
           </div>
         ))}
 
-        {/* Closing — cross-navigation */}
+        {/* Closing section */}
         {tour.closingText.length > 0 && (
           <div className="mt-8 mb-16">
             <div className="flex items-center gap-3 mb-8">
               <div className="h-px flex-1 bg-gradient-to-r from-indigo-200 to-transparent" />
               <span className="text-[11px] font-semibold uppercase tracking-widest text-indigo-500">
-                Cross-Navigation
+                {tour.closingLabel}
               </span>
               <div className="h-px flex-1 bg-gradient-to-l from-indigo-200 to-transparent" />
             </div>
