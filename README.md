@@ -1,6 +1,6 @@
 # Meridian
 
-A school quality assessment platform that operationalizes Bellwether's [School Quality Framework](https://bellwether.org/blog/reimagining-excellence-introducing-bellwethers-school-quality-framework/) (SQF). Meridian helps consulting teams and schools move through diagnostic assessments faster using structured workflows, evidence traceability, and multi-level AI.
+A school quality assessment platform that operationalizes Bellwether's [School Quality Framework](https://bellwether.org/blog/reimagining-excellence-introducing-bellwethers-school-quality-framework/) (SQF) — a diagnostic tool built to define what it looks like for a school to deliver strong academic, social-emotional, and life outcomes for every student, with intentional focus on those furthest from opportunity. Meridian helps consulting teams and schools move through evidence-based diagnostic assessments using structured workflows, traceability, and multi-level AI — so they can spend more time on the work that matters: leadership alignment, strategic planning, and action.
 
 This is not a generic dashboard or a single chatbot. It is a **workflow + ontology + evidence system** for school quality engagements — grounded in Bellwether's public 9 dimensions and 43 components, with every finding traceable back to source documents.
 
