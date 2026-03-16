@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SHOTS = path.join(__dirname, 'screenshots');
-const BASE = 'http://localhost:3000';
+const BASE = process.env.MERIDIAN_URL || 'https://meridian.uptownnickbrown.com';
 
 async function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 

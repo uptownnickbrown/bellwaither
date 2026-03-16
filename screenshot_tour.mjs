@@ -10,7 +10,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SHOTS = path.join(__dirname, 'screenshots');
-const BASE = 'http://localhost:3000';
+const BASE = process.env.MERIDIAN_URL || 'https://meridian.uptownnickbrown.com';
 
 // Ensure screenshots dir exists
 if (!fs.existsSync(SHOTS)) fs.mkdirSync(SHOTS, { recursive: true });
@@ -85,7 +85,7 @@ async function clickTab(page, pattern) {
   await screenshot(page, '03_evidence_list');
 
   // Click first evidence item for detail
-  const evItem = page.locator('[class*="cursor-pointer"]').filter({ hasText: /Achievement|Strategic Plan|Budget|Survey/i }).first();
+  const evItem = page.locator('text=/Board_Governance|New_Teacher|Grade_Level/i').first();
   if (await evItem.count() > 0) {
     await evItem.click();
     await delay(1500);
@@ -149,9 +149,8 @@ async function clickTab(page, pattern) {
   await delay(1500);
   await screenshot(page, '06_action_plan');
 
-  // Action items are <button> elements (not divs with cursor-pointer).
-  // Click the first action item button in the list.
-  const actionItem = page.locator('button.w-full.text-left').filter({ hasText: /Strengthen|Family|Cash|Math|Retention/i }).first();
+  // Click the first action item in the list.
+  const actionItem = page.locator('[class*="cursor-pointer"]').filter({ hasText: /Strengthen|Family|Cash|Math|Retention/i }).first();
   if (await actionItem.count() > 0) {
     await actionItem.click();
     await delay(1500);
@@ -190,7 +189,7 @@ async function clickTab(page, pattern) {
   await clickTab(page, /Dashboard/);
   await delay(1000);
 
-  const copilotBtn = page.locator('button').filter({ hasText: /AI Copilot/i }).first();
+  const copilotBtn = page.locator('button').filter({ hasText: /Copilot/i }).first();
   if (await copilotBtn.count() > 0) {
     await copilotBtn.click();
     await delay(1500);
@@ -200,7 +199,7 @@ async function clickTab(page, pattern) {
   // ─── 10. SCHOOL ADMIN VIEW ──────────────────────────
   console.log('\n10. School Admin View');
   // Close copilot first if open
-  const closeCopilot = page.locator('button').filter({ hasText: /AI Copilot/i }).first();
+  const closeCopilot = page.locator('button').filter({ hasText: /Copilot/i }).first();
   if (await closeCopilot.count() > 0) {
     await closeCopilot.click();
     await delay(500);

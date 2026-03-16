@@ -30,19 +30,19 @@ Selecting a component reveals its full success criteria, current score (if asses
 
 ### Evidence Repository
 
-All source documents live here — achievement data, interview transcripts, board minutes, observation reports, budgets, survey results, retention data, and strategic plans. Each document shows processing status and uploader.
+All source documents live here — achievement data, interview transcripts, board minutes, observation reports, budgets, survey results, retention data, and strategic plans. Each document shows processing status and uploader. Hover over any item to reveal preview, download, and delete actions.
 
 <img src="screenshots/03_evidence_list.png" width="800" alt="Evidence repository listing uploaded documents">
 
-Selecting a document reveals its **AI extraction** — a structured summary and numbered key findings generated automatically on upload. Both the summary and each key finding are editable in place. Preview and download buttons let consultants view the full document or grab the original file. Mapped components are shown as clickable links that navigate to the Framework view.
+Selecting a document reveals its **AI extraction** — a structured summary and numbered key findings generated automatically on upload. Both the summary and each key finding are editable in place. The document title is also editable inline. Preview, download, and delete buttons appear in the detail header. Mapped components are shown as clickable links that navigate to the Framework view. Deleting evidence automatically marks any component scores that relied on it as stale.
 
 <img src="screenshots/03b_evidence_detail.png" width="800" alt="AI extraction showing summary, key findings, and mapped components">
 
 ### Data Requests
 
-Consultants send structured data requests tied to specific framework components. Each request has a priority, assignee, status tracking, and a rationale ("Why this is needed"). Inline comment threads let consultants and school staff discuss each request in context. Conversations here are automatically synced to the Messages tab.
+Consultants send structured data requests tied to specific framework components. Each request has a priority, assignee, status tracking, and a rationale ("Why this is needed"). All fields — title, description, rationale, assignee, priority, and status — are editable inline in the detail panel. Click the priority or status badges to cycle through values. Requests can be deleted via the trash icon. Inline comment threads let consultants and school staff discuss each request in context. Conversations here are automatically synced to the Messages tab.
 
-<img src="screenshots/04_data_requests.png" width="800" alt="Data requests view with requests at various statuses">
+<img src="screenshots/04_data_requests.png" width="800" alt="Data requests view with inline editing and delete actions">
 
 ### Diagnostic Workspace
 
@@ -50,13 +50,17 @@ This is Meridian's core analytical tool, implementing the 4-layer AI architectur
 
 **Components (Layer 2)** — Each dimension row shows mini heatmap badges for its components. Expanding a dimension reveals individual component assessments with ratings, confidence levels, evidence counts, and "Assess" buttons to trigger AI scoring. The "Generate All Component Assessments" button runs AI assessment across all components at once, skipping those with no evidence and those that have been approved and locked.
 
+Components with new evidence uploaded since their last assessment show a blue **"+N new"** badge, making it easy to spot where re-assessment might be valuable. Components whose evidence was deleted show an amber **"Evidence removed"** indicator.
+
 <img src="screenshots/05_diagnostic_overview.png" width="800" alt="Diagnostic workspace showing all 9 dimensions with component badges">
 
-<img src="screenshots/05b_diagnostic_expanded.png" width="800" alt="Academic Program expanded showing component-level ratings">
+<img src="screenshots/05b_diagnostic_expanded.png" width="800" alt="Academic Program expanded showing component-level ratings with new evidence badges">
 
-Clicking a component opens its full assessment detail: strengths, gaps, contradictions, AI rationale (now with specific document citations and data points), and suggested actions. Every text field is editable in place. Thumbs up/down feedback lets consultants rate AI quality. The "Approve & Lock" button prevents regeneration until explicitly unlocked.
+Clicking a component opens its full assessment detail: strengths, gaps, contradictions, AI rationale (with specific document citations and data points), and suggested actions. Every text field is editable in place. Thumbs up/down feedback lets consultants rate AI quality. The "Approve & Lock" button prevents regeneration until explicitly unlocked.
 
-<img src="screenshots/05c_diagnostic_component_detail.png" width="800" alt="Component assessment detail with strengths, gaps, rationale, and actions">
+When new evidence is available, a collapsible **"New evidence since last assessment"** section appears at the top of the detail panel. Expanding it shows each new evidence item with its title, upload date, and relevance score — each clickable to navigate to the Evidence tab.
+
+<img src="screenshots/05c_diagnostic_component_detail.png" width="800" alt="Component assessment detail with new evidence section, strengths, gaps, and rationale">
 
 **Dimensions (Layer 3)** — Cross-component synthesis for each of the 9 dimensions. Identifies patterns, compounding risks, top opportunities, and leadership attention items. "Generate All Dimension Summaries" runs synthesis in batch.
 
@@ -70,7 +74,7 @@ Components with no mapped evidence show a clear "Insufficient Evidence" state in
 
 ### Action Plan
 
-Diagnostic findings translate into prioritized improvement actions. Each item has an owner, target date, status, and — critically — an **evidence-based rationale** tracing the recommendation back to specific assessment findings. Descriptions and rationale are editable in place. Cross-links navigate to the related component in the Framework or Diagnostic views.
+Diagnostic findings translate into prioritized improvement actions. Each item has an owner, target date, status, and — critically — an **evidence-based rationale** tracing the recommendation back to specific assessment findings. Descriptions and rationale are editable in place. Action items can be deleted via a hover trash icon. Cross-links navigate to the related component in the Framework or Diagnostic views.
 
 <img src="screenshots/06_action_plan.png" width="800" alt="Action plan with prioritized improvement items">
 
@@ -82,7 +86,7 @@ Selecting an action item opens a detail panel with the full description, evidenc
 
 A Slack-style messaging experience for engagement communication. The sidebar is split into **Channels** (general discussion, document review, leadership prep) and **Data Requests** (conversations from data request threads, automatically synced).
 
-Features include channel creation, @mentions with a member dropdown (type `@` to trigger), message grouping for consecutive messages from the same author, day separators, and relative timestamps. Data request threads show a banner linking back to the request in the Data Requests tab.
+Features include channel creation and deletion, @mentions with a member dropdown (type `@` to trigger), message grouping for consecutive messages from the same author, day separators, relative timestamps, and per-message delete on hover. Data request threads show a banner linking back to the request in the Data Requests tab.
 
 Users can also type `@Meridian AI` in any chat to invoke the AI copilot inline. The AI responds with formatted markdown, can create data requests, and its responses appear with a distinctive sparkle avatar and AI badge.
 
@@ -133,6 +137,12 @@ Data requests show the same request details and comment threads, with role-appro
 <img src="screenshots/10d_admin_data_requests.png" width="800" alt="School admin data requests view">
 
 <img src="screenshots/10e_admin_messages.png" width="800" alt="School admin messaging view">
+
+---
+
+## Delete Operations & Feedback
+
+All destructive actions (deleting evidence, data requests, channels, messages, and action items) show a confirmation dialog before proceeding. Success and error feedback appears as toast notifications in the bottom-right corner. Evidence deletion cascades intelligently — extractions and mappings are removed, but affected component scores are preserved and marked as stale rather than deleted, so consultants can see what needs re-assessment.
 
 ---
 
