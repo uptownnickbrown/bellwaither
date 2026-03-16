@@ -1,108 +1,207 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import rehypeRaw from "rehype-raw";
 import Link from "next/link";
-import { ArrowLeft, Compass, Loader2 } from "lucide-react";
-import type { Components } from "react-markdown";
+import { ArrowLeft, Loader2 } from "lucide-react";
 
-/* ── Custom renderers ──────────────────────────────────────────────────
-   These turn generic markdown into a polished, designed page.
-   react-markdown parses the TOUR.md; these components control every
-   visual detail. Update the markdown, and the page updates.          */
+/* ── Types ─────────────────────────────────────────────────────────── */
 
-const components: Components = {
-  h1: ({ children }) => (
-    <header className="text-center mb-16">
-      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-semibold mb-6">
-        <Compass className="w-3.5 h-3.5" />
-        Product Tour
-      </div>
-      <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
-        {children}
-      </h1>
-    </header>
-  ),
+interface TourBlock {
+  type: "text" | "image" | "subheading";
+  content: string;
+  alt?: string;
+}
 
-  h2: ({ children }) => {
-    const text = String(children);
-    // Section dividers like "Consultant View", "School Admin View"
-    if (text === "Consultant View" || text === "School Admin View" || text === "Cross-Navigation") {
-      return (
-        <div className="mt-20 mb-10">
-          <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-gradient-to-r from-indigo-200 to-transparent" />
-            <span className="text-xs font-semibold uppercase tracking-widest text-indigo-500">{children}</span>
-            <div className="h-px flex-1 bg-gradient-to-l from-indigo-200 to-transparent" />
-          </div>
+interface TourSection {
+  title: string;
+  blocks: TourBlock[];
+}
+
+interface TourData {
+  subtitle: string;
+  dividers: Map<number, string>; // section index → divider label
+  sections: TourSection[];
+  closingText: string[];
+}
+
+/* ── Parser ─────────────────────────────────────────────────────────── */
+
+function parseTour(md: string): TourData {
+  const lines = md.split("\n");
+  const sections: TourSection[] = [];
+  const dividers = new Map<number, string>();
+  const subtitleLines: string[] = [];
+  const closingText: string[] = [];
+  let current: TourSection | null = null;
+  let inHero = true;
+  let pastLastSection = false;
+
+  for (const line of lines) {
+    // Skip the h1 title
+    if (line.startsWith("# ") && !line.startsWith("## ")) continue;
+
+    // h2 = section dividers or closing sections
+    if (line.startsWith("## ")) {
+      const label = line.replace(/^## /, "").trim();
+      if (label === "Cross-Navigation" || label === "Demo Documents") {
+        pastLastSection = true;
+        continue;
+      }
+      inHero = false;
+      dividers.set(sections.length, label);
+      continue;
+    }
+
+    // h3 = feature section
+    if (line.startsWith("### ")) {
+      inHero = false;
+      pastLastSection = false;
+      current = { title: line.replace(/^### /, "").trim(), blocks: [] };
+      sections.push(current);
+      continue;
+    }
+
+    // Horizontal rules
+    if (line.trim() === "---") continue;
+
+    // Blank lines
+    if (line.trim() === "") continue;
+
+    // Collect hero subtitle
+    if (inHero) {
+      subtitleLines.push(line.trim());
+      continue;
+    }
+
+    // Closing text (Cross-Navigation, Demo Documents)
+    if (pastLastSection) {
+      if (line.trim()) closingText.push(line.trim());
+      continue;
+    }
+
+    if (!current) continue;
+
+    // Images (<img> tags)
+    const imgMatch = line.match(/src="([^"]+)".*?alt="([^"]*)"/);
+    if (imgMatch) {
+      const src = imgMatch[1].replace(/^screenshots\//, "/screenshots/");
+      current.blocks.push({ type: "image", content: src, alt: imgMatch[2] });
+      continue;
+    }
+
+    // Sub-headings (bold at start of line like **Components**)
+    if (line.match(/^\*\*[^*]+\*\*\s*—/)) {
+      const subMatch = line.match(/^\*\*([^*]+)\*\*\s*—\s*(.*)/);
+      if (subMatch) {
+        current.blocks.push({ type: "subheading", content: subMatch[1] });
+        current.blocks.push({ type: "text", content: subMatch[2] });
+        continue;
+      }
+    }
+
+    // Regular text
+    current.blocks.push({ type: "text", content: line.trim() });
+  }
+
+  return {
+    subtitle: subtitleLines.join(" "),
+    dividers,
+    sections,
+    closingText,
+  };
+}
+
+/* ── Inline markdown renderer (bold, code, entities) ───────────────── */
+
+function InlineMarkdown({ text }: { text: string }) {
+  const parts: React.ReactNode[] = [];
+  // Process **bold**, `code`, and &apos; entities
+  const regex = /\*\*(.+?)\*\*|`([^`]+)`|&apos;|&ldquo;|&rdquo;/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let key = 0;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    if (match[1]) {
+      parts.push(<strong key={key++} className="text-gray-700 font-semibold">{match[1]}</strong>);
+    } else if (match[2]) {
+      parts.push(<code key={key++} className="px-1.5 py-0.5 bg-gray-100 rounded text-sm font-mono text-indigo-700">{match[2]}</code>);
+    } else {
+      parts.push(match[0] === "&apos;" ? "'" : match[0] === "&ldquo;" ? "\u201C" : "\u201D");
+    }
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+  return <>{parts}</>;
+}
+
+/* ── Section component (Stripe-style on desktop) ───────────────────── */
+
+function FeatureSection({ section }: { section: TourSection }) {
+  const textBlocks = section.blocks.filter((b) => b.type === "text" || b.type === "subheading");
+  const imageBlocks = section.blocks.filter((b) => b.type === "image");
+
+  return (
+    <div className="lg:grid lg:grid-cols-2 lg:gap-12 xl:gap-16 mb-24 lg:mb-32">
+      {/* Text — sticky on desktop */}
+      <div className="lg:sticky lg:top-24 lg:self-start mb-8 lg:mb-0">
+        <h3 className="text-xl font-bold text-gray-900 mb-4">{section.title}</h3>
+        <div className="space-y-4">
+          {textBlocks.map((block, i) =>
+            block.type === "subheading" ? (
+              <h4 key={i} className="text-base font-semibold text-gray-800 mt-6 mb-1">
+                {block.content}
+              </h4>
+            ) : (
+              <p key={i} className="text-[15px] text-gray-500 leading-relaxed">
+                <InlineMarkdown text={block.content} />
+              </p>
+            )
+          )}
         </div>
-      );
-    }
-    return <h2 className="text-2xl font-bold text-gray-900 mt-20 mb-4">{children}</h2>;
-  },
-
-  h3: ({ children }) => (
-    <h3 className="text-lg font-semibold text-gray-800 mt-10 mb-3">{children}</h3>
-  ),
-
-  p: ({ children, node }) => {
-    // Check if this paragraph contains only an img — if so, render it as a figure
-    const childArr = node?.children;
-    if (childArr?.length === 1 && childArr[0].type === "element" && childArr[0].tagName === "img") {
-      return <>{children}</>;
-    }
-    return <p className="text-[15px] text-gray-500 leading-relaxed mb-5 max-w-2xl">{children}</p>;
-  },
-
-  strong: ({ children }) => (
-    <strong className="text-gray-700 font-semibold">{children}</strong>
-  ),
-
-  code: ({ children }) => (
-    <code className="px-1.5 py-0.5 bg-gray-100 rounded text-sm font-mono text-indigo-700">{children}</code>
-  ),
-
-  hr: () => (
-    <div className="my-20 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-  ),
-
-  img: ({ src, alt }) => (
-    <figure className="my-8">
-      <div className="rounded-xl overflow-hidden border border-gray-200/80 shadow-md hover:shadow-lg transition-shadow duration-300">
-        <img
-          src={src}
-          alt={alt || ""}
-          className="w-full block"
-          loading="lazy"
-        />
       </div>
-      {alt && (
-        <figcaption className="text-[13px] text-gray-400 mt-3 text-center">{alt}</figcaption>
-      )}
-    </figure>
-  ),
-};
+
+      {/* Screenshots — scroll on desktop */}
+      <div className="space-y-6">
+        {imageBlocks.map((block, i) => (
+          <figure key={i}>
+            <div className="rounded-xl overflow-hidden border border-gray-200/80 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <img
+                src={block.content}
+                alt={block.alt || ""}
+                className="w-full block"
+                loading="lazy"
+              />
+            </div>
+            {block.alt && (
+              <figcaption className="text-[12px] text-gray-400 mt-2.5 text-center">
+                {block.alt}
+              </figcaption>
+            )}
+          </figure>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 /* ── Page ───────────────────────────────────────────────────────────── */
 
 export default function TourPage() {
-  const [content, setContent] = useState<string | null>(null);
+  const [tour, setTour] = useState<TourData | null>(null);
 
   useEffect(() => {
     fetch("/TOUR.md")
       .then((r) => r.text())
-      .then((md) => {
-        // Rewrite relative image paths to absolute for Next.js public dir
-        const fixed = md.replace(
-          /src="screenshots\//g,
-          'src="/screenshots/'
-        );
-        setContent(fixed);
-      });
+      .then((md) => setTour(parseTour(md)));
   }, []);
 
-  if (content === null) {
+  if (!tour) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAFBFC]">
         <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
@@ -112,38 +211,75 @@ export default function TourPage() {
 
   return (
     <div className="min-h-screen bg-[#FAFBFC]">
-      {/* Floating nav */}
+      {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100">
-        <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between">
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-indigo-600 transition"
+            className="flex items-center gap-2 text-sm text-gray-500 hover:text-indigo-600 transition"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-3.5 h-3.5" />
             Back to Meridian
           </Link>
-          <div className="flex items-center gap-2">
-            <Compass className="w-4 h-4 text-indigo-500" />
-            <span className="text-sm font-semibold text-gray-800">Feature Tour</span>
-          </div>
-          <div className="w-[130px]" />
+          <span className="text-sm font-semibold text-gray-800">Meridian</span>
+          <div className="w-[120px]" />
         </div>
       </nav>
 
+      {/* Hero — compact */}
+      <header className="pt-20 pb-8 px-6">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-3">
+            Feature Tour
+          </h1>
+          <p className="text-base text-gray-500 leading-relaxed max-w-xl">
+            <InlineMarkdown text={tour.subtitle} />
+          </p>
+        </div>
+      </header>
+
       {/* Content */}
-      <article className="max-w-5xl mx-auto px-6 pt-28 pb-24">
-        <ReactMarkdown rehypePlugins={[rehypeRaw]} components={components}>
-          {content}
-        </ReactMarkdown>
+      <article className="max-w-6xl mx-auto px-6 pb-16">
+        {tour.sections.map((section, i) => (
+          <div key={i}>
+            {/* Section divider if one exists at this index */}
+            {tour.dividers.has(i) && (
+              <div className="flex items-center gap-3 mb-12 mt-8">
+                <div className="h-px flex-1 bg-gradient-to-r from-indigo-200 to-transparent" />
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-indigo-500">
+                  {tour.dividers.get(i)}
+                </span>
+                <div className="h-px flex-1 bg-gradient-to-l from-indigo-200 to-transparent" />
+              </div>
+            )}
+            <FeatureSection section={section} />
+          </div>
+        ))}
+
+        {/* Closing — cross-navigation */}
+        {tour.closingText.length > 0 && (
+          <div className="mt-8 mb-16">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="h-px flex-1 bg-gradient-to-r from-indigo-200 to-transparent" />
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-indigo-500">
+                Cross-Navigation
+              </span>
+              <div className="h-px flex-1 bg-gradient-to-l from-indigo-200 to-transparent" />
+            </div>
+            <div className="max-w-xl space-y-3">
+              {tour.closingText.map((line, i) => (
+                <p key={i} className="text-[15px] text-gray-500 leading-relaxed">
+                  <InlineMarkdown text={line} />
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
       </article>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 bg-white py-8 text-center">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
-        >
-          <ArrowLeft className="w-4 h-4" />
+      {/* Footer — minimal */}
+      <footer className="border-t border-gray-100 py-6 text-center">
+        <Link href="/" className="text-sm text-gray-400 hover:text-indigo-600 transition">
           Back to Meridian
         </Link>
       </footer>
