@@ -3,10 +3,11 @@
 import { useState, useCallback, useEffect } from "react";
 import type { Engagement, Dimension, UserRole } from "@/lib/types";
 import { getThreads } from "@/lib/api";
+import Link from "next/link";
 import {
   Compass, LayoutDashboard, FileText, ClipboardList,
   Target, BarChart3, MessageSquare, Sparkles,
-  ChevronDown, School, Users, Activity,
+  ChevronDown, School, Users, Activity, Map,
 } from "lucide-react";
 import DashboardView from "./views/DashboardView";
 import FrameworkView from "./views/FrameworkView";
@@ -116,6 +117,17 @@ export default function EngagementWorkspace({ engagement, framework, engagements
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Tour Link */}
+          <Link
+            href="/tour"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 hover:text-indigo-700 hover:bg-indigo-50 transition"
+          >
+            <Map className="w-3.5 h-3.5" />
+            Take a Tour
+          </Link>
+
+          <div className="w-px h-6 bg-gray-200" />
+
           {/* Role Switcher */}
           <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
             <button
