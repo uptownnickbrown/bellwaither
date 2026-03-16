@@ -10,103 +10,83 @@ Meridian is a two-sided workspace — consultants and school staff see the same 
 
 ### Dashboard
 
-The consultant dashboard provides a real-time view of assessment progress. KPI cards show evidence collected, components scored, confirmations, and pending data requests. The **SQF Assessment Progress** heatmap visualizes all 9 dimensions and 43 components at a glance — color-coded by Bellwether's 4-point rating scale.
+The consultant dashboard provides a real-time view of assessment progress. KPI cards show evidence collected, components scored, confirmations, and pending data requests. The **SQF Assessment Progress** heatmap visualizes all 9 dimensions and 43 components at a glance — color-coded by Bellwether's 4-point rating scale. Every element is clickable: stat cards navigate to their respective tabs, heatmap blocks deep-link to the Diagnostic workspace, and evidence items open in the Evidence tab.
 
 <img src="screenshots/01_dashboard.png" width="800" alt="Consultant dashboard with KPI cards and SQF heatmap">
 
-The lower half surfaces **Key Findings** — the most notable preliminary ratings with one-line evidence summaries — and a **Recent Evidence** feed. Every card is clickable: stat cards navigate to their respective tabs, heatmap blocks deep-link to the component in the Diagnostic workspace, and evidence items open in the Evidence tab.
+Below the fold, **Key Findings** surface the most notable preliminary ratings with one-line evidence summaries, and a **Recent Evidence** feed shows the latest uploads.
 
-<img src="screenshots/01b_dashboard_below_fold.png" width="800" alt="Full dashboard view showing key findings and recent evidence">
+<img src="screenshots/01b_dashboard_below_fold.png" width="800" alt="Dashboard key findings and recent evidence feed">
 
 ### School Quality Framework Browser
 
-The Framework tab lets users explore Bellwether's SQF structure: 9 dimensions, 43 components, each with Core Actions and Progress Indicators. The three-column layout shows dimensions on the left, components in the center (with ratings, confidence levels, and approval badges), and detailed success criteria on the right.
+The Framework tab lets users explore Bellwether's SQF structure: 9 dimensions, 43 components, each with Core Actions and Progress Indicators. Selecting a component reveals its full success criteria, current score, and cross-links to the Diagnostic workspace and Evidence tab. Strengths and gaps are editable in place.
 
-<img src="screenshots/02_framework_overview.png" width="800" alt="Framework browser showing dimensions and components">
-
-Selecting a component reveals its full success criteria, current score (if assessed), and cross-links to the Diagnostic workspace and Evidence tab. Strengths and gaps are shown inline and are editable in place — click any AI-generated text to refine it.
-
-<img src="screenshots/02b_framework_component_detail.png" width="800" alt="Component detail showing success criteria and cross-links">
+<img src="screenshots/02b_framework_component_detail.png" width="800" alt="Framework browser with component detail showing success criteria">
 
 ### Evidence Repository
 
-All source documents live here — achievement data, interview transcripts, board minutes, observation reports, budgets, survey results, retention data, and strategic plans. Each document shows processing status and uploader. Hover over any item to reveal preview, download, and delete actions.
+All source documents live here. Each document shows processing status and uploader. Hover actions reveal preview, download, and delete. Selecting a document shows its **AI extraction** — a structured summary and numbered key findings generated automatically on upload. The title, summary, and each key finding are editable in place. Mapped components are clickable links to the Framework view. Deleting evidence automatically marks any component scores that relied on it as stale.
 
-<img src="screenshots/03_evidence_list.png" width="800" alt="Evidence repository listing uploaded documents">
-
-Selecting a document reveals its **AI extraction** — a structured summary and numbered key findings generated automatically on upload. Both the summary and each key finding are editable in place. The document title is also editable inline. Preview, download, and delete buttons appear in the detail header. Mapped components are shown as clickable links that navigate to the Framework view. Deleting evidence automatically marks any component scores that relied on it as stale.
-
-<img src="screenshots/03b_evidence_detail.png" width="800" alt="AI extraction showing summary, key findings, and mapped components">
+<img src="screenshots/03b_evidence_detail.png" width="800" alt="Evidence detail showing AI extraction, key findings, and mapped components">
 
 ### Data Requests
 
-Consultants send structured data requests tied to specific framework components. Each request has a priority, assignee, status tracking, and a rationale ("Why this is needed"). All fields — title, description, rationale, assignee, priority, and status — are editable inline in the detail panel. Click the priority or status badges to cycle through values. Requests can be deleted via the trash icon. Inline comment threads let consultants and school staff discuss each request in context. Conversations here are automatically synced to the Messages tab.
+Consultants send structured data requests tied to specific framework components. Each request has a priority, assignee, status tracking, and a rationale. All fields are editable inline — click priority or status badges to cycle values. Inline comment threads let both sides discuss each request in context, synced automatically to the Messages tab.
 
-<img src="screenshots/04_data_requests.png" width="800" alt="Data requests view with inline editing and delete actions">
+<img src="screenshots/04_data_requests.png" width="800" alt="Data requests list with statuses and priorities">
+
+<img src="screenshots/04b_data_request_detail.png" width="800" alt="Data request detail with inline editing, comment thread, and delete action">
 
 ### Diagnostic Workspace
 
 This is Meridian's core analytical tool, implementing the 4-layer AI architecture. Three sub-tabs organize the work:
 
-**Components (Layer 2)** — Each dimension row shows mini heatmap badges for its components. Expanding a dimension reveals individual component assessments with ratings, confidence levels, evidence counts, and "Assess" buttons to trigger AI scoring. The "Generate All Component Assessments" button runs AI assessment across all components at once, skipping those with no evidence and those that have been approved and locked.
-
-Components with new evidence uploaded since their last assessment show a blue **"+N new"** badge, making it easy to spot where re-assessment might be valuable. Components whose evidence was deleted show an amber **"Evidence removed"** indicator.
+**Components (Layer 2)** — Each dimension row shows mini heatmap badges. Expanding a dimension reveals individual assessments with ratings, confidence, evidence counts, and "Assess" buttons. Components with new evidence since their last assessment show a blue **"+N new"** badge, making it easy to spot where re-assessment might be valuable. Components whose evidence was deleted show an amber **"Evidence removed"** indicator.
 
 <img src="screenshots/05_diagnostic_overview.png" width="800" alt="Diagnostic workspace showing all 9 dimensions with component badges">
 
 <img src="screenshots/05b_diagnostic_expanded.png" width="800" alt="Academic Program expanded showing component-level ratings with new evidence badges">
 
-Clicking a component opens its full assessment detail: strengths, gaps, contradictions, AI rationale (with specific document citations and data points), and suggested actions. Every text field is editable in place. Thumbs up/down feedback lets consultants rate AI quality. The "Approve & Lock" button prevents regeneration until explicitly unlocked.
+Clicking a component opens its full assessment detail: strengths, gaps, contradictions, AI rationale with document citations, and suggested actions. Every field is editable. When new evidence is available, a collapsible section at the top shows each item with its title, upload date, and relevance score — clickable to navigate to the Evidence tab.
 
-When new evidence is available, a collapsible **"New evidence since last assessment"** section appears at the top of the detail panel. Expanding it shows each new evidence item with its title, upload date, and relevance score — each clickable to navigate to the Evidence tab.
+<img src="screenshots/05c_diagnostic_component_detail.png" width="800" alt="Component assessment with new evidence section, strengths, gaps, and rationale">
 
-<img src="screenshots/05c_diagnostic_component_detail.png" width="800" alt="Component assessment detail with new evidence section, strengths, gaps, and rationale">
-
-**Dimensions (Layer 3)** — Cross-component synthesis for each of the 9 dimensions. Identifies patterns, compounding risks, top opportunities, and leadership attention items. "Generate All Dimension Summaries" runs synthesis in batch.
+**Dimensions (Layer 3)** — Cross-component synthesis identifying patterns, compounding risks, top opportunities, and leadership attention items.
 
 <img src="screenshots/05d_dimension_synthesis.png" width="800" alt="Dimension-level synthesis showing cross-component patterns">
 
-**Executive Summary** — Executive summary across all dimensions. Top strengths, critical gaps, strategic priorities, resource implications, and recommended next steps. Written for a sophisticated education audience.
+**Executive Summary** — Strategic overview across all dimensions: top strengths, critical gaps, priorities, resource implications, and next steps.
 
 <img src="screenshots/05e_executive_summary.png" width="800" alt="Executive summary with strategic priorities">
 
-Components with no mapped evidence show a clear "Insufficient Evidence" state instead of fabricated analysis, with guidance to upload or map evidence first.
+Components with no mapped evidence show a clear "Insufficient Evidence" state instead of fabricated analysis.
 
 ### Action Plan
 
-Diagnostic findings translate into prioritized improvement actions. Each item has an owner, target date, status, and — critically — an **evidence-based rationale** tracing the recommendation back to specific assessment findings. Descriptions and rationale are editable in place. Action items can be deleted via a hover trash icon. Cross-links navigate to the related component in the Framework or Diagnostic views.
+Diagnostic findings translate into prioritized improvement actions. Each item has an owner, target date, status, and an **evidence-based rationale** tracing the recommendation back to assessment findings. Descriptions and rationale are editable in place. Cross-links navigate to the related component in the Framework or Diagnostic views.
 
 <img src="screenshots/06_action_plan.png" width="800" alt="Action plan with prioritized improvement items">
 
-Selecting an action item opens a detail panel with the full description, evidence-based rationale, owner, target date, and cross-navigation links to the related component in the Framework or Diagnostic views.
-
-<img src="screenshots/06b_action_plan_detail.png" width="800" alt="Action plan detail panel with description, rationale, owner, and cross-links">
+<img src="screenshots/06b_action_plan_detail.png" width="800" alt="Action item detail with evidence-based rationale and cross-links">
 
 ### Messaging
 
-A Slack-style messaging experience for engagement communication. The sidebar is split into **Channels** (general discussion, document review, leadership prep) and **Data Requests** (conversations from data request threads, automatically synced).
+A Slack-style messaging experience. The sidebar splits into **Channels** and **Data Requests** (synced from data request comment threads). Features include channel creation, @mentions with a member dropdown, message grouping, day separators, and relative timestamps. Data request threads show a banner linking back to the Data Requests tab.
 
-Features include channel creation and deletion, @mentions with a member dropdown (type `@` to trigger), message grouping for consecutive messages from the same author, day separators, relative timestamps, and per-message delete on hover. Data request threads show a banner linking back to the request in the Data Requests tab.
+Type `@Meridian AI` in any chat to invoke the AI copilot inline — it can answer questions, create data requests via tool calling, and responds with formatted markdown.
 
-Users can also type `@Meridian AI` in any chat to invoke the AI copilot inline. The AI responds with formatted markdown, can create data requests, and its responses appear with a distinctive sparkle avatar and AI badge.
-
-<img src="screenshots/07_messaging.png" width="800" alt="Messaging with channels, data request threads, and @mentions">
+<img src="screenshots/07_messaging.png" width="800" alt="Messaging with channels, @mentions, and data request threads">
 
 <img src="screenshots/07b_messaging_dr_thread.png" width="800" alt="Data request conversation synced to Messages tab">
 
-### Activity Log
-
-Tracks all engagement actions — uploads, AI assessments, approvals, edits, data requests, messages — with varied actors, action types, and timestamps grouped by day. This provides a complete audit trail of who did what and when across the engagement.
-
-<img src="screenshots/08_activity_log.png" width="800" alt="Activity log showing engagement actions grouped by day">
-
 ### AI Copilot
 
-A contextual assistant available on every screen via the "AI Copilot" toggle. It knows the current page context and engagement data, and can answer questions, find evidence, explain ratings, and draft content. Suggested prompts are context-aware — they change based on which tab is active (Dashboard shows progress questions, Evidence shows document questions, etc.).
+A contextual assistant available on every screen. It knows the current page context and engagement data, and can answer questions, find evidence, explain ratings, and draft content. Suggested prompts change based on which tab is active. The copilot can **create data requests** directly from chat — say "Create a data request for the school's PD logs and assign it to Tom" and it will create the request and show a confirmation card.
 
-The copilot can also **create data requests** directly from chat using tool calling — say "Create a data request for the school's PD logs and assign it to Tom" and it will extract the details, create the request in the database, and show a confirmation card with a link to view it.
+<img src="screenshots/09_copilot_panel.png" width="800" alt="AI Copilot with context-aware suggestions">
 
-<img src="screenshots/09_copilot_panel.png" width="800" alt="AI Copilot panel with contextual suggestions and tool calling">
+An **Activity Log** tab tracks all engagement actions — uploads, assessments, approvals, edits, messages — grouped by day, providing a complete audit trail.
 
 ---
 
@@ -114,45 +94,21 @@ The copilot can also **create data requests** directly from chat using tool call
 
 Switching to the School Admin role (Dr. Angela Rivera, School Leader) transforms the experience. The same data is presented through a progress-and-action lens, with no AI terminology, no generation controls, and no indication that content is AI-generated or editable.
 
-### School Admin Dashboard
-
-The dashboard centers on **what the school needs to do** and **how the assessment is progressing**. A circular progress ring shows overall completion. The "Your Action Items" section surfaces pending data requests (needs your response), in-progress items (finish and submit), and submissions under review — or "You're all caught up" when nothing's needed.
-
-The heatmap and findings are still visible, giving the school leader transparency into where things stand. "Not Rated" components show as "Pending" instead.
+The dashboard centers on **what the school needs to do**: a progress ring shows overall completion, and "Your Action Items" surfaces pending requests, in-progress work, and submissions under review.
 
 <img src="screenshots/10_admin_dashboard.png" width="800" alt="School admin dashboard with progress ring and action items">
 
-<img src="screenshots/10b_admin_dashboard_lower.png" width="800" alt="Full school admin dashboard showing heatmap and findings">
+Assessment results are presented as clean read-only findings — no "Assess" buttons, no approval toggles. "Gaps" are relabeled as "Areas for Growth." If the assessment isn't complete, a professional "Assessment in progress" banner replaces the content. Data requests and messaging work identically for both roles.
 
-### School Admin Assessment View
-
-The same assessment data, presented as clean read-only results. No "Assess" buttons, no "Generate All", no approval toggles. "Gaps" are relabeled as "Areas for Growth." AI rationale and contradictions sections are hidden entirely. If the assessment isn't far enough along, a professional "Assessment in progress" state replaces the content.
-
-<img src="screenshots/10c_admin_scoring.png" width="800" alt="School admin assessment results view">
-
-### School Admin Data Requests & Messages
-
-Data requests show the same request details and comment threads, with role-appropriate author attribution. The messaging view is identical in functionality — both roles participate in the same conversations.
-
-<img src="screenshots/10d_admin_data_requests.png" width="800" alt="School admin data requests view">
-
-<img src="screenshots/10e_admin_messages.png" width="800" alt="School admin messaging view">
-
----
-
-## Delete Operations & Feedback
-
-All destructive actions (deleting evidence, data requests, channels, messages, and action items) show a confirmation dialog before proceeding. Success and error feedback appears as toast notifications in the bottom-right corner. Evidence deletion cascades intelligently — extractions and mappings are removed, but affected component scores are preserved and marked as stale rather than deleted, so consultants can see what needs re-assessment.
+<img src="screenshots/10c_admin_scoring.png" width="800" alt="School admin assessment results — read-only with progress banner">
 
 ---
 
 ## Cross-Navigation
 
-Every reference to an object in the app is a working link. Component codes in the Evidence tab navigate to the Framework view. Evidence counts in the Diagnostic workspace link to the Evidence tab. Data request thread banners in Messages navigate to the Data Requests tab. Dashboard cards and heatmap blocks deep-link to their respective targets. The copilot's data request confirmation cards link to the newly created request.
+Every reference in the app is a working link. Component codes in Evidence navigate to Framework. Evidence counts in Diagnostic link to Evidence. Data request banners in Messages link to Data Requests. Dashboard cards and heatmap blocks deep-link to their targets.
 
-Navigating from the Diagnostic or Framework views to Evidence automatically filters the evidence list to show only items mapped to that component, with a dismissible banner indicating the active filter.
-
-This cross-linking means you can follow any thread of reasoning — from a score to its evidence, from a data request to its conversation, from a finding to its action plan item — without losing context.
+Navigating from Diagnostic or Framework to Evidence automatically filters the list to show only items mapped to that component, with a dismissible banner indicating the active filter.
 
 ---
 
