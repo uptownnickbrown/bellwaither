@@ -42,7 +42,7 @@ Consultants send structured data requests tied to specific framework components.
 
 This is Meridian's core analytical tool, implementing the 4-layer AI architecture. Three sub-tabs organize the work:
 
-**Components (Layer 2)** — Each dimension row shows mini heatmap badges. Expanding a dimension reveals individual assessments with ratings, confidence, evidence counts, and "Assess" buttons. Components with new evidence since their last assessment show a blue **"+N new"** badge, making it easy to spot where re-assessment might be valuable. Components whose evidence was deleted show an amber **"Evidence removed"** indicator.
+**Components** — Each dimension row shows mini heatmap badges. Expanding a dimension reveals individual assessments with ratings, confidence, evidence counts, and "Assess" buttons. Components with new evidence since their last assessment show a blue **"+N new"** badge, making it easy to spot where re-assessment might be valuable. Components whose evidence was deleted show an amber **"Evidence removed"** indicator.
 
 <img src="screenshots/05_diagnostic_overview.png" width="800" alt="Diagnostic workspace showing all 9 dimensions with component badges">
 
@@ -52,7 +52,7 @@ Clicking a component opens its full assessment detail: strengths, gaps, contradi
 
 <img src="screenshots/05c_diagnostic_component_detail.png" width="800" alt="Component assessment with new evidence section, strengths, gaps, and rationale">
 
-**Dimensions (Layer 3)** — Cross-component synthesis identifying patterns, compounding risks, top opportunities, and leadership attention items.
+**Dimensions** — Cross-component synthesis identifying patterns, compounding risks, top opportunities, and leadership attention items.
 
 <img src="screenshots/05d_dimension_synthesis.png" width="800" alt="Dimension-level synthesis showing cross-component patterns">
 
