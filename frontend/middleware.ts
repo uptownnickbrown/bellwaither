@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  // Redirect HTTP to HTTPS in production (Railway sets x-forwarded-proto)
+  // Redirect HTTP to HTTPS in production only (Railway sets x-forwarded-proto)
   const proto = request.headers.get("x-forwarded-proto");
-  if (proto === "http") {
+  const isLocalhost = request.headers.get("host")?.includes("localhost");
+  if (proto === "http" && !isLocalhost) {
     const httpsUrl = new URL(request.url);
     httpsUrl.protocol = "https:";
     return NextResponse.redirect(httpsUrl, 301);
