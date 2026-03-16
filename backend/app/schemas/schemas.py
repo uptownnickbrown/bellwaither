@@ -125,6 +125,7 @@ class ComponentScoreResponse(BaseModel):
     ai_rationale: str | None = None
     consultant_notes: str | None = None
     evidence_count: int
+    stale: bool = False
     confidence: str | None = None
     suggested_actions: list | None = None
     follow_up_requests: list | None = None
@@ -203,6 +204,7 @@ class DataRequestResponse(BaseModel):
     rationale: str | None = None
     status: str
     priority: str
+    due_date: datetime | None = None
     assigned_to: str | None = None
     created_by: str | None = None
     created_at: datetime
@@ -284,6 +286,22 @@ class GlobalSummaryUpdate(BaseModel):
     strategic_priorities: list[str] | None = None
     resource_implications: list[str] | None = None
     recommended_next_steps: list[str] | None = None
+
+
+class DataRequestUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    rationale: str | None = None
+    status: str | None = None
+    priority: str | None = None
+    due_date: datetime | None = None
+    assigned_to: str | None = None
+
+
+class EvidenceUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    evidence_type: str | None = None
 
 
 class ActionItemUpdate(BaseModel):

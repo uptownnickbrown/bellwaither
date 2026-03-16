@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import type { ActionPlan, ActionItem, UserRole } from "@/lib/types";
-import { getActionPlans, getActionItems, updateActionItem } from "@/lib/api";
+import { getActionPlans, getActionItems, updateActionItem, deleteActionItem } from "@/lib/api";
 import EditableText from "@/components/EditableText";
-import { Target, CheckCircle2, Clock, AlertCircle, Ban, FileText, ArrowRight, Milestone, CalendarClock, ArrowUpRight } from "lucide-react";
+import { Target, CheckCircle2, Clock, AlertCircle, Ban, FileText, ArrowRight, Milestone, CalendarClock, ArrowUpRight, Trash2 } from "lucide-react";
+import ConfirmDialog from "@/components/ConfirmDialog";
+import { useToast } from "@/components/Toast";
 
 interface Props {
   engagementId: string;
@@ -27,6 +29,9 @@ export default function ActionPlanView({ engagementId, role = "consultant", onNa
   const [items, setItems] = useState<ActionItem[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<ActionPlan | null>(null);
   const [selectedItem, setSelectedItem] = useState<ActionItem | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<ActionItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     getActionPlans(engagementId).then((p) => {
@@ -51,6 +56,22 @@ export default function ActionPlanView({ engagementId, role = "consultant", onNa
       onNavTargetConsumed?.();
     }
   }, [navTargetId, items, onNavTargetConsumed]);
+
+  const handleDeleteItem = async () => {
+    if (!itemToDelete || !selectedPlan) return;
+    setDeleting(true);
+    try {
+      await deleteActionItem(engagementId, selectedPlan.id, itemToDelete.id);
+      if (selectedItem?.id === itemToDelete.id) setSelectedItem(null);
+      getActionItems(engagementId, selectedPlan.id).then(setItems);
+      toast(`Deleted "${itemToDelete.title}"`, "success");
+    } catch {
+      toast("Failed to delete action item", "error");
+    } finally {
+      setDeleting(false);
+      setItemToDelete(null);
+    }
+  };
 
   // School admin: "coming soon" state when no action plan or items exist
   if (isAdmin && plans.length === 0) {
@@ -149,10 +170,10 @@ export default function ActionPlanView({ engagementId, role = "consultant", onNa
               const statusStyle = STATUS_STYLES[item.status] || STATUS_STYLES.not_started;
               const Icon = statusStyle.icon;
               return (
-                <button
+                <div
                   key={item.id}
                   onClick={() => setSelectedItem(item)}
-                  className={`w-full text-left bg-white rounded-xl border p-4 transition hover:shadow-sm ${
+                  className={`group w-full text-left bg-white rounded-xl border p-4 transition hover:shadow-sm cursor-pointer ${
                     selectedItem?.id === item.id ? "border-indigo-300 shadow-sm" : "border-gray-200"
                   }`}
                 >
@@ -161,7 +182,18 @@ export default function ActionPlanView({ engagementId, role = "consultant", onNa
                       {item.priority_order}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-sm font-semibold text-gray-800">{item.title}</h3>
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="text-sm font-semibold text-gray-800">{item.title}</h3>
+                        {!isAdmin && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setItemToDelete(item); }}
+                            className="hidden group-hover:flex w-7 h-7 items-center justify-center rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition flex-shrink-0"
+                            title="Delete action item"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                       <div className="flex items-center gap-3 mt-2">
                         <span
                           className="flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full"
@@ -174,7 +206,7 @@ export default function ActionPlanView({ engagementId, role = "consultant", onNa
                       </div>
                     </div>
                   </div>
-                </button>
+                </div>
               );
             })}
             {items.length === 0 && !isAdmin && (
@@ -283,6 +315,15 @@ export default function ActionPlanView({ engagementId, role = "consultant", onNa
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={!!itemToDelete}
+        onClose={() => setItemToDelete(null)}
+        onConfirm={handleDeleteItem}
+        title="Delete Action Item"
+        description={`This will permanently delete "${itemToDelete?.title}" and its milestones.`}
+        loading={deleting}
+      />
     </div>
   );
 }

@@ -2,15 +2,17 @@
 
 import { useEffect, useState, useCallback } from "react";
 import type { Evidence, Extraction, EvidenceMapping, UserRole } from "@/lib/types";
-import { getEvidence, getExtractions, getEvidenceMappings, uploadEvidence, getEvidenceDownloadUrl, updateExtraction, getComponentEvidenceIds } from "@/lib/api";
+import { getEvidence, getExtractions, getEvidenceMappings, uploadEvidence, getEvidenceDownloadUrl, updateExtraction, getComponentEvidenceIds, deleteEvidence, updateEvidence } from "@/lib/api";
 import EditableText, { EditableListItem } from "@/components/EditableText";
 import {
   FileText, Upload, Search, Filter, ChevronDown,
   CheckCircle2, Clock, AlertCircle, X, Sparkles,
   FileSpreadsheet, Image, Mic, Eye, Download, ArrowUpRight,
-  FolderDown, Loader2,
+  FolderDown, Loader2, Trash2,
 } from "lucide-react";
 import DocumentPreviewModal from "@/components/DocumentPreviewModal";
+import ConfirmDialog from "@/components/ConfirmDialog";
+import { useToast } from "@/components/Toast";
 
 interface Props {
   engagementId: string;
@@ -38,6 +40,9 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
   const [previewEvidence, setPreviewEvidence] = useState<Evidence | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [componentFilter, setComponentFilter] = useState<{ id: string; label: string; evidenceIds: string[] } | null>(null);
+  const [evidenceToDelete, setEvidenceToDelete] = useState<Evidence | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const { toast } = useToast();
 
   const loadEvidence = useCallback(() => {
     getEvidence(engagementId).then(setEvidence);
@@ -125,6 +130,30 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleDelete = async () => {
+    if (!evidenceToDelete) return;
+    setDeleting(true);
+    try {
+      const result = await deleteEvidence(engagementId, evidenceToDelete.id);
+      if (selectedEvidence?.id === evidenceToDelete.id) {
+        setSelectedEvidence(null);
+        setExtraction(null);
+        setMappings([]);
+      }
+      loadEvidence();
+      const staleCount = result.stale_scores?.length || 0;
+      toast(
+        `Deleted "${evidenceToDelete.title || evidenceToDelete.filename}"${staleCount > 0 ? `. ${staleCount} score${staleCount !== 1 ? "s" : ""} marked as stale.` : ""}`,
+        "success"
+      );
+    } catch {
+      toast("Failed to delete evidence", "error");
+    } finally {
+      setDeleting(false);
+      setEvidenceToDelete(null);
+    }
   };
 
   const filtered = evidence.filter((ev) => {
@@ -264,6 +293,15 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
                         >
                           <Download className="w-3.5 h-3.5" />
                         </button>
+                        {role === "consultant" && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setEvidenceToDelete(ev); }}
+                            className="w-7 h-7 flex items-center justify-center rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition"
+                            title="Delete evidence"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                       </div>
                       <StatusBadge status={ev.processing_status} />
                     </div>
@@ -286,7 +324,20 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="p-5 border-b border-gray-100">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base font-semibold text-gray-900">{selectedEvidence.title || selectedEvidence.filename}</h2>
+                  {role === "consultant" ? (
+                    <EditableText
+                      value={selectedEvidence.title || selectedEvidence.filename}
+                      className="text-base font-semibold text-gray-900"
+                      onSave={async (v) => {
+                        await updateEvidence(engagementId, selectedEvidence.id, { title: v });
+                        const updated = { ...selectedEvidence, title: v };
+                        setSelectedEvidence(updated);
+                        setEvidence((prev) => prev.map((e) => e.id === updated.id ? updated : e));
+                      }}
+                    />
+                  ) : (
+                    <h2 className="text-base font-semibold text-gray-900">{selectedEvidence.title || selectedEvidence.filename}</h2>
+                  )}
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => setPreviewEvidence(selectedEvidence)}
@@ -302,6 +353,15 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
                     >
                       <Download className="w-4 h-4" />
                     </button>
+                    {role === "consultant" && (
+                      <button
+                        onClick={() => setEvidenceToDelete(selectedEvidence)}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition"
+                        title="Delete evidence"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                     <button onClick={() => setSelectedEvidence(null)} className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition">
                       <X className="w-4 h-4" />
                     </button>
@@ -422,6 +482,15 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
           onClose={() => setPreviewEvidence(null)}
         />
       )}
+
+      <ConfirmDialog
+        open={!!evidenceToDelete}
+        onClose={() => setEvidenceToDelete(null)}
+        onConfirm={handleDelete}
+        title="Delete Evidence"
+        description={`This will permanently delete "${evidenceToDelete?.title || evidenceToDelete?.filename}" and its AI extractions. Any component scores that rely on this evidence will be marked as stale.`}
+        loading={deleting}
+      />
     </div>
   );
 }

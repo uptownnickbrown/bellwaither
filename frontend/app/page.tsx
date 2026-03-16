@@ -5,6 +5,7 @@ import { getEngagements, getFramework } from "@/lib/api";
 import type { Engagement, Dimension } from "@/lib/types";
 import EngagementWorkspace from "@/components/EngagementWorkspace";
 import { Compass, ArrowRight, School } from "lucide-react";
+import { ToastProvider } from "@/components/Toast";
 
 export default function Home() {
   const [engagements, setEngagements] = useState<Engagement[]>([]);
@@ -68,11 +69,13 @@ export default function Home() {
   }
 
   return (
-    <EngagementWorkspace
-      engagement={selectedEngagement}
-      framework={framework}
-      engagements={engagements}
-      onSelectEngagement={setSelectedEngagement}
-    />
+    <ToastProvider>
+      <EngagementWorkspace
+        engagement={selectedEngagement}
+        framework={framework}
+        engagements={engagements}
+        onSelectEngagement={setSelectedEngagement}
+      />
+    </ToastProvider>
   );
 }

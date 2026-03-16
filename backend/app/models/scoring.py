@@ -48,6 +48,8 @@ class ComponentScore(Base):
     suggested_actions = Column(JSON, nullable=True)   # draft action items
     follow_up_requests = Column(JSON, nullable=True)  # suggested data requests
 
+    stale = Column(Boolean, default=False, nullable=False)  # True when evidence has changed since scoring
+
     model_used = Column(String(50), nullable=True)
     scored_at = Column(DateTime, default=datetime.utcnow)
     reviewed_at = Column(DateTime, nullable=True)

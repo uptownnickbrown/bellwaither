@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import type { Dimension, ComponentScore, DimensionSummary, GlobalSummary, BatchProgress, EvidenceCountMap, UserRole } from "@/lib/types";
+import type { Dimension, ComponentScore, DimensionSummary, GlobalSummary, BatchProgress, EvidenceCountMap, UserRole, NewEvidenceItem } from "@/lib/types";
 import { RATING_CONFIG } from "@/lib/types";
 import {
   getScores, getDimensionSummaries, getGlobalSummary,
   assessComponent, synthesizeDimension, generateGlobalSummary,
   updateScore, updateDimensionSummary, updateGlobalSummary,
   toggleScoreApproval, toggleDimensionSummaryApproval, toggleGlobalSummaryApproval,
-  getEvidenceCounts, getExportUrl,
+  getEvidenceCounts, getNewEvidence, getExportUrl,
   batchAssessComponents, batchSynthesizeDimensions, batchGenerateGlobal,
 } from "@/lib/api";
 import EditableText, { EditableListItem } from "@/components/EditableText";
@@ -17,7 +17,7 @@ import {
   BarChart3, Sparkles, ChevronDown,
   AlertTriangle, CheckCircle2, TrendingUp, Layers,
   Globe, Loader2, Lock, Unlock, ShieldCheck, FileQuestion,
-  PlayCircle, Ban, ClipboardCheck, Clock, ArrowUpRight, FileDown,
+  PlayCircle, Ban, ClipboardCheck, Clock, ArrowUpRight, FileDown, ChevronRight, FileText,
 } from "lucide-react";
 
 interface Props {
@@ -128,7 +128,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
   }
 
   const handleAssess = async (compId: string) => {
-    const evCount = evidenceCounts[compId] || 0;
+    const evCount = evidenceCounts[compId]?.total || 0;
     if (evCount === 0) return; // Silently refuse -- UI disables it
     const score = scoreMap.get(compId);
     if (score?.approved) return;
@@ -373,7 +373,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                       const score = scoreMap.get(c.id);
                       const rating = score?.rating || "not_rated";
                       const config = RATING_CONFIG[rating as keyof typeof RATING_CONFIG] || RATING_CONFIG.not_rated;
-                      const evCount = evidenceCounts[c.id] || 0;
+                      const evCount = evidenceCounts[c.id]?.total || 0;
                       return (
                         <div
                           key={c.id}
@@ -399,7 +399,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                       const score = scoreMap.get(comp.id);
                       const rating = score?.rating || "not_rated";
                       const config = RATING_CONFIG[rating as keyof typeof RATING_CONFIG] || RATING_CONFIG.not_rated;
-                      const evCount = evidenceCounts[comp.id] || 0;
+                      const evCount = evidenceCounts[comp.id]?.total || 0;
                       const isApproved = score?.approved || false;
                       const hasNoEvidence = evCount === 0;
 
@@ -426,6 +426,18 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                             {!isAdmin && hasNoEvidence && !score && (
                               <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[9px] font-medium flex-shrink-0">
                                 <FileQuestion className="w-2.5 h-2.5" /> No evidence
+                              </span>
+                            )}
+                            {/* Stale score indicator */}
+                            {!isAdmin && score?.stale && (
+                              <span className="px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[9px] font-medium flex-shrink-0">
+                                Evidence removed
+                              </span>
+                            )}
+                            {/* New evidence indicator */}
+                            {!isAdmin && (evidenceCounts[comp.id]?.new || 0) > 0 && (
+                              <span className="px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[9px] font-medium flex-shrink-0">
+                                +{evidenceCounts[comp.id].new} new
                               </span>
                             )}
                           </div>
@@ -505,7 +517,8 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                 score={selectedScore}
                 framework={framework}
                 engagementId={engagementId}
-                evidenceCount={evidenceCounts[selectedScore.component_id] || 0}
+                evidenceCount={evidenceCounts[selectedScore.component_id]?.total || 0}
+                newEvidenceCount={evidenceCounts[selectedScore.component_id]?.new || 0}
                 onScoreUpdate={(updated) => setScores(scores.map((s) => s.id === updated.id ? updated : s))}
                 onToggleApproval={(approved) => handleToggleScoreApproval(selectedScore.id, approved)}
                 loading={loading}
@@ -548,7 +561,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
             const summary = dimSummaryMap.get(dim.id);
             const isApproved = summary?.approved || false;
             // Check if all components in this dimension lack evidence
-            const dimHasAnyEvidence = dim.components.some((c) => (evidenceCounts[c.id] || 0) > 0);
+            const dimHasAnyEvidence = dim.components.some((c) => (evidenceCounts[c.id]?.total || 0) > 0);
             const dimHasAnyScored = dim.components.some((c) => {
               const s = scoreMap.get(c.id);
               return s && s.rating !== "not_rated";
@@ -909,12 +922,13 @@ export default function ScoringView({ engagementId, framework, role = "consultan
 }
 
 function ScoreDetail({
-  score, framework, engagementId, evidenceCount, onScoreUpdate, onToggleApproval, loading, role = "consultant", onNavigate,
+  score, framework, engagementId, evidenceCount, newEvidenceCount, onScoreUpdate, onToggleApproval, loading, role = "consultant", onNavigate,
 }: {
   score: ComponentScore;
   framework: Dimension[];
   engagementId: string;
   evidenceCount: number;
+  newEvidenceCount: number;
   onScoreUpdate: (s: ComponentScore) => void;
   onToggleApproval: (approved: boolean) => void;
   loading: string | null;
@@ -989,10 +1003,18 @@ function ScoreDetail({
               className="text-xs text-indigo-600 hover:text-indigo-800 hover:underline font-medium flex items-center gap-1 transition"
             >
               {score.evidence_count} evidence items
+              {newEvidenceCount > 0 && (
+                <span className="text-blue-600 font-semibold">(+{newEvidenceCount} new)</span>
+              )}
               <ArrowUpRight className="w-3 h-3" />
             </button>
           ) : (
             !isAdmin && <span className="text-xs text-gray-400">{score.evidence_count} evidence items</span>
+          )}
+          {score.stale && (
+            <span className="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+              Evidence removed
+            </span>
           )}
         </div>
       </div>
@@ -1005,6 +1027,27 @@ function ScoreDetail({
             <div>
               <p className="text-sm font-medium text-amber-700">No Evidence Mapped</p>
               <p className="text-xs text-amber-600 mt-0.5">Upload or map evidence to this component to enable assessment.</p>
+            </div>
+          </div>
+        )}
+
+        {/* New evidence since last assessment */}
+        {!isAdmin && newEvidenceCount > 0 && (
+          <NewEvidenceSection
+            engagementId={engagementId}
+            componentId={score.component_id}
+            count={newEvidenceCount}
+            onNavigate={onNavigate}
+          />
+        )}
+
+        {/* Stale evidence warning */}
+        {!isAdmin && score.stale && (
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-amber-50 border border-amber-100">
+            <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-amber-700">Evidence Removed</p>
+              <p className="text-xs text-amber-600 mt-0.5">Some evidence used in this assessment has been deleted. Consider re-assessing.</p>
             </div>
           </div>
         )}
@@ -1128,6 +1171,70 @@ function EditableListSection({ title, items, color, field, engagementId, summary
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+function NewEvidenceSection({
+  engagementId, componentId, count, onNavigate,
+}: {
+  engagementId: string;
+  componentId: string;
+  count: number;
+  onNavigate?: (tab: string, id?: string) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [items, setItems] = useState<NewEvidenceItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (expanded && !loaded) {
+      getNewEvidence(engagementId, componentId).then((data) => {
+        setItems(data);
+        setLoaded(true);
+      });
+    }
+  }, [expanded, loaded, engagementId, componentId]);
+
+  return (
+    <div className="rounded-lg border border-blue-200 bg-blue-50/50 overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center gap-2 px-3 py-2.5 text-left hover:bg-blue-50 transition"
+      >
+        <ChevronRight className={`w-3.5 h-3.5 text-blue-500 transition-transform ${expanded ? "rotate-90" : ""}`} />
+        <FileText className="w-3.5 h-3.5 text-blue-500" />
+        <span className="text-xs font-medium text-blue-700">
+          {count} new evidence item{count !== 1 ? "s" : ""} since last assessment
+        </span>
+      </button>
+      {expanded && (
+        <div className="border-t border-blue-200 divide-y divide-blue-100">
+          {items.map((item) => (
+            <div key={item.evidence_id} className="px-3 py-2 flex items-center gap-3">
+              <div className="min-w-0 flex-1">
+                <button
+                  onClick={() => onNavigate?.("evidence", item.evidence_id)}
+                  className="text-xs font-medium text-blue-700 hover:text-blue-900 hover:underline transition truncate block"
+                >
+                  {item.title}
+                </button>
+                {item.uploaded_at && (
+                  <span className="text-[10px] text-gray-400">
+                    Uploaded {new Date(item.uploaded_at).toLocaleDateString()}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] text-blue-500 font-medium flex-shrink-0">
+                {Math.round(item.relevance_score * 100)}% relevant
+              </span>
+            </div>
+          ))}
+          {items.length === 0 && loaded && (
+            <div className="px-3 py-2 text-xs text-gray-400">No new items found</div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

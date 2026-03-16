@@ -2,14 +2,16 @@
 
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import type { MessageThread, Message, UserRole } from "@/lib/types";
-import { getThreads, getMessages, sendMessage, createThread, chatWithCopilot } from "@/lib/api";
+import { getThreads, getMessages, sendMessage, createThread, chatWithCopilot, deleteThread, deleteMessage } from "@/lib/api";
 import type { CopilotToolResult } from "@/lib/types";
 import {
   MessageSquare, Send, Hash, ClipboardList, BarChart3, Target,
   Plus, X, ArrowUpRight, Users, Sparkles, Bot, Loader2,
-  FileText, AlertCircle, Calendar, Flag, UserCircle,
+  FileText, AlertCircle, Calendar, Flag, UserCircle, Trash2,
 } from "lucide-react";
 import AIMarkdown from "@/components/AIMarkdown";
+import ConfirmDialog from "@/components/ConfirmDialog";
+import { useToast } from "@/components/Toast";
 
 interface Props {
   engagementId: string;
@@ -194,6 +196,11 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
 
   // ── AI copilot processing state ────────────────────────────────────────
   const [aiProcessing, setAiProcessing] = useState(false);
+
+  // ── Delete state ──────────────────────────────────────────────────────
+  const [threadToDelete, setThreadToDelete] = useState<MessageThread | null>(null);
+  const [deletingThread, setDeletingThread] = useState(false);
+  const { toast } = useToast();
 
   // ── @mention dropdown state ─────────────────────────────────────────────
   const [mentionActive, setMentionActive] = useState(false);
@@ -451,6 +458,38 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
     }
   };
 
+  // ── Delete thread ──────────────────────────────────────────────────────
+  const handleDeleteThread = async () => {
+    if (!threadToDelete) return;
+    setDeletingThread(true);
+    try {
+      await deleteThread(engagementId, threadToDelete.id);
+      if (selectedThread?.id === threadToDelete.id) {
+        setSelectedThread(null);
+        setMessages([]);
+      }
+      loadThreads();
+      toast(`Deleted "${threadToDelete.title}"`, "success");
+    } catch {
+      toast("Failed to delete channel", "error");
+    } finally {
+      setDeletingThread(false);
+      setThreadToDelete(null);
+    }
+  };
+
+  // ── Delete message ────────────────────────────────────────────────────
+  const handleDeleteMessage = async (msg: Message) => {
+    if (!selectedThread) return;
+    try {
+      await deleteMessage(engagementId, selectedThread.id, msg.id);
+      setMessages((prev) => prev.filter((m) => m.id !== msg.id));
+      toast("Message deleted", "success");
+    } catch {
+      toast("Failed to delete message", "error");
+    }
+  };
+
   // ── Build grouped messages with day separators ──────────────────────────
   const groupedMessages = useMemo(() => {
     const groups: Array<
@@ -497,10 +536,10 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
     const count = thread.message_count ?? 0;
 
     return (
-      <button
+      <div
         key={thread.id}
         onClick={() => setSelectedThread(thread)}
-        className={`w-full text-left px-3 py-2 rounded-lg transition group flex items-center gap-2.5 ${
+        className={`w-full text-left px-3 py-2 rounded-lg transition group flex items-center gap-2.5 cursor-pointer ${
           isSelected
             ? "bg-indigo-600 text-white"
             : "text-gray-600 hover:bg-gray-100"
@@ -520,17 +559,30 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
             >
               {thread.title || thread.thread_type}
             </span>
-            {count > 0 && (
-              <span
-                className={`text-[10px] font-semibold rounded-full min-w-[18px] text-center px-1.5 py-0.5 flex-shrink-0 ${
-                  isSelected
-                    ? "bg-indigo-400/40 text-white"
-                    : "bg-gray-200 text-gray-600"
-                }`}
-              >
-                {count}
-              </span>
-            )}
+            <div className="flex items-center gap-1 flex-shrink-0">
+              {thread.thread_type !== "data_request" && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setThreadToDelete(thread); }}
+                  className={`hidden group-hover:flex w-5 h-5 items-center justify-center rounded transition ${
+                    isSelected ? "text-indigo-200 hover:text-white hover:bg-indigo-500" : "text-gray-400 hover:text-red-600 hover:bg-red-50"
+                  }`}
+                  title="Delete channel"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </button>
+              )}
+              {count > 0 && (
+                <span
+                  className={`text-[10px] font-semibold rounded-full min-w-[18px] text-center px-1.5 py-0.5 ${
+                    isSelected
+                      ? "bg-indigo-400/40 text-white"
+                      : "bg-gray-200 text-gray-600"
+                  }`}
+                >
+                  {count}
+                </span>
+              )}
+            </div>
           </div>
           <p
             className={`text-[11px] truncate mt-0.5 ${
@@ -540,7 +592,7 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
             {lastActivity ? relativeTime(lastActivity) : "No activity"}
           </p>
         </div>
-      </button>
+      </div>
     );
   };
 
@@ -830,6 +882,15 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
                           </div>
                         )}
                       </div>
+                      {!isAI && selectedThread?.thread_type !== "data_request" && (
+                        <button
+                          onClick={() => handleDeleteMessage(msg)}
+                          className="hidden group-hover:flex w-6 h-6 items-center justify-center rounded text-gray-300 hover:text-red-500 transition flex-shrink-0"
+                          title="Delete message"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      )}
                     </div>
                   );
                 }
@@ -887,6 +948,15 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
                         </div>
                       )}
                     </div>
+                    {!isAI && selectedThread?.thread_type !== "data_request" && (
+                      <button
+                        onClick={() => handleDeleteMessage(msg)}
+                        className="hidden group-hover:flex w-6 h-6 items-center justify-center rounded text-gray-300 hover:text-red-500 transition flex-shrink-0 mt-1"
+                        title="Delete message"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    )}
                   </div>
                 );
               })}
@@ -994,6 +1064,15 @@ export default function MessagingView({ engagementId, role, onNavigate, navTarge
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={!!threadToDelete}
+        onClose={() => setThreadToDelete(null)}
+        onConfirm={handleDeleteThread}
+        title="Delete Channel"
+        description={`This will permanently delete "${threadToDelete?.title}" and all its messages.`}
+        loading={deletingThread}
+      />
     </div>
   );
 }

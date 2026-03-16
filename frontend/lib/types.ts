@@ -86,6 +86,7 @@ export interface ComponentScore {
   ai_rationale: string | null;
   consultant_notes: string | null;
   evidence_count: number;
+  stale: boolean;
   confidence: string | null;
   suggested_actions: string[] | null;
   follow_up_requests: string[] | null;
@@ -128,7 +129,16 @@ export interface BatchProgress {
   results: Array<{ status: string; component_code?: string; dimension?: string; error?: string }>;
 }
 
-export type EvidenceCountMap = Record<string, number>;
+export type EvidenceCountMap = Record<string, { total: number; new: number }>;
+
+export interface NewEvidenceItem {
+  evidence_id: string;
+  title: string;
+  filename: string;
+  uploaded_at: string | null;
+  relevance_score: number;
+  relevant_excerpts: string[] | null;
+}
 
 export interface DataRequest {
   id: string;
@@ -139,6 +149,7 @@ export interface DataRequest {
   rationale: string | null;
   status: string;
   priority: string;
+  due_date: string | null;
   assigned_to: string | null;
   created_by: string | null;
   created_at: string;

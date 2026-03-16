@@ -43,6 +43,14 @@ export const uploadEvidence = async (engId: string, file: File, evidenceType: st
 export const updateExtraction = (engId: string, evId: string, extId: string, data: Record<string, unknown>) =>
   fetchApi<{ ok: boolean }>(`/engagements/${engId}/evidence/${evId}/extractions/${extId}`, { method: "PATCH", body: JSON.stringify(data) });
 
+// Evidence update
+export const updateEvidence = (engId: string, evId: string, data: Record<string, unknown>) =>
+  fetchApi<{ ok: boolean }>(`/engagements/${engId}/evidence/${evId}`, { method: "PATCH", body: JSON.stringify(data) });
+
+// Evidence delete
+export const deleteEvidence = (engId: string, evId: string) =>
+  fetchApi<{ ok: boolean; stale_scores: string[] }>(`/engagements/${engId}/evidence/${evId}`, { method: "DELETE" });
+
 // Scores
 export const getScores = (engId: string) => fetchApi<import("./types").ComponentScore[]>(`/engagements/${engId}/scores`);
 export const assessComponent = (engId: string, compId: string) =>
@@ -61,6 +69,10 @@ export const toggleGlobalSummaryApproval = (engId: string, summaryId: string, ap
 // Evidence counts per component
 export const getEvidenceCounts = (engId: string) =>
   fetchApi<import("./types").EvidenceCountMap>(`/engagements/${engId}/evidence-counts`);
+
+// New evidence since last score
+export const getNewEvidence = (engId: string, compId: string) =>
+  fetchApi<import("./types").NewEvidenceItem[]>(`/engagements/${engId}/scores/${compId}/new-evidence`);
 
 // Evidence IDs for a component
 export const getComponentEvidenceIds = (engId: string, compId: string) =>
@@ -96,11 +108,23 @@ export const getComments = (engId: string, reqId: string) => fetchApi<import("./
 export const createComment = (engId: string, reqId: string, data: { author: string; role?: string; content: string }) =>
   fetchApi<import("./types").Comment>(`/engagements/${engId}/data-requests/${reqId}/comments`, { method: "POST", body: JSON.stringify(data) });
 
+// Data request update
+export const updateDataRequest = (engId: string, reqId: string, data: Record<string, unknown>) =>
+  fetchApi<{ ok: boolean }>(`/engagements/${engId}/data-requests/${reqId}`, { method: "PATCH", body: JSON.stringify(data) });
+
+// Data request delete
+export const deleteDataRequest = (engId: string, reqId: string) =>
+  fetchApi<{ ok: boolean }>(`/engagements/${engId}/data-requests/${reqId}`, { method: "DELETE" });
+
 // Action plans
 export const getActionPlans = (engId: string) => fetchApi<import("./types").ActionPlan[]>(`/engagements/${engId}/action-plans`);
 export const getActionItems = (engId: string, planId: string) => fetchApi<import("./types").ActionItem[]>(`/engagements/${engId}/action-plans/${planId}/items`);
 export const updateActionItem = (engId: string, planId: string, itemId: string, data: Record<string, unknown>) =>
   fetchApi<{ ok: boolean }>(`/engagements/${engId}/action-plans/${planId}/items/${itemId}`, { method: "PATCH", body: JSON.stringify(data) });
+
+// Action item delete
+export const deleteActionItem = (engId: string, planId: string, itemId: string) =>
+  fetchApi<{ ok: boolean }>(`/engagements/${engId}/action-plans/${planId}/items/${itemId}`, { method: "DELETE" });
 
 // Messaging
 export const getThreads = (engId: string) => fetchApi<import("./types").MessageThread[]>(`/engagements/${engId}/threads`);
@@ -109,6 +133,12 @@ export const createThread = (engId: string, data: { title: string; thread_type?:
 export const getMessages = (engId: string, threadId: string) => fetchApi<import("./types").Message[]>(`/engagements/${engId}/threads/${threadId}/messages`);
 export const sendMessage = (engId: string, threadId: string, data: { author: string; role?: string; content: string; mentions?: string[]; attachments?: Record<string, unknown> }) =>
   fetchApi<import("./types").Message>(`/engagements/${engId}/threads/${threadId}/messages`, { method: "POST", body: JSON.stringify(data) });
+
+// Thread and message delete
+export const deleteThread = (engId: string, threadId: string) =>
+  fetchApi<{ ok: boolean }>(`/engagements/${engId}/threads/${threadId}`, { method: "DELETE" });
+export const deleteMessage = (engId: string, threadId: string, msgId: string) =>
+  fetchApi<{ ok: boolean }>(`/engagements/${engId}/threads/${threadId}/messages/${msgId}`, { method: "DELETE" });
 
 // Copilot
 export const chatWithCopilot = (engId: string, data: { message: string; context?: string; role?: string; conversation_history?: Array<{role: string; content: string}> }) =>

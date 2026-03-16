@@ -39,6 +39,7 @@ from app.models import (
     GlobalSummary,
     Message,
     MessageThread,
+    Milestone,
 )
 from app.models.data_request import RequestStatus
 from app.models.evidence import EvidenceType, ProcessingStatus
@@ -265,6 +266,99 @@ async def get_evidence_mappings(
     ]
 
 
+# ---- Evidence Update ----
+
+@router.patch("/engagements/{engagement_id}/evidence/{evidence_id}")
+async def update_evidence(
+    engagement_id: uuid.UUID,
+    evidence_id: uuid.UUID,
+    data: EvidenceUpdate,
+    db: AsyncSession = Depends(get_db),
+):
+    """Update evidence metadata (title, description, evidence_type)."""
+    result = await db.execute(
+        select(Evidence).where(Evidence.id == evidence_id, Evidence.engagement_id == engagement_id)
+    )
+    ev = result.scalar_one_or_none()
+    if not ev:
+        raise HTTPException(status_code=404, detail="Evidence not found")
+    update_data = data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        if field == "evidence_type" and value is not None:
+            value = EvidenceType(value)
+        setattr(ev, field, value)
+    await db.commit()
+    return {"ok": True}
+
+
+# ---- Evidence Delete ----
+
+@router.delete("/engagements/{engagement_id}/evidence/{evidence_id}")
+async def delete_evidence(
+    engagement_id: uuid.UUID,
+    evidence_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete an evidence file and its extractions/mappings. Marks affected scores as stale."""
+    result = await db.execute(
+        select(Evidence).where(
+            Evidence.id == evidence_id,
+            Evidence.engagement_id == engagement_id,
+        )
+    )
+    ev = result.scalar_one_or_none()
+    if not ev:
+        raise HTTPException(status_code=404, detail="Evidence not found")
+
+    # Find affected components before deleting mappings
+    mapping_result = await db.execute(
+        select(EvidenceMapping.component_id).where(EvidenceMapping.evidence_id == evidence_id).distinct()
+    )
+    affected_component_ids = [r[0] for r in mapping_result.all()]
+
+    # Mark affected ComponentScores as stale
+    stale_scores = []
+    for comp_id in affected_component_ids:
+        score_result = await db.execute(
+            select(ComponentScore).where(
+                ComponentScore.engagement_id == engagement_id,
+                ComponentScore.component_id == comp_id,
+            )
+        )
+        score = score_result.scalar_one_or_none()
+        if score:
+            score.stale = True
+            stale_scores.append(str(comp_id))
+
+    # Delete mappings
+    mapping_del = await db.execute(
+        select(EvidenceMapping).where(EvidenceMapping.evidence_id == evidence_id)
+    )
+    for m in mapping_del.scalars().all():
+        await db.delete(m)
+
+    # Delete extractions
+    ext_result = await db.execute(
+        select(EvidenceExtraction).where(EvidenceExtraction.evidence_id == evidence_id)
+    )
+    for ext in ext_result.scalars().all():
+        await db.delete(ext)
+
+    # Delete file from disk
+    try:
+        if os.path.exists(ev.file_path):
+            os.remove(ev.file_path)
+    except OSError:
+        pass  # File may already be gone
+
+    title = ev.title or ev.filename
+    await db.delete(ev)
+    await log_activity(db, engagement_id, "Consultant", "deleted", "evidence", title)
+    await db.commit()
+
+    return {"ok": True, "stale_scores": stale_scores}
+
+
 # ---- Extraction Inline Edit ----
 
 @router.patch("/engagements/{engagement_id}/evidence/{evidence_id}/extractions/{extraction_id}")
@@ -404,6 +498,7 @@ async def assess_component_endpoint(
         score.model_used = ai_result.get("model_used")
         score.scored_at = datetime.utcnow()
         score.status = ScoreStatus.DRAFT
+        score.stale = False
     else:
         score = ComponentScore(
             engagement_id=engagement_id,
@@ -464,7 +559,8 @@ async def get_evidence_counts(
     engagement_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    """Get evidence mapping counts per component for this engagement."""
+    """Get evidence mapping counts per component, including new-since-score counts."""
+    # Total counts
     result = await db.execute(
         select(
             EvidenceMapping.component_id,
@@ -475,7 +571,71 @@ async def get_evidence_counts(
         .group_by(EvidenceMapping.component_id)
     )
     rows = result.all()
-    return {str(r.component_id): r.evidence_count for r in rows}
+    counts = {str(r.component_id): {"total": r.evidence_count, "new": 0} for r in rows}
+
+    # Find new mappings since last score for each scored component
+    scores_result = await db.execute(
+        select(ComponentScore.component_id, ComponentScore.scored_at)
+        .where(ComponentScore.engagement_id == engagement_id)
+    )
+    for comp_id, scored_at in scores_result.all():
+        comp_key = str(comp_id)
+        if comp_key not in counts or scored_at is None:
+            continue
+        new_result = await db.execute(
+            select(func.count(EvidenceMapping.id))
+            .join(Evidence, EvidenceMapping.evidence_id == Evidence.id)
+            .where(
+                Evidence.engagement_id == engagement_id,
+                EvidenceMapping.component_id == comp_id,
+                EvidenceMapping.created_at > scored_at,
+            )
+        )
+        new_count = new_result.scalar() or 0
+        counts[comp_key]["new"] = new_count
+
+    return counts
+
+
+@router.get("/engagements/{engagement_id}/scores/{component_id}/new-evidence")
+async def get_new_evidence_for_component(
+    engagement_id: uuid.UUID,
+    component_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Get evidence items mapped after the component was last scored."""
+    score_result = await db.execute(
+        select(ComponentScore).where(
+            ComponentScore.engagement_id == engagement_id,
+            ComponentScore.component_id == component_id,
+        )
+    )
+    score = score_result.scalar_one_or_none()
+    if not score or not score.scored_at:
+        return []
+
+    result = await db.execute(
+        select(EvidenceMapping, Evidence.title, Evidence.filename, Evidence.uploaded_at)
+        .join(Evidence, EvidenceMapping.evidence_id == Evidence.id)
+        .where(
+            Evidence.engagement_id == engagement_id,
+            EvidenceMapping.component_id == component_id,
+            EvidenceMapping.created_at > score.scored_at,
+        )
+        .order_by(EvidenceMapping.created_at.desc())
+    )
+    rows = result.all()
+    return [
+        {
+            "evidence_id": str(m.evidence_id),
+            "title": title or filename,
+            "filename": filename,
+            "uploaded_at": uploaded_at.isoformat() if uploaded_at else None,
+            "relevance_score": m.relevance_score,
+            "relevant_excerpts": m.relevant_excerpts,
+        }
+        for m, title, filename, uploaded_at in rows
+    ]
 
 
 @router.get("/engagements/{engagement_id}/components/{component_id}/evidence-ids")
@@ -677,6 +837,7 @@ async def _assess_single_component(
         score.model_used = ai_result.get("model_used")
         score.scored_at = datetime.utcnow()
         score.status = ScoreStatus.DRAFT
+        score.stale = False
     else:
         score = ComponentScore(
             engagement_id=engagement_id,
@@ -1004,6 +1165,17 @@ async def synthesize_dimension_endpoint(
         logger.exception("AI dimension synthesis failed for %s", dim.name)
         raise HTTPException(status_code=502, detail=f"AI service error during dimension synthesis: {e}")
 
+    # Delete existing non-approved summaries to prevent duplicates
+    old_summaries = await db.execute(
+        select(DimensionSummary).where(
+            DimensionSummary.engagement_id == engagement_id,
+            DimensionSummary.dimension_id == dimension_id,
+            DimensionSummary.approved == False,
+        )
+    )
+    for old in old_summaries.scalars().all():
+        await db.delete(old)
+
     summary = DimensionSummary(
         engagement_id=engagement_id,
         dimension_id=dimension_id,
@@ -1086,6 +1258,16 @@ async def generate_global_summary_endpoint(
         logger.exception("AI global summary generation failed for engagement %s", engagement_id)
         raise HTTPException(status_code=502, detail=f"AI service error during global summary: {e}")
 
+    # Delete existing non-approved summaries to prevent duplicates
+    old_global = await db.execute(
+        select(GlobalSummary).where(
+            GlobalSummary.engagement_id == engagement_id,
+            GlobalSummary.approved == False,
+        )
+    )
+    for old in old_global.scalars().all():
+        await db.delete(old)
+
     summary = GlobalSummary(
         engagement_id=engagement_id,
         executive_summary=ai_result.get("executive_summary"),
@@ -1165,16 +1347,64 @@ async def create_data_request(
 async def update_data_request(
     engagement_id: uuid.UUID,
     request_id: uuid.UUID,
-    status: str = None,
+    data: DataRequestUpdate,
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(select(DataRequest).where(DataRequest.id == request_id))
+    """Update data request fields."""
+    from app.models.data_request import RequestPriority
+    result = await db.execute(
+        select(DataRequest).where(DataRequest.id == request_id, DataRequest.engagement_id == engagement_id)
+    )
     req = result.scalar_one_or_none()
     if not req:
         raise HTTPException(status_code=404, detail="Data request not found")
-    if status:
-        req.status = RequestStatus(status)
+    update_data = data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        if field == "status" and value is not None:
+            value = RequestStatus(value)
+        elif field == "priority" and value is not None:
+            value = RequestPriority(value)
+        setattr(req, field, value)
     await db.commit()
+    return {"ok": True}
+
+
+@router.delete("/engagements/{engagement_id}/data-requests/{request_id}")
+async def delete_data_request(
+    engagement_id: uuid.UUID,
+    request_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete a data request and its comments."""
+    result = await db.execute(
+        select(DataRequest).where(
+            DataRequest.id == request_id,
+            DataRequest.engagement_id == engagement_id,
+        )
+    )
+    req = result.scalar_one_or_none()
+    if not req:
+        raise HTTPException(status_code=404, detail="Data request not found")
+
+    # Delete comments
+    comments_result = await db.execute(
+        select(DataRequestComment).where(DataRequestComment.data_request_id == request_id)
+    )
+    for comment in comments_result.scalars().all():
+        await db.delete(comment)
+
+    # Nullify evidence links (don't delete evidence itself)
+    ev_result = await db.execute(
+        select(Evidence).where(Evidence.data_request_id == request_id)
+    )
+    for ev in ev_result.scalars().all():
+        ev.data_request_id = None
+
+    title = req.title
+    await db.delete(req)
+    await log_activity(db, engagement_id, "Consultant", "deleted", "data_request", title)
+    await db.commit()
+
     return {"ok": True}
 
 
@@ -1245,6 +1475,39 @@ async def list_action_items(plan_id: uuid.UUID, engagement_id: uuid.UUID, db: As
         .order_by(ActionItem.priority_order)
     )
     return result.scalars().all()
+
+
+@router.delete("/engagements/{engagement_id}/action-plans/{plan_id}/items/{item_id}")
+async def delete_action_item(
+    engagement_id: uuid.UUID,
+    plan_id: uuid.UUID,
+    item_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete an action item and its milestones."""
+    result = await db.execute(
+        select(ActionItem).where(
+            ActionItem.id == item_id,
+            ActionItem.action_plan_id == plan_id,
+        )
+    )
+    item = result.scalar_one_or_none()
+    if not item:
+        raise HTTPException(status_code=404, detail="Action item not found")
+
+    # Delete milestones
+    ms_result = await db.execute(
+        select(Milestone).where(Milestone.action_item_id == item_id)
+    )
+    for ms in ms_result.scalars().all():
+        await db.delete(ms)
+
+    title = item.title
+    await db.delete(item)
+    await log_activity(db, engagement_id, "Consultant", "deleted", "action_item", title)
+    await db.commit()
+
+    return {"ok": True}
 
 
 # ---- Messaging ----
@@ -1439,6 +1702,62 @@ async def create_message(
             )
 
     raise HTTPException(status_code=404, detail="Thread not found")
+
+
+@router.delete("/engagements/{engagement_id}/threads/{thread_id}")
+async def delete_thread(
+    engagement_id: uuid.UUID,
+    thread_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete a message thread and all its messages."""
+    result = await db.execute(
+        select(MessageThread).where(
+            MessageThread.id == thread_id,
+            MessageThread.engagement_id == engagement_id,
+        )
+    )
+    thread = result.scalar_one_or_none()
+    if not thread:
+        raise HTTPException(status_code=404, detail="Thread not found")
+
+    # Delete all messages in thread
+    msg_result = await db.execute(
+        select(Message).where(Message.thread_id == thread_id)
+    )
+    for msg in msg_result.scalars().all():
+        await db.delete(msg)
+
+    title = thread.title
+    await db.delete(thread)
+    await log_activity(db, engagement_id, "Consultant", "deleted", "thread", title)
+    await db.commit()
+
+    return {"ok": True}
+
+
+@router.delete("/engagements/{engagement_id}/threads/{thread_id}/messages/{message_id}")
+async def delete_message(
+    engagement_id: uuid.UUID,
+    thread_id: uuid.UUID,
+    message_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete a single message."""
+    result = await db.execute(
+        select(Message).where(
+            Message.id == message_id,
+            Message.thread_id == thread_id,
+        )
+    )
+    msg = result.scalar_one_or_none()
+    if not msg:
+        raise HTTPException(status_code=404, detail="Message not found")
+
+    await db.delete(msg)
+    await db.commit()
+
+    return {"ok": True}
 
 
 # ---- Copilot ----

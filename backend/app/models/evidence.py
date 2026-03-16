@@ -83,5 +83,6 @@ class EvidenceMapping(Base):
     relevant_excerpts = Column(JSON, nullable=True)  # list of excerpt strings with page/line refs
     rationale = Column(Text, nullable=True)  # why this evidence maps to this component
     is_confirmed = Column(Integer, default=0)  # 0=AI-suggested, 1=consultant-confirmed
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     evidence = relationship("Evidence", back_populates="mappings")

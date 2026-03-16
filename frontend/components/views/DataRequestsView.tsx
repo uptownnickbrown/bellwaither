@@ -3,12 +3,15 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import type { DataRequest, Comment, UserRole } from "@/lib/types";
 import { STATUS_CONFIG, PRIORITY_CONFIG } from "@/lib/types";
-import { getDataRequests, getComments, createComment, createDataRequest } from "@/lib/api";
+import { getDataRequests, getComments, createComment, createDataRequest, deleteDataRequest, updateDataRequest } from "@/lib/api";
+import EditableText from "@/components/EditableText";
 import {
   ClipboardList, Plus, Send, MessageSquare,
   Clock, CheckCircle2, AlertCircle, Upload,
-  ChevronRight, ArrowUpRight,
+  ChevronRight, ArrowUpRight, Trash2,
 } from "lucide-react";
+import ConfirmDialog from "@/components/ConfirmDialog";
+import { useToast } from "@/components/Toast";
 
 interface Props {
   engagementId: string;
@@ -24,6 +27,9 @@ export default function DataRequestsView({ engagementId, role, onNavigate, navTa
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [showCreate, setShowCreate] = useState(false);
+  const [requestToDelete, setRequestToDelete] = useState<DataRequest | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const { toast } = useToast();
 
   // Track pending nav target so loadRequests can pick the right default
   const navTargetRef = useRef(navTargetId);
@@ -73,6 +79,49 @@ export default function DataRequestsView({ engagementId, role, onNavigate, navTa
     getComments(engagementId, selectedRequest.id).then(setComments);
   };
 
+  const handleDeleteRequest = async () => {
+    if (!requestToDelete) return;
+    setDeleting(true);
+    try {
+      await deleteDataRequest(engagementId, requestToDelete.id);
+      if (selectedRequest?.id === requestToDelete.id) {
+        setSelectedRequest(null);
+        setComments([]);
+      }
+      loadRequests();
+      toast(`Deleted "${requestToDelete.title}"`, "success");
+    } catch {
+      toast("Failed to delete data request", "error");
+    } finally {
+      setDeleting(false);
+      setRequestToDelete(null);
+    }
+  };
+
+  const handleUpdateField = async (field: string, value: string) => {
+    if (!selectedRequest) return;
+    await updateDataRequest(engagementId, selectedRequest.id, { [field]: value });
+    const updated = { ...selectedRequest, [field]: value };
+    setSelectedRequest(updated);
+    setRequests((prev) => prev.map((r) => r.id === updated.id ? updated : r));
+  };
+
+  const cyclePriority = async () => {
+    if (!selectedRequest || role !== "consultant") return;
+    const cycle = ["low", "medium", "high"];
+    const idx = cycle.indexOf(selectedRequest.priority);
+    const next = cycle[(idx + 1) % cycle.length];
+    await handleUpdateField("priority", next);
+  };
+
+  const cycleStatus = async () => {
+    if (!selectedRequest || role !== "consultant") return;
+    const cycle = ["pending", "in_progress", "submitted", "accepted", "needs_revision"];
+    const idx = cycle.indexOf(selectedRequest.status);
+    const next = cycle[(idx + 1) % cycle.length];
+    await handleUpdateField("status", next);
+  };
+
   const pendingCount = requests.filter((r) => r.status === "pending").length;
   const submittedCount = requests.filter((r) => r.status === "submitted").length;
 
@@ -102,21 +151,32 @@ export default function DataRequestsView({ engagementId, role, onNavigate, navTa
               const statusConf = STATUS_CONFIG[req.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.pending;
               const priorityConf = PRIORITY_CONFIG[req.priority as keyof typeof PRIORITY_CONFIG] || PRIORITY_CONFIG.medium;
               return (
-                <button
+                <div
                   key={req.id}
                   onClick={() => setSelectedRequest(req)}
-                  className={`w-full text-left p-4 hover:bg-gray-50 transition ${
+                  className={`group w-full text-left p-4 hover:bg-gray-50 transition cursor-pointer ${
                     selectedRequest?.id === req.id ? "bg-indigo-50/50" : ""
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="text-sm font-medium text-gray-800 line-clamp-2">{req.title}</h3>
-                    <span
-                      className="text-[10px] font-medium px-2 py-0.5 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: statusConf.color + "15", color: statusConf.color }}
-                    >
-                      {statusConf.label}
-                    </span>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      {role === "consultant" && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setRequestToDelete(req); }}
+                          className="hidden group-hover:flex w-7 h-7 items-center justify-center rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition"
+                          title="Delete request"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      <span
+                        className="text-[10px] font-medium px-2 py-0.5 rounded-full"
+                        style={{ backgroundColor: statusConf.color + "15", color: statusConf.color }}
+                      >
+                        {statusConf.label}
+                      </span>
+                    </div>
                   </div>
                   <div className="flex items-center gap-3 mt-2">
                     <span
@@ -127,7 +187,7 @@ export default function DataRequestsView({ engagementId, role, onNavigate, navTa
                     </span>
                     {req.assigned_to && <span className="text-xs text-gray-400">→ {req.assigned_to}</span>}
                   </div>
-                </button>
+                </div>
               );
             })}
             {requests.length === 0 && (
@@ -145,20 +205,99 @@ export default function DataRequestsView({ engagementId, role, onNavigate, navTa
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col" style={{ maxHeight: "calc(100vh - 220px)" }}>
               {/* Request Header */}
               <div className="p-5 border-b border-gray-100 flex-shrink-0">
-                <h2 className="text-base font-semibold text-gray-900">{selectedRequest.title}</h2>
-                {selectedRequest.description && (
-                  <p className="text-sm text-gray-600 mt-2">{selectedRequest.description}</p>
-                )}
-                {selectedRequest.rationale && (
-                  <div className="mt-3 bg-amber-50 rounded-lg p-3">
-                    <h4 className="text-xs font-semibold text-amber-700 mb-1">Why this is needed</h4>
-                    <p className="text-xs text-amber-600">{selectedRequest.rationale}</p>
+                <div className="flex items-start justify-between">
+                  {role === "consultant" ? (
+                    <EditableText
+                      value={selectedRequest.title}
+                      className="text-base font-semibold text-gray-900"
+                      onSave={(v) => handleUpdateField("title", v)}
+                    />
+                  ) : (
+                    <h2 className="text-base font-semibold text-gray-900">{selectedRequest.title}</h2>
+                  )}
+                  {role === "consultant" && (
+                    <button
+                      onClick={() => setRequestToDelete(selectedRequest)}
+                      className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition flex-shrink-0"
+                      title="Delete request"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                {(selectedRequest.description || role === "consultant") && (
+                  <div className="mt-2">
+                    {role === "consultant" ? (
+                      <EditableText
+                        value={selectedRequest.description || ""}
+                        multiline
+                        className="text-sm text-gray-600"
+                        placeholder="Add a description..."
+                        onSave={(v) => handleUpdateField("description", v)}
+                      />
+                    ) : selectedRequest.description ? (
+                      <p className="text-sm text-gray-600">{selectedRequest.description}</p>
+                    ) : null}
                   </div>
                 )}
-                <div className="flex items-center gap-4 mt-3">
+                {(selectedRequest.rationale || role === "consultant") && (
+                  <div className="mt-3 bg-amber-50 rounded-lg p-3">
+                    <h4 className="text-xs font-semibold text-amber-700 mb-1">Why this is needed</h4>
+                    {role === "consultant" ? (
+                      <EditableText
+                        value={selectedRequest.rationale || ""}
+                        multiline
+                        className="text-xs text-amber-600"
+                        placeholder="Add a rationale..."
+                        onSave={(v) => handleUpdateField("rationale", v)}
+                      />
+                    ) : (
+                      <p className="text-xs text-amber-600">{selectedRequest.rationale}</p>
+                    )}
+                  </div>
+                )}
+                <div className="flex items-center gap-4 mt-3 flex-wrap">
                   <span className="text-xs text-gray-400">Created by: {selectedRequest.created_by}</span>
-                  <span className="text-xs text-gray-400">Assigned to: {selectedRequest.assigned_to}</span>
+                  {role === "consultant" ? (
+                    <span className="text-xs text-gray-400">
+                      Assigned to:{" "}
+                      <EditableText
+                        value={selectedRequest.assigned_to || ""}
+                        className="text-xs text-gray-600 font-medium inline"
+                        placeholder="Unassigned"
+                        onSave={(v) => handleUpdateField("assigned_to", v)}
+                      />
+                    </span>
+                  ) : (
+                    <span className="text-xs text-gray-400">Assigned to: {selectedRequest.assigned_to}</span>
+                  )}
                   <span className="text-xs text-gray-400">{new Date(selectedRequest.created_at).toLocaleDateString()}</span>
+                  {role === "consultant" && (
+                    <>
+                      <button
+                        onClick={cyclePriority}
+                        className="text-[10px] font-medium px-1.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition"
+                        style={{
+                          backgroundColor: (PRIORITY_CONFIG[selectedRequest.priority as keyof typeof PRIORITY_CONFIG] || PRIORITY_CONFIG.medium).color + "15",
+                          color: (PRIORITY_CONFIG[selectedRequest.priority as keyof typeof PRIORITY_CONFIG] || PRIORITY_CONFIG.medium).color,
+                        }}
+                        title="Click to cycle priority"
+                      >
+                        {(PRIORITY_CONFIG[selectedRequest.priority as keyof typeof PRIORITY_CONFIG] || PRIORITY_CONFIG.medium).label}
+                      </button>
+                      <button
+                        onClick={cycleStatus}
+                        className="text-[10px] font-medium px-2 py-0.5 rounded-full cursor-pointer hover:opacity-80 transition"
+                        style={{
+                          backgroundColor: (STATUS_CONFIG[selectedRequest.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.pending).color + "15",
+                          color: (STATUS_CONFIG[selectedRequest.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.pending).color,
+                        }}
+                        title="Click to cycle status"
+                      >
+                        {(STATUS_CONFIG[selectedRequest.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.pending).label}
+                      </button>
+                    </>
+                  )}
                 </div>
                 <div className="flex items-center gap-3 mt-3">
                   {selectedRequest.component_id && (
@@ -233,6 +372,15 @@ export default function DataRequestsView({ engagementId, role, onNavigate, navTa
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={!!requestToDelete}
+        onClose={() => setRequestToDelete(null)}
+        onConfirm={handleDeleteRequest}
+        title="Delete Data Request"
+        description={`This will permanently delete "${requestToDelete?.title}" and all its comments. Evidence linked to this request will not be deleted.`}
+        loading={deleting}
+      />
     </div>
   );
 }
