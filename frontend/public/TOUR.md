@@ -2,6 +2,8 @@
 
 A visual walkthrough of Meridian using the seeded demo engagement for **Lincoln Innovation Academy**, a fictional K-8 charter school with 420 students in Metro City Public Schools, MN.
 
+Meridian operationalizes Bellwether's School Quality Framework — a diagnostic tool built around 9 dimensions and 43 components that define what it looks like for a school to deliver strong academic, social-emotional, and life outcomes for every student, with intentional focus on those furthest from opportunity.
+
 Meridian is a two-sided workspace — consultants and school staff see the same engagement with role-appropriate views. This tour shows both.
 
 ---

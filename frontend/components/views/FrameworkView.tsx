@@ -47,7 +47,8 @@ export default function FrameworkView({ framework, engagementId, role = "consult
     <div className="max-w-7xl mx-auto">
       <div className="mb-4">
         <h1 className="text-lg font-bold text-gray-900">School Quality Framework</h1>
-        <p className="text-sm text-gray-500">9 dimensions, 43 components with Core Actions and Progress Indicators</p>
+        <p className="text-sm text-gray-600">Defining what it means for a school to deliver strong outcomes for every student — especially those furthest from opportunity.</p>
+        <p className="text-xs text-gray-400 mt-1">9 dimensions, 43 components with Core Actions and Progress Indicators</p>
       </div>
 
       <div className="grid grid-cols-12 gap-6">

@@ -368,7 +368,8 @@ export default function DashboardView({ engagement, framework, role = "consultan
 
           {/* Framework Heat Map */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="text-sm font-semibold text-gray-900 mb-4">SQF Assessment Progress</h2>
+            <h2 className="text-sm font-semibold text-gray-900">SQF Assessment Progress</h2>
+            <p className="text-xs text-gray-400 mb-3">9 dimensions of school quality — academics, culture, talent, leadership, and more — each assessed against evidence.</p>
             <div className="space-y-3">
               {framework.map((dim) => (
                 <div key={dim.id} className="flex items-center gap-3">
