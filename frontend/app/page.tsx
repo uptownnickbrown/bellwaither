@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getEngagements, getFramework } from "@/lib/api";
 import type { Engagement, Dimension } from "@/lib/types";
 import EngagementWorkspace from "@/components/EngagementWorkspace";
+import MobileGate from "@/components/MobileGate";
 import { Compass, ArrowRight, School } from "lucide-react";
 import { ToastProvider } from "@/components/Toast";
 
@@ -69,13 +70,15 @@ export default function Home() {
   }
 
   return (
-    <ToastProvider>
-      <EngagementWorkspace
-        engagement={selectedEngagement}
-        framework={framework}
-        engagements={engagements}
-        onSelectEngagement={setSelectedEngagement}
-      />
-    </ToastProvider>
+    <MobileGate>
+      <ToastProvider>
+        <EngagementWorkspace
+          engagement={selectedEngagement}
+          framework={framework}
+          engagements={engagements}
+          onSelectEngagement={setSelectedEngagement}
+        />
+      </ToastProvider>
+    </MobileGate>
   );
 }
