@@ -1170,7 +1170,7 @@ async def synthesize_dimension_endpoint(
         select(DimensionSummary).where(
             DimensionSummary.engagement_id == engagement_id,
             DimensionSummary.dimension_id == dimension_id,
-            DimensionSummary.approved == False,
+            DimensionSummary.approved.is_(False),
         )
     )
     for old in old_summaries.scalars().all():
@@ -1262,7 +1262,7 @@ async def generate_global_summary_endpoint(
     old_global = await db.execute(
         select(GlobalSummary).where(
             GlobalSummary.engagement_id == engagement_id,
-            GlobalSummary.approved == False,
+            GlobalSummary.approved.is_(False),
         )
     )
     for old in old_global.scalars().all():
