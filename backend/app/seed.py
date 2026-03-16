@@ -995,6 +995,25 @@ async def seed_demo_engagement():
         if existing.scalar_one_or_none():
             return  # Already seeded
 
+        # === Demo timeline ===
+        now = datetime.utcnow()
+        T_DAY1_UPLOADS = now - timedelta(days=3, hours=3)
+        T_DAY2_UPLOADS = now - timedelta(days=2, hours=5)
+        T_SCORING = now - timedelta(days=1, hours=8)
+        T_RECENT = now - timedelta(hours=2)
+
+        RECENT_EVIDENCE = {
+            "Student_Behavior_and_Discipline_Data_2024-2025.csv",
+            "Grade_Level_Meeting_Notes_5th_Grade_Jan_2025.txt",
+            "Board_Governance_Self_Assessment_2024.csv",
+        }
+        DAY2_EVIDENCE = {
+            "Fundraising_and_Development_Report_2024-2025.md",
+            "Title_I_and_Federal_Funding_Compliance_Report.txt",
+            "Special_Education_Compliance_Report_2024-2025.md",
+            "Student_Attendance_Data_2024-2025.csv",
+        }
+
         # Create engagement
         engagement = Engagement(
             id=ENGAGEMENT_ID,
@@ -1044,6 +1063,13 @@ async def seed_demo_engagement():
                 fsize = os.path.getsize(fpath)
             except OSError:
                 fsize = 0
+            # Determine evidence timestamp based on demo timeline
+            if fname in RECENT_EVIDENCE:
+                ev_ts = T_RECENT
+            elif fname in DAY2_EVIDENCE:
+                ev_ts = T_DAY2_UPLOADS
+            else:
+                ev_ts = T_DAY1_UPLOADS
             ev = Evidence(
                 engagement_id=ENGAGEMENT_ID,
                 filename=fname,
@@ -1054,6 +1080,7 @@ async def seed_demo_engagement():
                 title=fname.rsplit(".", 1)[0],
                 uploaded_by=uploader,
                 processing_status=ProcessingStatus.COMPLETED,
+                uploaded_at=ev_ts,
             )
             db.add(ev)
             await db.flush()
@@ -1073,6 +1100,7 @@ async def seed_demo_engagement():
                         component_id=comps[code].id,
                         relevance_score=0.85,
                         rationale=f"Content directly relevant to {code} - {comps[code].name}",
+                        created_at=ev_ts,
                     )
                     db.add(mapping)
                     if code not in evidence_map:
@@ -1126,7 +1154,8 @@ async def seed_demo_engagement():
                     confidence=score_data.get("confidence", "low"),
                     suggested_actions=score_data.get("suggested_actions"),
                     model_used=score_data.get("model_used", "gpt-4.1"),
-                    reviewed_at=datetime.utcnow() - timedelta(hours=4) if approved else None,
+                    scored_at=T_SCORING,
+                    reviewed_at=T_SCORING + timedelta(hours=4) if approved else None,
                 )
                 db.add(score)
 
@@ -1360,7 +1389,6 @@ async def seed_demo_engagement():
             db.add(m)
 
         # Seed activity log entries
-        now = datetime.utcnow()
         activity_entries = [
             # === Day 1 (3 days ago) — Engagement kickoff and initial uploads ===
             ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="engagement", target_label="Lincoln Innovation Academy - SQF Assessment", created_at=now - timedelta(days=3, hours=6)),
@@ -1371,14 +1399,14 @@ async def seed_demo_engagement():
             ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Teacher Evaluation Summary 2024-25", detail="Extracted 7 key findings", created_at=now - timedelta(days=3, hours=3, minutes=50)),
             ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Community Partnership Agreements Summary", detail="Extracted 6 key findings", created_at=now - timedelta(days=3, hours=3, minutes=30)),
             ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="Communication Plan 2024-2025", detail="Extracted 6 key findings", created_at=now - timedelta(days=3, hours=2, minutes=45)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="Student Behavior and Discipline Data", detail="Extracted 6 key findings", created_at=now - timedelta(days=3, hours=2, minutes=10)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="Student Behavior and Discipline Data", detail="Submitted via data request: Disaggregated Discipline Data 2024-25", created_at=T_RECENT),
 
             # === Day 2 (2 days ago) — More uploads, batch scoring ===
             ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="Fundraising and Development Report", detail="Extracted 6 key findings", created_at=now - timedelta(days=2, hours=7, minutes=10)),
             ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="Title I and Federal Funding Compliance Report", detail="Extracted 6 key findings", created_at=now - timedelta(days=2, hours=6, minutes=45)),
             ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="Special Education Compliance Report", detail="Extracted 7 key findings", created_at=now - timedelta(days=2, hours=6, minutes=15)),
             ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Tom Nakamura", action="uploaded", target_type="evidence", target_label="Student Attendance Data 2024-25", detail="Extracted 6 key findings", created_at=now - timedelta(days=2, hours=5, minutes=30)),
-            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="uploaded", target_type="evidence", target_label="Board Governance Self-Assessment 2024", detail="Extracted 7 key findings", created_at=now - timedelta(days=2, hours=5)),
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="Board Governance Self-Assessment 2024", detail="Board completed annual self-assessment", created_at=T_RECENT + timedelta(minutes=5)),
             ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Meridian", action="scored", target_type="component_score", target_label="Batch assessment: 32 components scored", detail="Assessed all components with mapped evidence", created_at=now - timedelta(days=1, hours=8)),
 
             # === Day 2 (1 day ago) — Dimension synthesis and global summary ===
@@ -1411,6 +1439,9 @@ async def seed_demo_engagement():
             ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="created", target_type="message", target_label="Site visit planning and next steps", detail="Sent in Leadership Team Prep thread", created_at=now - timedelta(hours=3, minutes=45)),
             ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Marcus Johnson", action="edited", target_type="component_score", target_label="4A: Talent Philosophy", detail="Added consultant notes on retention equity concerns", created_at=now - timedelta(hours=2, minutes=20)),
             ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Sarah Chen", action="edited", target_type="component_score", target_label="2C: Instruction", detail="Added observation protocol context to rationale", created_at=now - timedelta(hours=1, minutes=10)),
+
+            # === Recent evidence uploads (today) ===
+            ActivityLog(engagement_id=ENGAGEMENT_ID, actor="Dr. Angela Rivera", action="uploaded", target_type="evidence", target_label="Grade Level Meeting Notes (5th Grade, Jan 2025)", detail="Extracted 6 key findings", created_at=T_RECENT + timedelta(minutes=10)),
         ]
         for a in activity_entries:
             db.add(a)

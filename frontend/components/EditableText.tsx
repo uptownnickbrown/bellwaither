@@ -221,7 +221,7 @@ export function EditableListItem({
     <EditableText
       value={value}
       onSave={onSave}
-      multiline={false}
+      multiline
       className={className}
       edited={edited}
       readOnly={readOnly}
