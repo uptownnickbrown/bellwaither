@@ -28,24 +28,30 @@ class Engagement(Base):
     __tablename__ = "engagements"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    school_id = Column(UUID(as_uuid=True), ForeignKey("schools.id"), nullable=True)
     name = Column(String(200), nullable=False)
-    school_name = Column(String(200), nullable=False)
-    school_type = Column(String(50), nullable=True)  # charter, traditional, etc.
+    school_name = Column(String(200), nullable=False)  # denormalized from School
+    school_type = Column(String(50), nullable=True)
     district = Column(String(200), nullable=True)
     state = Column(String(2), nullable=True)
-    grade_levels = Column(String(50), nullable=True)  # e.g. "K-8"
+    grade_levels = Column(String(50), nullable=True)
     enrollment = Column(Integer, nullable=True)
     stage = Column(SAEnum(EngagementStage), default=EngagementStage.ASSESSMENT)
     description = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    school = relationship("School", back_populates="engagements")
     members = relationship("EngagementMember", back_populates="engagement")
     evidence = relationship("Evidence", back_populates="engagement")
     data_requests = relationship("DataRequest", back_populates="engagement")
     component_scores = relationship("ComponentScore", back_populates="engagement")
     action_plans = relationship("ActionPlan", back_populates="engagement")
     threads = relationship("MessageThread", back_populates="engagement")
+    framework_dimensions = relationship(
+        "EngagementDimension", back_populates="engagement",
+        order_by="EngagementDimension.order"
+    )
 
 
 class EngagementMember(Base):

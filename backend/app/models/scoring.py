@@ -25,12 +25,12 @@ class ScoreStatus(str, enum.Enum):
 
 
 class ComponentScore(Base):
-    """Layer 2: Component-level assessment (one of 43 components)."""
+    """Layer 2: Component-level assessment."""
     __tablename__ = "component_scores"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     engagement_id = Column(UUID(as_uuid=True), ForeignKey("engagements.id"), nullable=False)
-    component_id = Column(UUID(as_uuid=True), ForeignKey("components.id"), nullable=False)
+    component_id = Column(UUID(as_uuid=True), ForeignKey("engagement_components.id"), nullable=False)
 
     rating = Column(SAEnum(RatingLevel), default=RatingLevel.NOT_RATED)
     status = Column(SAEnum(ScoreStatus), default=ScoreStatus.DRAFT)
@@ -55,15 +55,16 @@ class ComponentScore(Base):
     reviewed_at = Column(DateTime, nullable=True)
 
     engagement = relationship("Engagement", back_populates="component_scores")
+    engagement_component = relationship("EngagementComponent", back_populates="scores")
 
 
 class DimensionSummary(Base):
-    """Layer 3: Dimension-level synthesis (one of 9 dimensions)."""
+    """Layer 3: Dimension-level synthesis."""
     __tablename__ = "dimension_summaries"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     engagement_id = Column(UUID(as_uuid=True), ForeignKey("engagements.id"), nullable=False)
-    dimension_id = Column(UUID(as_uuid=True), ForeignKey("dimensions.id"), nullable=False)
+    dimension_id = Column(UUID(as_uuid=True), ForeignKey("engagement_dimensions.id"), nullable=False)
 
     overall_assessment = Column(Text, nullable=True)
     patterns = Column(JSON, nullable=True)       # cross-component patterns
@@ -73,6 +74,8 @@ class DimensionSummary(Base):
     approved = Column(Boolean, default=False, nullable=False)  # Lock to prevent regeneration
     model_used = Column(String(50), nullable=True)
     generated_at = Column(DateTime, default=datetime.utcnow)
+
+    engagement_dimension = relationship("EngagementDimension", back_populates="summaries")
 
 
 class GlobalSummary(Base):

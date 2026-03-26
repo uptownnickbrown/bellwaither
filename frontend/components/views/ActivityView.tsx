@@ -120,13 +120,13 @@ export default function ActivityView({ engagementId, role }: Props) {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Clock className="w-6 h-6 text-gray-300 animate-pulse" />
+          <Clock className="w-6 h-6 text-gray-500 animate-pulse" />
         </div>
       ) : entries.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <Activity className="w-12 h-12 text-gray-200 mx-auto mb-3" />
           <h3 className="text-sm font-medium text-gray-600 mb-1">No activity yet</h3>
-          <p className="text-xs text-gray-400">Actions like uploading evidence, running assessments, and approving findings will appear here.</p>
+          <p className="text-xs text-gray-500">Actions like uploading evidence, running assessments, and approving findings will appear here.</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -162,10 +162,10 @@ export default function ActivityView({ engagementId, role }: Props) {
                           )}
                         </p>
                         {entry.detail && (
-                          <p className="text-xs text-gray-400 mt-0.5">{entry.detail}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{entry.detail}</p>
                         )}
                       </div>
-                      <span className="text-[10px] text-gray-400 flex-shrink-0 mt-1">
+                      <span className="text-xs text-gray-500 flex-shrink-0 mt-1">
                         {relativeTime(entry.created_at)}
                       </span>
                     </div>

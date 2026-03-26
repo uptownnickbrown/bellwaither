@@ -29,7 +29,7 @@ class DataRequest(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     engagement_id = Column(UUID(as_uuid=True), ForeignKey("engagements.id"), nullable=False)
-    component_id = Column(UUID(as_uuid=True), ForeignKey("components.id"), nullable=True)
+    component_id = Column(UUID(as_uuid=True), ForeignKey("engagement_components.id"), nullable=True)
 
     title = Column(String(500), nullable=False)
     description = Column(Text, nullable=True)
@@ -44,6 +44,7 @@ class DataRequest(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     engagement = relationship("Engagement", back_populates="data_requests")
+    engagement_component = relationship("EngagementComponent", back_populates="data_requests")
     comments = relationship("DataRequestComment", back_populates="data_request", order_by="DataRequestComment.created_at")
     evidence = relationship("Evidence", backref="data_request")
 

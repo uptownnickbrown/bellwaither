@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Engagement, Dimension, ComponentScore, Evidence, DataRequest, GlobalSummary, UserRole } from "@/lib/types";
+import type { Engagement, Dimension, EngagementDimension, ComponentScore, Evidence, DataRequest, GlobalSummary, UserRole } from "@/lib/types";
 import { RATING_CONFIG } from "@/lib/types";
 import { getScores, getEvidence, getDataRequests, getGlobalSummary } from "@/lib/api";
 import {
@@ -14,11 +14,16 @@ import {
 interface Props {
   engagement: Engagement;
   framework: Dimension[];
+  engagementFramework?: EngagementDimension[];
   role?: UserRole;
   onNavigate?: (tab: string, id?: string) => void;
 }
 
-export default function DashboardView({ engagement, framework, role = "consultant", onNavigate }: Props) {
+export default function DashboardView({ engagement, framework, engagementFramework, role = "consultant", onNavigate }: Props) {
+  // Use engagement framework when available (per-school customized), fall back to global SQF
+  const activeDims = engagementFramework
+    ? engagementFramework.map((d) => ({ ...d, number: parseInt(d.number) || 0 }))
+    : framework;
   const isAdmin = role === "school_admin";
   const [scores, setScores] = useState<ComponentScore[]>([]);
   const [evidence, setEvidence] = useState<Evidence[]>([]);
@@ -39,7 +44,7 @@ export default function DashboardView({ engagement, framework, role = "consultan
     });
   }, [engagement.id]);
 
-  const totalComponents = framework.reduce((acc, d) => acc + d.components.length, 0);
+  const totalComponents = activeDims.reduce((acc, d) => acc + d.components.length, 0);
   const scoredComponents = scores.filter((s) => s.rating !== "not_rated").length;
   const confirmedScores = scores.filter((s) => s.status === "confirmed").length;
   const pendingRequests = requests.filter((r) => r.status === "pending").length;
@@ -69,19 +74,19 @@ export default function DashboardView({ engagement, framework, role = "consultan
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900">{engagement.school_name}</h1>
-              <p className="text-sm text-gray-500 mt-0.5">{engagement.name}</p>
+              <p className="text-sm text-gray-600 mt-0.5">{engagement.name}</p>
               <div className="flex items-center gap-4 mt-2">
                 {engagement.district && (
-                  <span className="flex items-center gap-1 text-xs text-gray-400">
+                  <span className="flex items-center gap-1 text-xs text-gray-500">
                     <MapPin className="w-3 h-3" /> {engagement.district}{engagement.state ? `, ${engagement.state}` : ""}
                   </span>
                 )}
                 {engagement.grade_levels && (
-                  <span className="flex items-center gap-1 text-xs text-gray-400">
+                  <span className="flex items-center gap-1 text-xs text-gray-500">
                     <Users className="w-3 h-3" /> Grades {engagement.grade_levels} | {engagement.enrollment} students
                   </span>
                 )}
-                <span className="flex items-center gap-1 text-xs text-gray-400">
+                <span className="flex items-center gap-1 text-xs text-gray-500">
                   <Calendar className="w-3 h-3" /> Started {new Date(engagement.created_at).toLocaleDateString()}
                 </span>
               </div>
@@ -122,7 +127,7 @@ export default function DashboardView({ engagement, framework, role = "consultan
                 </div>
               </div>
               <p className="text-sm font-medium text-gray-700">Assessment Progress</p>
-              <p className="text-xs text-gray-400 mt-1">{scoredComponents} of {totalComponents} areas reviewed</p>
+              <p className="text-xs text-gray-500 mt-1">{scoredComponents} of {totalComponents} areas reviewed</p>
             </div>
 
             {/* Your Action Items — right two columns */}
@@ -216,19 +221,19 @@ export default function DashboardView({ engagement, framework, role = "consultan
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-semibold text-gray-900">Assessment Overview</h2>
               {scoredComponents < totalComponents && (
-                <span className="text-xs text-gray-400 flex items-center gap-1.5">
+                <span className="text-xs text-gray-500 flex items-center gap-1.5">
                   <Clock className="w-3 h-3" /> Review in progress — {totalComponents - scoredComponents} areas remaining
                 </span>
               )}
             </div>
             <div className="space-y-3">
-              {framework.map((dim) => {
+              {activeDims.map((dim) => {
                 const dimScored = dim.components.filter(c => scoreMap.has(c.id) && scoreMap.get(c.id)!.rating !== "not_rated").length;
                 return (
                   <div key={dim.id} className="flex items-center gap-3">
                     <div className="w-44 flex-shrink-0">
                       <div className="text-xs font-medium text-gray-700 truncate">{dim.number}. {dim.name}</div>
-                      <div className="text-[10px] text-gray-400">{dimScored}/{dim.components.length} reviewed</div>
+                      <div className="text-xs text-gray-500">{dimScored}/{dim.components.length} reviewed</div>
                     </div>
                     <div className="flex gap-1 flex-1">
                       {dim.components.map((comp) => {
@@ -269,8 +274,8 @@ export default function DashboardView({ engagement, framework, role = "consultan
               {scoredComponents === 0 ? (
                 <div className="text-center py-8">
                   <BarChart3 className="w-8 h-8 text-gray-200 mx-auto mb-3" />
-                  <p className="text-sm text-gray-400">Findings will appear here as the review progresses.</p>
-                  <p className="text-xs text-gray-300 mt-1">Submitting requested materials helps move things along.</p>
+                  <p className="text-sm text-gray-500">Findings will appear here as the review progresses.</p>
+                  <p className="text-xs text-gray-500 mt-1">Submitting requested materials helps move things along.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -318,8 +323,8 @@ export default function DashboardView({ engagement, framework, role = "consultan
               {evidence.length === 0 ? (
                 <div className="text-center py-8">
                   <FolderOpen className="w-8 h-8 text-gray-200 mx-auto mb-3" />
-                  <p className="text-sm text-gray-400">No documents submitted yet.</p>
-                  <p className="text-xs text-gray-300 mt-1">Upload materials through the Evidence tab or in response to data requests.</p>
+                  <p className="text-sm text-gray-500">No documents submitted yet.</p>
+                  <p className="text-xs text-gray-500 mt-1">Upload materials through the Evidence tab or in response to data requests.</p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -334,7 +339,7 @@ export default function DashboardView({ engagement, framework, role = "consultan
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-medium text-gray-700 truncate group-hover:text-indigo-600 transition">{ev.title || ev.filename}</div>
-                        <div className="text-xs text-gray-400">{new Date(ev.uploaded_at).toLocaleDateString()}</div>
+                        <div className="text-xs text-gray-500">{new Date(ev.uploaded_at).toLocaleDateString()}</div>
                       </div>
                     </div>
                   ))}
@@ -369,9 +374,9 @@ export default function DashboardView({ engagement, framework, role = "consultan
           {/* Framework Heat Map */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h2 className="text-sm font-semibold text-gray-900">SQF Assessment Progress</h2>
-            <p className="text-xs text-gray-400 mb-3">9 dimensions of school quality — academics, culture, talent, leadership, and more — each assessed against evidence.</p>
+            <p className="text-xs text-gray-500 mb-3">9 dimensions of school quality — academics, culture, talent, leadership, and more — each assessed against evidence.</p>
             <div className="space-y-3">
-              {framework.map((dim) => (
+              {activeDims.map((dim) => (
                 <div key={dim.id} className="flex items-center gap-3">
                   <div className="w-40 flex-shrink-0">
                     <div className="text-xs font-medium text-gray-700 truncate">{dim.number}. {dim.name}</div>
@@ -413,7 +418,7 @@ export default function DashboardView({ engagement, framework, role = "consultan
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <h2 className="text-sm font-semibold text-gray-900 mb-4">Key Findings (Preliminary)</h2>
               {scoredComponents === 0 ? (
-                <p className="text-sm text-gray-400">No component assessments yet. Upload evidence and run assessments to see findings.</p>
+                <p className="text-sm text-gray-500">No component assessments yet. Upload evidence and run assessments to see findings.</p>
               ) : (
                 <div className="space-y-3">
                   {scores
@@ -459,7 +464,7 @@ export default function DashboardView({ engagement, framework, role = "consultan
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <h2 className="text-sm font-semibold text-gray-900 mb-4">Recent Evidence</h2>
               {evidence.length === 0 ? (
-                <p className="text-sm text-gray-400">No evidence uploaded yet.</p>
+                <p className="text-sm text-gray-500">No evidence uploaded yet.</p>
               ) : (
                 <div className="space-y-2">
                   {evidence.slice(0, 8).map((ev) => (
@@ -473,7 +478,7 @@ export default function DashboardView({ engagement, framework, role = "consultan
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-medium text-gray-700 truncate group-hover:text-indigo-600 transition">{ev.title || ev.filename}</div>
-                        <div className="text-xs text-gray-400">{ev.uploaded_by} · {new Date(ev.uploaded_at).toLocaleDateString()}</div>
+                        <div className="text-xs text-gray-500">{ev.uploaded_by} · {new Date(ev.uploaded_at).toLocaleDateString()}</div>
                       </div>
                       <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
                         ev.processing_status === "completed" ? "bg-emerald-400" :
@@ -513,7 +518,7 @@ function StatCard({ icon: Icon, label, value, color, onClick }: { icon: React.El
           <div className="text-xs text-gray-500">{label}</div>
         </div>
         {onClick && (
-          <ArrowUpRight className="w-4 h-4 text-gray-300 group-hover:text-indigo-500 transition" />
+          <ArrowUpRight className="w-4 h-4 text-gray-500 group-hover:text-indigo-500 transition" />
         )}
       </div>
     </div>

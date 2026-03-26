@@ -171,7 +171,7 @@ export default function DataRequestsView({ engagementId, role, onNavigate, navTa
                         </button>
                       )}
                       <span
-                        className="text-[10px] font-medium px-2 py-0.5 rounded-full"
+                        className="text-xs font-medium px-2 py-0.5 rounded-full"
                         style={{ backgroundColor: statusConf.color + "15", color: statusConf.color }}
                       >
                         {statusConf.label}
@@ -180,12 +180,12 @@ export default function DataRequestsView({ engagementId, role, onNavigate, navTa
                   </div>
                   <div className="flex items-center gap-3 mt-2">
                     <span
-                      className="text-[10px] font-medium px-1.5 py-0.5 rounded"
+                      className="text-xs font-medium px-1.5 py-0.5 rounded"
                       style={{ backgroundColor: priorityConf.color + "15", color: priorityConf.color }}
                     >
                       {priorityConf.label}
                     </span>
-                    {req.assigned_to && <span className="text-xs text-gray-400">→ {req.assigned_to}</span>}
+                    {req.assigned_to && <span className="text-xs text-gray-500">→ {req.assigned_to}</span>}
                   </div>
                 </div>
               );
@@ -193,7 +193,7 @@ export default function DataRequestsView({ engagementId, role, onNavigate, navTa
             {requests.length === 0 && (
               <div className="p-8 text-center">
                 <ClipboardList className="w-10 h-10 text-gray-200 mx-auto mb-2" />
-                <p className="text-sm text-gray-400">No data requests yet</p>
+                <p className="text-sm text-gray-500">No data requests yet</p>
               </div>
             )}
           </div>
@@ -257,9 +257,9 @@ export default function DataRequestsView({ engagementId, role, onNavigate, navTa
                   </div>
                 )}
                 <div className="flex items-center gap-4 mt-3 flex-wrap">
-                  <span className="text-xs text-gray-400">Created by: {selectedRequest.created_by}</span>
+                  <span className="text-xs text-gray-500">Created by: {selectedRequest.created_by}</span>
                   {role === "consultant" ? (
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-gray-500">
                       Assigned to:{" "}
                       <EditableText
                         value={selectedRequest.assigned_to || ""}
@@ -269,14 +269,14 @@ export default function DataRequestsView({ engagementId, role, onNavigate, navTa
                       />
                     </span>
                   ) : (
-                    <span className="text-xs text-gray-400">Assigned to: {selectedRequest.assigned_to}</span>
+                    <span className="text-xs text-gray-500">Assigned to: {selectedRequest.assigned_to}</span>
                   )}
-                  <span className="text-xs text-gray-400">{new Date(selectedRequest.created_at).toLocaleDateString()}</span>
+                  <span className="text-xs text-gray-500">{new Date(selectedRequest.created_at).toLocaleDateString()}</span>
                   {role === "consultant" && (
                     <>
                       <button
                         onClick={cyclePriority}
-                        className="text-[10px] font-medium px-1.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition"
+                        className="text-xs font-medium px-1.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition"
                         style={{
                           backgroundColor: (PRIORITY_CONFIG[selectedRequest.priority as keyof typeof PRIORITY_CONFIG] || PRIORITY_CONFIG.medium).color + "15",
                           color: (PRIORITY_CONFIG[selectedRequest.priority as keyof typeof PRIORITY_CONFIG] || PRIORITY_CONFIG.medium).color,
@@ -287,7 +287,7 @@ export default function DataRequestsView({ engagementId, role, onNavigate, navTa
                       </button>
                       <button
                         onClick={cycleStatus}
-                        className="text-[10px] font-medium px-2 py-0.5 rounded-full cursor-pointer hover:opacity-80 transition"
+                        className="text-xs font-medium px-2 py-0.5 rounded-full cursor-pointer hover:opacity-80 transition"
                         style={{
                           backgroundColor: (STATUS_CONFIG[selectedRequest.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.pending).color + "15",
                           color: (STATUS_CONFIG[selectedRequest.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.pending).color,
@@ -322,7 +322,7 @@ export default function DataRequestsView({ engagementId, role, onNavigate, navTa
               {/* Thread */}
               <div className="flex-1 overflow-y-auto p-5 space-y-3">
                 {comments.length === 0 ? (
-                  <p className="text-sm text-gray-400 text-center py-4">No messages yet. Start the conversation.</p>
+                  <p className="text-sm text-gray-500 text-center py-4">No messages yet. Start the conversation.</p>
                 ) : (
                   comments.map((comment) => {
                     const isConsultant = comment.role === "consultant" || comment.role === "analyst";
@@ -333,7 +333,7 @@ export default function DataRequestsView({ engagementId, role, onNavigate, navTa
                         }`}>
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-xs font-semibold text-gray-700">{comment.author}</span>
-                            <span className="text-[10px] text-gray-400">{new Date(comment.created_at).toLocaleTimeString()}</span>
+                            <span className="text-xs text-gray-500">{new Date(comment.created_at).toLocaleTimeString()}</span>
                           </div>
                           <p className="text-sm text-gray-700">{comment.content}</p>
                         </div>

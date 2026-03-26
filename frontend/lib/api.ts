@@ -16,8 +16,20 @@ async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json();
 }
 
-// Framework
+// Framework (canonical SQF library)
 export const getFramework = () => fetchApi<import("./types").Dimension[]>("/framework");
+
+// Engagement-scoped framework
+export const getEngagementFramework = (engId: string) =>
+  fetchApi<import("./types").EngagementDimension[]>(`/engagements/${engId}/framework`);
+
+// Schools
+export const getSchools = () => fetchApi<import("./types").School[]>("/schools");
+export const getSchool = (id: string) => fetchApi<import("./types").School>(`/schools/${id}`);
+export const createSchool = (data: { name: string; school_type?: string; district?: string; state?: string; grade_levels?: string; enrollment?: string }) =>
+  fetchApi<import("./types").School>("/schools", { method: "POST", body: JSON.stringify(data) });
+export const getSchoolEngagements = (schoolId: string) =>
+  fetchApi<import("./types").Engagement[]>(`/schools/${schoolId}/engagements`);
 
 // Engagements
 export const getEngagements = () => fetchApi<import("./types").Engagement[]>("/engagements");
@@ -146,6 +158,14 @@ export const chatWithCopilot = (engId: string, data: { message: string; context?
 
 // Export
 export const getExportUrl = (engId: string) => `${API_BASE}/engagements/${engId}/export`;
+
+// Onboarding
+export const startOnboarding = (data: { name: string; school_type?: string; district?: string; state?: string; grade_levels?: string; enrollment?: string }) =>
+  fetchApi<{ school_id: string; school: import("./types").School; ai_response: import("./types").OnboardingAIResponse }>("/onboarding/start", { method: "POST", body: JSON.stringify(data) });
+export const onboardingRespond = (schoolId: string, message: string) =>
+  fetchApi<{ ai_response: import("./types").OnboardingAIResponse }>(`/onboarding/${schoolId}/respond`, { method: "POST", body: JSON.stringify({ message }) });
+export const finalizeOnboarding = (schoolId: string, data: { framework: unknown; engagement_name?: string; strategic_priorities?: string[]; programs?: string[] }) =>
+  fetchApi<{ engagement_id: string; school_id: string; engagement: import("./types").Engagement }>(`/onboarding/${schoolId}/finalize`, { method: "POST", body: JSON.stringify(data) });
 
 // Activity Log
 export const getActivityLog = (engId: string, limit = 50) =>

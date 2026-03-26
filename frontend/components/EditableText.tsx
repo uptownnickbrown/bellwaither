@@ -151,7 +151,7 @@ export default function EditableText({
             disabled={saving}
           />
         )}
-        <span className="absolute -bottom-5 right-0 text-[10px] text-gray-400 select-none">
+        <span className="absolute -bottom-5 right-0 text-xs text-gray-400 select-none">
           {multiline ? "Cmd+Enter to save" : "Enter to save"} · Esc to cancel
         </span>
       </div>
@@ -192,7 +192,7 @@ export default function EditableText({
 
       {/* Edited badge */}
       {edited && !justSaved && (
-        <span className="absolute -top-1.5 -right-1 text-[9px] font-medium text-indigo-500 bg-indigo-50 px-1 rounded select-none">
+        <span className="absolute -top-1.5 -right-1 text-xs font-medium text-indigo-500 bg-indigo-50 px-1 rounded select-none">
           edited
         </span>
       )}

@@ -207,7 +207,7 @@ export default function DocumentPreviewModal({ evidence, engagementId, onClose }
                           <ul className="space-y-2">
                             {extraction.key_findings.map((finding, i) => (
                               <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                                <span className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-600 text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-600 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
                                   {i + 1}
                                 </span>
                                 {finding}

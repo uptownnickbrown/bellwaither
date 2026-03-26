@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import type { Engagement, Dimension, UserRole } from "@/lib/types";
+import type { Engagement, Dimension, EngagementDimension, UserRole } from "@/lib/types";
 import { getThreads } from "@/lib/api";
 import Link from "next/link";
 import {
   Compass, LayoutDashboard, FileText, ClipboardList,
   Target, BarChart3, MessageSquare, Sparkles,
-  ChevronDown, School, Users, Activity, Map,
+  ChevronDown, School, Users, Activity, Map, Layers,
 } from "lucide-react";
 import DashboardView from "./views/DashboardView";
 import FrameworkView from "./views/FrameworkView";
@@ -18,6 +18,7 @@ import ActionPlanView from "./views/ActionPlanView";
 import MessagingView from "./views/MessagingView";
 import ActivityView from "./views/ActivityView";
 import CopilotPanel from "./CopilotPanel";
+import FrameworkStudioOverlay from "./FrameworkStudioOverlay";
 
 type Tab = "dashboard" | "framework" | "evidence" | "requests" | "scoring" | "actions" | "messages" | "activity";
 
@@ -35,14 +36,16 @@ const TABS: { key: Tab; label: string; icon: React.ElementType }[] = [
 interface Props {
   engagement: Engagement;
   framework: Dimension[];
+  engagementFramework: EngagementDimension[];
   engagements: Engagement[];
   onSelectEngagement: (e: Engagement) => void;
 }
 
-export default function EngagementWorkspace({ engagement, framework, engagements, onSelectEngagement }: Props) {
+export default function EngagementWorkspace({ engagement, framework, engagementFramework, engagements, onSelectEngagement }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
   const [role, setRole] = useState<UserRole>("consultant");
   const [copilotOpen, setCopilotOpen] = useState(false);
+  const [studioOpen, setStudioOpen] = useState(false);
   const [engDropdownOpen, setEngDropdownOpen] = useState(false);
   const [navTargetId, setNavTargetId] = useState<string | null>(null);
   const [messageCount, setMessageCount] = useState(0);
@@ -77,7 +80,7 @@ export default function EngagementWorkspace({ engagement, framework, engagements
       <div className="sticky top-0 z-30 flex-shrink-0">
       <header className="bg-white border-b border-gray-200 px-6 h-14 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
               <circle cx="16" cy="16" r="14.5" fill="#4F46E5" stroke="#4338CA" strokeWidth="1"/>
               <g transform="translate(16,16) rotate(45)">
@@ -88,7 +91,7 @@ export default function EngagementWorkspace({ engagement, framework, engagements
               </g>
             </svg>
             <span className="font-bold text-lg text-gray-900 tracking-tight">Meridian</span>
-          </div>
+          </Link>
           <div className="w-px h-6 bg-gray-200" />
           <div className="relative">
             <button
@@ -152,6 +155,15 @@ export default function EngagementWorkspace({ engagement, framework, engagements
 
           <div className="w-px h-6 bg-gray-200" />
 
+          {/* Framework Studio Toggle */}
+          <button
+            onClick={() => setStudioOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+          >
+            <Layers className="w-3.5 h-3.5" />
+            Framework Studio
+          </button>
+
           {/* Copilot Toggle */}
           <button
             onClick={() => setCopilotOpen(!copilotOpen)}
@@ -194,7 +206,7 @@ export default function EngagementWorkspace({ engagement, framework, engagements
               <Icon className="w-4 h-4" />
               {label}
               {key === "messages" && messageCount > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 text-[10px] font-semibold bg-indigo-100 text-indigo-700 rounded-full">
+                <span className="ml-1 px-1.5 py-0.5 text-xs font-semibold bg-indigo-100 text-indigo-700 rounded-full">
                   {messageCount}
                 </span>
               )}
@@ -207,11 +219,11 @@ export default function EngagementWorkspace({ engagement, framework, engagements
       {/* Content Area */}
       <div className="flex flex-1 overflow-hidden">
         <main className={`flex-1 overflow-y-auto p-6 ${copilotOpen ? "" : ""}`}>
-          {activeTab === "dashboard" && <DashboardView engagement={engagement} framework={framework} role={role} onNavigate={navigateTo} />}
-          {activeTab === "framework" && <FrameworkView framework={framework} engagementId={engagement.id} role={role} onNavigate={navigateTo} navTargetId={navTargetId} onNavTargetConsumed={() => setNavTargetId(null)} />}
+          {activeTab === "dashboard" && <DashboardView engagement={engagement} framework={framework} engagementFramework={engagementFramework} role={role} onNavigate={navigateTo} />}
+          {activeTab === "framework" && <FrameworkView framework={framework} engagementFramework={engagementFramework} engagementId={engagement.id} role={role} onNavigate={navigateTo} navTargetId={navTargetId} onNavTargetConsumed={() => setNavTargetId(null)} />}
           {activeTab === "evidence" && <EvidenceView engagementId={engagement.id} role={role} onNavigate={navigateTo} navTargetId={navTargetId} onNavTargetConsumed={() => setNavTargetId(null)} />}
           {activeTab === "requests" && <DataRequestsView engagementId={engagement.id} role={role} onNavigate={navigateTo} navTargetId={navTargetId} onNavTargetConsumed={() => setNavTargetId(null)} />}
-          {activeTab === "scoring" && <ScoringView engagementId={engagement.id} framework={framework} role={role} onNavigate={navigateTo} navTargetId={navTargetId} onNavTargetConsumed={() => setNavTargetId(null)} />}
+          {activeTab === "scoring" && <ScoringView engagementId={engagement.id} framework={framework} engagementFramework={engagementFramework} role={role} onNavigate={navigateTo} navTargetId={navTargetId} onNavTargetConsumed={() => setNavTargetId(null)} />}
           {activeTab === "actions" && <ActionPlanView engagementId={engagement.id} role={role} onNavigate={navigateTo} navTargetId={navTargetId} onNavTargetConsumed={() => setNavTargetId(null)} />}
           {activeTab === "messages" && <MessagingView engagementId={engagement.id} role={role} onNavigate={navigateTo} navTargetId={navTargetId} onNavTargetConsumed={() => setNavTargetId(null)} />}
           {activeTab === "activity" && <ActivityView engagementId={engagement.id} role={role} />}
@@ -229,6 +241,16 @@ export default function EngagementWorkspace({ engagement, framework, engagements
           />
         )}
       </div>
+
+      {/* Framework Studio Overlay */}
+      {studioOpen && (
+        <FrameworkStudioOverlay
+          engagementId={engagement.id}
+          schoolName={engagement.school_name}
+          engagementFramework={engagementFramework}
+          onClose={() => setStudioOpen(false)}
+        />
+      )}
     </div>
   );
 }

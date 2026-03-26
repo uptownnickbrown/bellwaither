@@ -7,16 +7,20 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from app.database import async_session
 from app.models.action_plan import ActionItem, ActionPlan, ItemStatus, PlanStatus
 from app.models.activity import ActivityLog
 from app.models.data_request import DataRequest, DataRequestComment, RequestPriority, RequestStatus
 from app.models.engagement import Engagement, EngagementMember, EngagementRole, EngagementStage
+from app.models.engagement_framework import EngagementComponent, EngagementDimension
 from app.models.evidence import Evidence, EvidenceExtraction, EvidenceMapping, EvidenceType, ProcessingStatus
 from app.models.framework import Component, CriterionType, Dimension, SuccessCriterion
 from app.models.messaging import Message, MessageThread, ThreadType
+from app.models.school import School
 from app.models.scoring import ComponentScore, DimensionSummary, GlobalSummary, RatingLevel, ScoreStatus
+from app.services.framework_service import fork_sqf_directly_to_engagement
 
 FIXTURES_PATH = Path(__file__).parent / "fixtures" / "ai_assessments.json"
 
@@ -29,6 +33,7 @@ def _load_fixtures() -> dict | None:
     return None
 
 # Fixed UUIDs for demo data consistency
+SCHOOL_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
 ENGAGEMENT_ID = uuid.UUID("10000000-0000-0000-0000-000000000001")
 PLAN_ID = uuid.UUID("20000000-0000-0000-0000-000000000001")
 
@@ -1014,9 +1019,23 @@ async def seed_demo_engagement():
             "Student_Attendance_Data_2024-2025.csv",
         }
 
+        # Create school
+        school = School(
+            id=SCHOOL_ID,
+            name="Lincoln Innovation Academy",
+            school_type="Charter",
+            district="Metro City Public Schools",
+            state="MN",
+            grade_levels="K-8",
+            enrollment="420",
+        )
+        db.add(school)
+        await db.flush()
+
         # Create engagement
         engagement = Engagement(
             id=ENGAGEMENT_ID,
+            school_id=SCHOOL_ID,
             name="Lincoln Innovation Academy - SQF Assessment 2025-26",
             school_name="Lincoln Innovation Academy",
             school_type="Charter",
@@ -1028,6 +1047,11 @@ async def seed_demo_engagement():
             description="Comprehensive School Quality Framework assessment for Lincoln Innovation Academy, a K-8 charter school serving 420 students in the Metro City area. This assessment covers all 9 SQF dimensions to inform strategic planning and continuous improvement.",
         )
         db.add(engagement)
+        await db.flush()
+
+        # Fork SQF framework into engagement-scoped tables
+        await fork_sqf_directly_to_engagement(db, ENGAGEMENT_ID)
+        await db.flush()
 
         # Add members
         members = [
@@ -1041,9 +1065,22 @@ async def seed_demo_engagement():
 
         await db.flush()
 
-        # Get components for scoring
-        comps_result = await db.execute(select(Component).order_by(Component.code))
-        comps = {c.code: c for c in comps_result.scalars().all()}
+        # Get engagement-scoped components (these are what scores/mappings reference now)
+        eng_comps_result = await db.execute(
+            select(EngagementComponent)
+            .join(EngagementDimension)
+            .where(EngagementDimension.engagement_id == ENGAGEMENT_ID)
+            .order_by(EngagementComponent.code)
+        )
+        comps = {c.code: c for c in eng_comps_result.scalars().all()}
+
+        # Also load engagement dimensions for dimension summaries
+        eng_dims_result = await db.execute(
+            select(EngagementDimension)
+            .where(EngagementDimension.engagement_id == ENGAGEMENT_ID)
+            .order_by(EngagementDimension.order)
+        )
+        eng_dims_by_name = {d.name: d for d in eng_dims_result.scalars().all()}
 
         # Seed evidence items from demo_uploads/seeded/
         evidence_data = EVIDENCE_DATA
@@ -1159,17 +1196,14 @@ async def seed_demo_engagement():
                 )
                 db.add(score)
 
-        # Seed dimension summaries from fixtures
-        dims_result = await db.execute(select(Dimension).order_by(Dimension.number))
-        dims_by_name = {d.name: d for d in dims_result.scalars().all()}
-
+        # Seed dimension summaries from fixtures (using engagement-scoped dimensions)
         if fixtures and "dimension_summaries" in fixtures:
             for dim_name, ds_data in fixtures["dimension_summaries"].items():
-                if dim_name not in dims_by_name or "error" in ds_data:
+                if dim_name not in eng_dims_by_name or "error" in ds_data:
                     continue
                 ds = DimensionSummary(
                     engagement_id=ENGAGEMENT_ID,
-                    dimension_id=dims_by_name[dim_name].id,
+                    dimension_id=eng_dims_by_name[dim_name].id,
                     overall_assessment=ds_data.get("overall_assessment"),
                     patterns=ds_data.get("patterns"),
                     compounding_risks=ds_data.get("compounding_risks"),

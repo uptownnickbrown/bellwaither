@@ -72,12 +72,12 @@ class EvidenceExtraction(Base):
 
 
 class EvidenceMapping(Base):
-    """Maps evidence to framework components with confidence."""
+    """Maps evidence to engagement-scoped framework components with confidence."""
     __tablename__ = "evidence_mappings"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     evidence_id = Column(UUID(as_uuid=True), ForeignKey("evidence.id"), nullable=False)
-    component_id = Column(UUID(as_uuid=True), ForeignKey("components.id"), nullable=False)
+    component_id = Column(UUID(as_uuid=True), ForeignKey("engagement_components.id"), nullable=False)
 
     relevance_score = Column(Float, nullable=False, default=0.0)  # 0.0 - 1.0
     relevant_excerpts = Column(JSON, nullable=True)  # list of excerpt strings with page/line refs
@@ -86,3 +86,4 @@ class EvidenceMapping(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     evidence = relationship("Evidence", back_populates="mappings")
+    engagement_component = relationship("EngagementComponent", back_populates="mappings")

@@ -23,8 +23,52 @@ export interface Dimension {
   components: Component[];
 }
 
+// Engagement-scoped framework types
+export interface EngagementCriterion {
+  id: string;
+  criterion_type: "core_action" | "progress_indicator";
+  text: string;
+  order: number;
+}
+
+export interface EngagementComponent {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  evidence_guidance: string | null;
+  is_custom: number;
+  source_component_id: string | null;
+  criteria: EngagementCriterion[];
+}
+
+export interface EngagementDimension {
+  id: string;
+  number: string;
+  name: string;
+  description: string | null;
+  color: string | null;
+  is_custom: number;
+  source_dimension_id: string | null;
+  components: EngagementComponent[];
+}
+
+// School
+export interface School {
+  id: string;
+  name: string;
+  school_type: string | null;
+  district: string | null;
+  state: string | null;
+  grade_levels: string | null;
+  enrollment: string | null;
+  description: string | null;
+  created_at: string;
+}
+
 export interface Engagement {
   id: string;
+  school_id: string | null;
   name: string;
   school_name: string;
   school_type: string | null;
@@ -240,6 +284,50 @@ export interface AIFeedbackItem {
   rating: string;
   comment: string | null;
   created_at: string;
+}
+
+// Onboarding
+export interface OnboardingLearned {
+  identity?: string;
+  programs?: string[];
+  priorities?: string[];
+  challenges?: string[];
+  custom_needs?: string[];
+  skip_candidates?: string[];
+}
+
+export interface OnboardingAIResponse {
+  status: "interviewing" | "proposal";
+  message?: string;
+  turn?: number;
+  learned?: OnboardingLearned;
+  framework?: {
+    dimensions: OnboardingDimension[];
+  };
+  rationale?: string;
+  model_used?: string;
+}
+
+export interface OnboardingDimension {
+  number: string;
+  name: string;
+  description?: string;
+  color?: string;
+  is_custom: boolean;
+  components: OnboardingComponent[];
+}
+
+export interface OnboardingComponent {
+  code: string;
+  name: string;
+  description?: string;
+  is_custom: boolean;
+  criteria: OnboardingCriterion[];
+}
+
+export interface OnboardingCriterion {
+  criterion_type: "core_action" | "progress_indicator";
+  text: string;
 }
 
 export type UserRole = "consultant" | "school_admin";

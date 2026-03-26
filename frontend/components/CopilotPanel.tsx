@@ -117,7 +117,7 @@ function DataRequestCard({ result, onNavigate }: { result: CopilotToolResult; on
           </div>
           <span className="text-xs font-semibold text-indigo-900">Data Request Created</span>
         </div>
-        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${priorityStyle.classes}`}>
+        <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${priorityStyle.classes}`}>
           {priorityStyle.label}
         </span>
       </div>
@@ -217,7 +217,7 @@ export default function CopilotPanel({ engagementId, schoolName, context, role, 
           </div>
           <div>
             <h3 className="text-sm font-semibold text-gray-800">Copilot</h3>
-            <p className="text-[10px] text-gray-400">Context: {context} · {schoolName}</p>
+            <p className="text-xs text-gray-400">Context: {context} · {schoolName}</p>
           </div>
         </div>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition">
@@ -235,7 +235,7 @@ export default function CopilotPanel({ engagementId, schoolName, context, role, 
               <p className="text-xs text-gray-400 mt-1">Ask about evidence, findings, or create data requests directly.</p>
             </div>
             <div className="space-y-2">
-              <p className="text-[10px] font-semibold text-gray-400 uppercase">Try asking:</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase">Try asking:</p>
               {(SUGGESTED_PROMPTS[context] || SUGGESTED_PROMPTS.default).map((prompt, i) => (
                 <button
                   key={i}

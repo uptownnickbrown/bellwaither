@@ -6,7 +6,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
 
-# --- Framework ---
+# --- Framework (canonical SQF library) ---
 class SuccessCriterionResponse(BaseModel):
     id: UUID
     criterion_type: str
@@ -38,9 +38,103 @@ class DimensionResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+# --- Engagement Framework (per-engagement snapshot) ---
+class EngagementCriterionResponse(BaseModel):
+    id: UUID
+    criterion_type: str
+    text: str
+    order: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class EngagementComponentResponse(BaseModel):
+    id: UUID
+    code: str
+    name: str
+    description: str | None = None
+    evidence_guidance: str | None = None
+    is_custom: int = 0
+    source_component_id: UUID | None = None
+    criteria: list[EngagementCriterionResponse] = []
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class EngagementDimensionResponse(BaseModel):
+    id: UUID
+    number: str
+    name: str
+    description: str | None = None
+    color: str | None = None
+    is_custom: int = 0
+    source_dimension_id: UUID | None = None
+    components: list[EngagementComponentResponse] = []
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+# --- Engagement Framework Mutations ---
+class EngagementDimensionUpdate(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    color: str | None = None
+
+
+class EngagementComponentUpdate(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    evidence_guidance: str | None = None
+
+
+class CriterionCreate(BaseModel):
+    criterion_type: str
+    text: str
+
+
+class EngagementDimensionCreate(BaseModel):
+    name: str
+    description: str | None = None
+    color: str | None = None
+
+
+class EngagementComponentCreate(BaseModel):
+    code: str
+    name: str
+    description: str | None = None
+    evidence_guidance: str | None = None
+    criteria: list[CriterionCreate] | None = None
+
+
+# --- School ---
+class SchoolCreate(BaseModel):
+    name: str
+    school_type: str | None = None
+    district: str | None = None
+    state: str | None = None
+    grade_levels: str | None = None
+    enrollment: str | None = None
+    description: str | None = None
+
+
+class SchoolResponse(BaseModel):
+    id: UUID
+    name: str
+    school_type: str | None = None
+    district: str | None = None
+    state: str | None = None
+    grade_levels: str | None = None
+    enrollment: str | None = None
+    description: str | None = None
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 # --- Engagement ---
 class EngagementCreate(BaseModel):
     name: str
+    school_id: UUID | None = None
     school_name: str
     school_type: str | None = None
     district: str | None = None
@@ -52,6 +146,7 @@ class EngagementCreate(BaseModel):
 
 class EngagementResponse(BaseModel):
     id: UUID
+    school_id: UUID | None = None
     name: str
     school_name: str
     school_type: str | None = None

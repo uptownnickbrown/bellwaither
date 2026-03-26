@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.ai.model_router import AITaskType, get_model_for_task
 from app.ai.prompts.system_prompts import COPILOT_SYSTEM_PROMPT
 from app.config import settings
-from app.models import Component, DataRequest
+from app.models import DataRequest, EngagementComponent, EngagementDimension
 from app.models.data_request import RequestPriority, RequestStatus
 
 logger = logging.getLogger(__name__)
@@ -87,12 +87,17 @@ async def _execute_create_data_request(
 ) -> dict:
     """Execute the create_data_request tool call against the database."""
 
-    # Resolve component_code to component_id if provided
+    # Resolve component_code to engagement-scoped component_id if provided
     component_id = None
     component_code = args.get("component_code")
     if component_code:
         result = await db.execute(
-            select(Component).where(Component.code == component_code)
+            select(EngagementComponent)
+            .join(EngagementDimension)
+            .where(
+                EngagementDimension.engagement_id == engagement_id,
+                EngagementComponent.code == component_code,
+            )
         )
         comp = result.scalar_one_or_none()
         if comp:
@@ -211,7 +216,18 @@ async def copilot_chat(
 
     logger.info("Copilot chat started: model=%s role=%s context=%s tools=%s", model, user_role, current_context, tools_enabled)
 
-    response = await client.chat.completions.create(**call_kwargs)
+    # Retry on transient connection errors (Docker DNS flakiness)
+    import asyncio
+    for attempt in range(3):
+        try:
+            response = await client.chat.completions.create(**call_kwargs)
+            break
+        except Exception as e:
+            if attempt < 2 and "Connection" in type(e).__name__:
+                logger.warning("Copilot OpenAI connection failed (attempt %d), retrying...", attempt + 1)
+                await asyncio.sleep(1 * (attempt + 1))
+                continue
+            raise
 
     assistant_message = response.choices[0].message
     tool_results = []

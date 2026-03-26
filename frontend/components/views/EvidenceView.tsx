@@ -213,7 +213,7 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
               {item.status === "uploading" && <Loader2 className="w-3 h-3 text-indigo-600 animate-spin flex-shrink-0" />}
               {item.status === "done" && <CheckCircle2 className="w-3 h-3 text-emerald-600 flex-shrink-0" />}
               {item.status === "failed" && <AlertCircle className="w-3 h-3 text-red-500 flex-shrink-0" />}
-              {item.status === "pending" && <Clock className="w-3 h-3 text-gray-300 flex-shrink-0" />}
+              {item.status === "pending" && <Clock className="w-3 h-3 text-gray-500 flex-shrink-0" />}
               <span className={item.status === "done" ? "text-gray-500" : item.status === "failed" ? "text-red-600" : "text-gray-700"}>
                 {item.name}
               </span>
@@ -272,9 +272,9 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
                     <div className="min-w-0 flex-1">
                       <div className="text-sm font-medium text-gray-800 truncate">{ev.title || ev.filename}</div>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs text-gray-400">{ev.uploaded_by}</span>
-                        <span className="text-xs text-gray-300">·</span>
-                        <span className="text-xs text-gray-400">{new Date(ev.uploaded_at).toLocaleDateString()}</span>
+                        <span className="text-xs text-gray-500">{ev.uploaded_by}</span>
+                        <span className="text-xs text-gray-500">·</span>
+                        <span className="text-xs text-gray-500">{new Date(ev.uploaded_at).toLocaleDateString()}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
@@ -312,7 +312,7 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
             {filtered.length === 0 && (
               <div className="p-8 text-center">
                 <FileText className="w-10 h-10 text-gray-200 mx-auto mb-2" />
-                <p className="text-sm text-gray-400">{search ? "No matching evidence" : "No evidence uploaded yet"}</p>
+                <p className="text-sm text-gray-500">{search ? "No matching evidence" : "No evidence uploaded yet"}</p>
               </div>
             )}
           </div>
@@ -368,9 +368,9 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
                   </div>
                 </div>
                 <div className="flex items-center gap-4 mt-2">
-                  <span className="text-xs text-gray-400">Type: {selectedEvidence.evidence_type}</span>
-                  <span className="text-xs text-gray-400">Format: {selectedEvidence.file_type}</span>
-                  <span className="text-xs text-gray-400">Uploaded: {new Date(selectedEvidence.uploaded_at).toLocaleString()}</span>
+                  <span className="text-xs text-gray-500">Type: {selectedEvidence.evidence_type}</span>
+                  <span className="text-xs text-gray-500">Format: {selectedEvidence.file_type}</span>
+                  <span className="text-xs text-gray-500">Uploaded: {new Date(selectedEvidence.uploaded_at).toLocaleString()}</span>
                 </div>
               </div>
 
@@ -404,7 +404,7 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
                       <ul className="space-y-2">
                         {extraction.key_findings.map((finding, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                            <span className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-600 text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-600 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
                               {i + 1}
                             </span>
                             <EditableListItem
@@ -458,7 +458,7 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
                   ) : (
                     <>
                       <Clock className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-                      <p className="text-sm text-gray-400">No extraction available yet.</p>
+                      <p className="text-sm text-gray-500">No extraction available yet.</p>
                     </>
                   )}
                 </div>
@@ -468,7 +468,7 @@ export default function EvidenceView({ engagementId, role, onNavigate, navTarget
             <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
               <FileText className="w-12 h-12 text-gray-200 mx-auto mb-3" />
               <h3 className="text-sm font-medium text-gray-700 mb-1">Select evidence to view details</h3>
-              <p className="text-xs text-gray-400">Click on any document to see extracted findings and metadata.</p>
+              <p className="text-xs text-gray-500">Click on any document to see extracted findings and metadata.</p>
             </div>
           )}
         </div>
@@ -506,7 +506,7 @@ function StatusBadge({ status }: { status: string }) {
   const Icon = c.icon;
   return (
     <span
-      className="flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full"
+      className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full"
       style={{ backgroundColor: c.bg, color: c.color }}
     >
       <Icon className="w-3 h-3" />

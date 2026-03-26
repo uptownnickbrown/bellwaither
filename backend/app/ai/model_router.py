@@ -31,6 +31,9 @@ class AITaskType(str, Enum):
     FOLLOW_UP_GENERATION = "follow_up"   # Generate follow-up data requests
     REPORT_COMPOSITION = "report"        # Compose formatted reports
 
+    # Onboarding
+    ONBOARDING_INTERVIEW = "onboarding_interview"  # Framework customization interview
+
 
 # Model routing table - maps task types to models
 # This is the abstraction layer for future eval-based routing
@@ -45,6 +48,7 @@ MODEL_ROUTING: dict[AITaskType, str] = {
     AITaskType.COPILOT_CHAT: settings.model_retrieval,
     AITaskType.FOLLOW_UP_GENERATION: settings.model_extraction,
     AITaskType.REPORT_COMPOSITION: settings.model_composition,
+    AITaskType.ONBOARDING_INTERVIEW: settings.model_synthesis,
 }
 
 

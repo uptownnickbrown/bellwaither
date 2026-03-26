@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import type { Dimension, ComponentScore, DimensionSummary, GlobalSummary, BatchProgress, EvidenceCountMap, UserRole, NewEvidenceItem } from "@/lib/types";
+import type { Dimension, EngagementDimension, ComponentScore, DimensionSummary, GlobalSummary, BatchProgress, EvidenceCountMap, UserRole, NewEvidenceItem } from "@/lib/types";
 import { RATING_CONFIG } from "@/lib/types";
 import {
   getScores, getDimensionSummaries, getGlobalSummary,
@@ -23,6 +23,7 @@ import {
 interface Props {
   engagementId: string;
   framework: Dimension[];
+  engagementFramework?: EngagementDimension[];
   role?: UserRole;
   onNavigate?: (tab: string, id?: string) => void;
   navTargetId?: string | null;
@@ -31,7 +32,11 @@ interface Props {
 
 type ViewLevel = "components" | "dimensions" | "global";
 
-export default function ScoringView({ engagementId, framework, role = "consultant", onNavigate, navTargetId, onNavTargetConsumed }: Props) {
+export default function ScoringView({ engagementId, framework, engagementFramework, role = "consultant", onNavigate, navTargetId, onNavTargetConsumed }: Props) {
+  // Use engagement framework when available
+  const activeDims = engagementFramework
+    ? engagementFramework.map((d) => ({ ...d, number: parseInt(d.number) || 0 }))
+    : framework;
   const isAdmin = role === "school_admin";
   const [scores, setScores] = useState<ComponentScore[]>([]);
   const [dimSummaries, setDimSummaries] = useState<DimensionSummary[]>([]);
@@ -69,14 +74,14 @@ export default function ScoringView({ engagementId, framework, role = "consultan
       if (scoreByComp) {
         setSelectedScoreId(scoreByComp.id);
         // Expand the dimension containing this component
-        const dim = framework.find((d) => d.components.some((c) => c.id === navTargetId));
+        const dim = activeDims.find((d) => d.components.some((c) => c.id === navTargetId));
         if (dim) setSelectedDimId(dim.id);
         setViewLevel("components");
       } else {
         const scoreById = scores.find((s) => s.id === navTargetId);
         if (scoreById) {
           setSelectedScoreId(scoreById.id);
-          const dim = framework.find((d) => d.components.some((c) => c.id === scoreById.component_id));
+          const dim = activeDims.find((d) => d.components.some((c) => c.id === scoreById.component_id));
           if (dim) setSelectedDimId(dim.id);
           setViewLevel("components");
         }
@@ -90,7 +95,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
   const selectedScore = scores.find((s) => s.id === selectedScoreId);
 
   // Count totals for the current level
-  const totalComponents = framework.reduce((sum, d) => sum + d.components.length, 0);
+  const totalComponents = activeDims.reduce((sum, d) => sum + d.components.length, 0);
   const scoredComponents = scores.filter((s) => s.rating !== "not_rated").length;
   const approvedComponents = scores.filter((s) => s.approved).length;
 
@@ -107,17 +112,17 @@ export default function ScoringView({ engagementId, framework, role = "consultan
             The consulting team is currently reviewing your school&apos;s materials and conducting the diagnostic assessment.
             Component-level results will appear here as each area is completed.
           </p>
-          <div className="flex items-center justify-center gap-6 text-sm text-gray-400">
+          <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
-                <BarChart3 className="w-4 h-4 text-gray-300" />
+                <BarChart3 className="w-4 h-4 text-gray-500" />
               </div>
               <span>0 of {totalComponents} components</span>
             </div>
             <div className="w-px h-8 bg-gray-100" />
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
-                <Clock className="w-4 h-4 text-gray-300" />
+                <Clock className="w-4 h-4 text-gray-500" />
               </div>
               <span>Review underway</span>
             </div>
@@ -281,7 +286,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                 style={{ width: `${Math.round((scoredComponents / totalComponents) * 100)}%` }}
               />
             </div>
-            <p className="text-[10px] text-indigo-400 mt-1 text-right">{Math.round((scoredComponents / totalComponents) * 100)}%</p>
+            <p className="text-xs text-indigo-400 mt-1 text-right">{Math.round((scoredComponents / totalComponents) * 100)}%</p>
           </div>
         </div>
       )}
@@ -311,7 +316,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
         <div className="mb-4 bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-semibold text-gray-800">Batch Generation Complete</h3>
-            <button onClick={() => setBatchProgress(null)} className="text-xs text-gray-400 hover:text-gray-600">Dismiss</button>
+            <button onClick={() => setBatchProgress(null)} className="text-xs text-gray-500 hover:text-gray-600">Dismiss</button>
           </div>
           <div className="flex items-center gap-4 text-xs">
             <span className="text-emerald-600 font-medium">{batchProgress.completed} completed</span>
@@ -354,7 +359,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
               )}
             </div>
 
-            {framework.map((dim) => (
+            {activeDims.map((dim) => (
               <div key={dim.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <button
                   onClick={() => setSelectedDimId(selectedDimId === dim.id ? null : dim.id)}
@@ -364,7 +369,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                     <div className="w-1.5 h-8 rounded-full" style={{ backgroundColor: dim.color || "#6366F1" }} />
                     <div className="text-left">
                       <span className="text-sm font-semibold text-gray-800">{dim.number}. {dim.name}</span>
-                      <div className="text-xs text-gray-400 mt-0.5">{dim.components.length} components</div>
+                      <div className="text-xs text-gray-500 mt-0.5">{dim.components.length} components</div>
                     </div>
                   </div>
                   {/* Mini heatmap */}
@@ -418,38 +423,38 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                             <span className={`text-sm truncate ${hasNoEvidence && !isAdmin ? "text-gray-400" : "text-gray-700"}`}>{comp.name}</span>
                             {/* Approval badge (consultant only) */}
                             {!isAdmin && isApproved && (
-                              <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-semibold flex-shrink-0">
+                              <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold flex-shrink-0">
                                 <ShieldCheck className="w-2.5 h-2.5" /> Approved
                               </span>
                             )}
                             {/* Insufficient evidence indicator (consultant only) */}
                             {!isAdmin && hasNoEvidence && !score && (
-                              <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[9px] font-medium flex-shrink-0">
+                              <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 text-xs font-medium flex-shrink-0">
                                 <FileQuestion className="w-2.5 h-2.5" /> No evidence
                               </span>
                             )}
                             {/* Stale score indicator */}
                             {!isAdmin && score?.stale && (
-                              <span className="px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[9px] font-medium flex-shrink-0">
+                              <span className="px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 text-xs font-medium flex-shrink-0">
                                 Evidence removed
                               </span>
                             )}
                             {/* New evidence indicator */}
                             {!isAdmin && (evidenceCounts[comp.id]?.new || 0) > 0 && (
-                              <span className="px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[9px] font-medium flex-shrink-0">
+                              <span className="px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 text-xs font-medium flex-shrink-0">
                                 +{evidenceCounts[comp.id].new} new
                               </span>
                             )}
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             <span
-                              className="text-[10px] font-medium px-2 py-0.5 rounded-full"
+                              className="text-xs font-medium px-2 py-0.5 rounded-full"
                               style={{ backgroundColor: config.bg, color: config.color }}
                             >
                               {config.label}
                             </span>
                             {score?.confidence && !isAdmin && (
-                              <span className="text-[10px] text-gray-400">{score.confidence}</span>
+                              <span className="text-xs text-gray-500">{score.confidence}</span>
                             )}
                             {/* Approve/Unlock button (consultant only) */}
                             {!isAdmin && score && (score.rating !== "not_rated" || isApproved) && (
@@ -459,7 +464,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                                   handleToggleScoreApproval(score.id, !isApproved);
                                 }}
                                 disabled={loading === `approve-${score.id}`}
-                                className={`flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded transition disabled:opacity-50 ${
+                                className={`flex items-center gap-1 px-2 py-1 text-xs font-medium rounded transition disabled:opacity-50 ${
                                   isApproved
                                     ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                                     : "bg-gray-100 text-gray-500 hover:bg-gray-200"
@@ -481,7 +486,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                               <button
                                 onClick={(e) => { e.stopPropagation(); handleAssess(comp.id); }}
                                 disabled={loading === comp.id || isApproved || hasNoEvidence}
-                                className={`flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded transition disabled:opacity-50 ${
+                                className={`flex items-center gap-1 px-2 py-1 text-xs font-medium rounded transition disabled:opacity-50 ${
                                   hasNoEvidence
                                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                     : isApproved
@@ -515,7 +520,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
             {selectedScore ? (
               <ScoreDetail
                 score={selectedScore}
-                framework={framework}
+                framework={activeDims as Dimension[]}
                 engagementId={engagementId}
                 evidenceCount={evidenceCounts[selectedScore.component_id]?.total || 0}
                 newEvidenceCount={evidenceCounts[selectedScore.component_id]?.new || 0}
@@ -542,8 +547,8 @@ export default function ScoringView({ engagementId, framework, role = "consultan
           <div className="flex items-center justify-between">
             <div className="text-xs text-gray-500">
               {isAdmin
-                ? `${dimSummaries.length} of ${framework.length} dimensions reviewed`
-                : `${dimSummaries.length}/${framework.length} synthesized | ${dimSummaries.filter((d) => d.approved).length} approved`}
+                ? `${dimSummaries.length} of ${activeDims.length} dimensions reviewed`
+                : `${dimSummaries.length}/${activeDims.length} synthesized | ${dimSummaries.filter((d) => d.approved).length} approved`}
             </div>
             {!isAdmin && (
               <button
@@ -557,7 +562,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
             )}
           </div>
 
-          {framework.map((dim) => {
+          {activeDims.map((dim) => {
             const summary = dimSummaryMap.get(dim.id);
             const isApproved = summary?.approved || false;
             // Check if all components in this dimension lack evidence
@@ -575,7 +580,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                     <div>
                       <h3 className="text-base font-semibold text-gray-900">{dim.number}. {dim.name}</h3>
                       {isApproved && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-semibold mt-1">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold mt-1">
                           <ShieldCheck className="w-3 h-3" /> Approved
                         </span>
                       )}
@@ -630,12 +635,12 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                 {/* Insufficient evidence / pending state */}
                 {!dimHasAnyEvidence && !dimHasAnyScored && !summary ? (
                   <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-50 border border-gray-100">
-                    <FileQuestion className="w-8 h-8 text-gray-300 flex-shrink-0" />
+                    <FileQuestion className="w-8 h-8 text-gray-500 flex-shrink-0" />
                     <div>
                       <p className="text-sm font-medium text-gray-500">
                         {isAdmin ? "Review pending" : "Insufficient Evidence"}
                       </p>
-                      <p className="text-xs text-gray-400 mt-0.5">
+                      <p className="text-xs text-gray-500 mt-0.5">
                         {isAdmin
                           ? "This dimension is still being reviewed. Results will appear here once the analysis is complete."
                           : "No evidence has been mapped to components in this dimension. Upload or map evidence to enable analysis."}
@@ -714,7 +719,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                     </div>
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-gray-500">
                     {isAdmin
                       ? "The dimension-level summary for this area is still being developed."
                       : "No synthesis yet. Run component assessments first, then synthesize."}
@@ -753,7 +758,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
               <div className="flex items-center gap-3">
                 <h2 className="text-base font-semibold text-gray-900">Executive Summary</h2>
                 {globalSummary?.approved && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-semibold">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
                     <ShieldCheck className="w-3 h-3" /> Approved
                   </span>
                 )}
@@ -812,17 +817,17 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                 {isAdmin ? (
                   <>
                     <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center border border-gray-100 mb-2">
-                      <Globe className="w-7 h-7 text-gray-300" />
+                      <Globe className="w-7 h-7 text-gray-500" />
                     </div>
                     <p className="text-sm font-medium text-gray-600">Executive summary in development</p>
-                    <p className="text-xs text-gray-400 mt-1 max-w-sm">The executive summary draws on completed dimension reviews. It will be available once the assessment reaches that stage.</p>
+                    <p className="text-xs text-gray-500 mt-1 max-w-sm">The executive summary draws on completed dimension reviews. It will be available once the assessment reaches that stage.</p>
                   </>
                 ) : (
                   <>
-                    <FileQuestion className="w-8 h-8 text-gray-300 flex-shrink-0" />
+                    <FileQuestion className="w-8 h-8 text-gray-500 flex-shrink-0" />
                     <div>
                       <p className="text-sm font-medium text-gray-500">Insufficient Evidence</p>
-                      <p className="text-xs text-gray-400 mt-0.5">No dimension summaries have been generated yet. Generate dimension syntheses first, then create the global executive summary.</p>
+                      <p className="text-xs text-gray-500 mt-0.5">No dimension summaries have been generated yet. Generate dimension syntheses first, then create the global executive summary.</p>
                     </div>
                   </>
                 )}
@@ -907,7 +912,7 @@ export default function ScoringView({ engagementId, framework, role = "consultan
                 <h3 className="text-sm font-medium text-gray-700 mb-1">
                   {isAdmin ? "Executive summary in development" : "No global summary yet"}
                 </h3>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-gray-500">
                   {isAdmin
                     ? "The executive summary will be available once the dimension-level reviews are complete."
                     : "Generate dimension syntheses first, then create the global executive summary."}
@@ -936,8 +941,8 @@ function ScoreDetail({
   onNavigate?: (tab: string, id?: string) => void;
 }) {
   const isAdmin = role === "school_admin";
-  const comp = framework.flatMap((d) => d.components).find((c) => c.id === score.component_id);
-  const dim = framework.find((d) => d.components.some((c) => c.id === score.component_id));
+  const comp = framework.flatMap((d: Dimension) => d.components).find((c: { id: string }) => c.id === score.component_id);
+  const dim = framework.find((d: Dimension) => d.components.some((c: { id: string }) => c.id === score.component_id));
   const config = RATING_CONFIG[score.rating as keyof typeof RATING_CONFIG] || RATING_CONFIG.not_rated;
   const isApproved = score.approved;
 
@@ -977,7 +982,7 @@ function ScoreDetail({
                 <>
                   <ShieldCheck className="w-3.5 h-3.5" />
                   Approved
-                  <span className="text-[9px] text-emerald-500 ml-1">(click to unlock)</span>
+                  <span className="text-xs text-emerald-500 ml-1">(click to unlock)</span>
                 </>
               ) : (
                 <>
@@ -988,7 +993,7 @@ function ScoreDetail({
             </button>
           )}
         </div>
-        <div className="text-xs text-gray-400">{dim?.name}</div>
+        <div className="text-xs text-gray-500">{dim?.name}</div>
         <div className="flex items-center gap-3 mt-3">
           <span
             className="text-xs font-semibold px-3 py-1 rounded-full"
@@ -996,7 +1001,7 @@ function ScoreDetail({
           >
             {config.label}
           </span>
-          {!isAdmin && <span className="text-xs text-gray-400">Confidence: {score.confidence}</span>}
+          {!isAdmin && <span className="text-xs text-gray-500">Confidence: {score.confidence}</span>}
           {!isAdmin && score.evidence_count > 0 ? (
             <button
               onClick={() => onNavigate?.("evidence", `component:${score.component_id}`)}
@@ -1009,7 +1014,7 @@ function ScoreDetail({
               <ArrowUpRight className="w-3 h-3" />
             </button>
           ) : (
-            !isAdmin && <span className="text-xs text-gray-400">{score.evidence_count} evidence items</span>
+            !isAdmin && <span className="text-xs text-gray-500">{score.evidence_count} evidence items</span>
           )}
           {score.stale && (
             <span className="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
@@ -1128,7 +1133,7 @@ function ScoreDetail({
             <ul className="space-y-1.5">
               {score.suggested_actions.map((a, i) => (
                 <li key={i} className="text-sm text-gray-600 flex items-start gap-2">
-                  <span className="w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                  <span className="w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
                   <EditableListItem value={a} className="flex-1" readOnly={isAdmin || isApproved} onSave={(v) => patchListItem("suggested_actions", score.suggested_actions!, i, v)} />
                 </li>
               ))}
@@ -1220,18 +1225,18 @@ function NewEvidenceSection({
                   {item.title}
                 </button>
                 {item.uploaded_at && (
-                  <span className="text-[10px] text-gray-400">
+                  <span className="text-xs text-gray-500">
                     Uploaded {new Date(item.uploaded_at).toLocaleDateString()}
                   </span>
                 )}
               </div>
-              <span className="text-[10px] text-blue-500 font-medium flex-shrink-0">
+              <span className="text-xs text-blue-500 font-medium flex-shrink-0">
                 {Math.round(item.relevance_score * 100)}% relevant
               </span>
             </div>
           ))}
           {items.length === 0 && loaded && (
-            <div className="px-3 py-2 text-xs text-gray-400">No new items found</div>
+            <div className="px-3 py-2 text-xs text-gray-500">No new items found</div>
           )}
         </div>
       )}

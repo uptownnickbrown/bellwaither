@@ -43,7 +43,7 @@ class ActionItem(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     action_plan_id = Column(UUID(as_uuid=True), ForeignKey("action_plans.id"), nullable=False)
-    component_id = Column(UUID(as_uuid=True), ForeignKey("components.id"), nullable=True)
+    component_id = Column(UUID(as_uuid=True), ForeignKey("engagement_components.id"), nullable=True)
 
     title = Column(String(500), nullable=False)
     description = Column(Text, nullable=True)
@@ -56,6 +56,7 @@ class ActionItem(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     action_plan = relationship("ActionPlan", back_populates="items")
+    engagement_component = relationship("EngagementComponent", back_populates="action_items")
     milestones = relationship("Milestone", back_populates="action_item", order_by="Milestone.target_date")
 
 

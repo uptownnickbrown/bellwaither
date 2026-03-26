@@ -33,6 +33,9 @@ from app.models import (
     Dimension,
     DimensionSummary,
     Engagement,
+    EngagementComponent,
+    EngagementCriterion,
+    EngagementDimension,
     Evidence,
     EvidenceExtraction,
     EvidenceMapping,
@@ -40,6 +43,7 @@ from app.models import (
     Message,
     MessageThread,
     Milestone,
+    School,
 )
 from app.models.data_request import RequestStatus
 from app.models.evidence import EvidenceType, ProcessingStatus
@@ -47,6 +51,7 @@ from app.models.messaging import ThreadType
 from app.models.scoring import RatingLevel, ScoreStatus
 from app.schemas.schemas import *
 from app.services.document_processor import process_document
+from app.services.framework_service import fork_sqf_directly_to_engagement, fork_template_to_engagement
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +87,42 @@ async def get_component(component_id: uuid.UUID, db: AsyncSession = Depends(get_
     return comp
 
 
+# ---- Schools ----
+
+@router.get("/schools", response_model=list[SchoolResponse])
+async def list_schools(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(School).order_by(School.created_at.desc()))
+    return result.scalars().all()
+
+
+@router.post("/schools", response_model=SchoolResponse)
+async def create_school(data: SchoolCreate, db: AsyncSession = Depends(get_db)):
+    school = School(**data.model_dump())
+    db.add(school)
+    await db.commit()
+    await db.refresh(school)
+    return school
+
+
+@router.get("/schools/{school_id}", response_model=SchoolResponse)
+async def get_school(school_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(School).where(School.id == school_id))
+    school = result.scalar_one_or_none()
+    if not school:
+        raise HTTPException(status_code=404, detail="School not found")
+    return school
+
+
+@router.get("/schools/{school_id}/engagements", response_model=list[EngagementResponse])
+async def list_school_engagements(school_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(
+        select(Engagement)
+        .where(Engagement.school_id == school_id)
+        .order_by(Engagement.created_at.desc())
+    )
+    return result.scalars().all()
+
+
 # ---- Engagements ----
 
 @router.get("/engagements", response_model=list[EngagementResponse])
@@ -96,6 +137,23 @@ async def create_engagement(data: EngagementCreate, db: AsyncSession = Depends(g
     db.add(engagement)
     await db.commit()
     await db.refresh(engagement)
+
+    # Fork framework into engagement-scoped tables
+    if engagement.school_id:
+        # Try to get school's framework template
+        from app.models.school import SchoolFrameworkTemplate
+        tmpl_result = await db.execute(
+            select(SchoolFrameworkTemplate).where(SchoolFrameworkTemplate.school_id == engagement.school_id)
+        )
+        tmpl = tmpl_result.scalar_one_or_none()
+        if tmpl:
+            await fork_template_to_engagement(db, tmpl.id, engagement.id)
+        else:
+            await fork_sqf_directly_to_engagement(db, engagement.id)
+    else:
+        await fork_sqf_directly_to_engagement(db, engagement.id)
+    await db.commit()
+
     return engagement
 
 
@@ -106,6 +164,316 @@ async def get_engagement(engagement_id: uuid.UUID, db: AsyncSession = Depends(ge
     if not eng:
         raise HTTPException(status_code=404, detail="Engagement not found")
     return eng
+
+
+# ---- Engagement Framework ----
+
+@router.get("/engagements/{engagement_id}/framework", response_model=list[EngagementDimensionResponse])
+async def get_engagement_framework(engagement_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+    """Get the engagement's framework snapshot (dimensions, components, criteria)."""
+    result = await db.execute(
+        select(EngagementDimension)
+        .where(EngagementDimension.engagement_id == engagement_id)
+        .options(
+            selectinload(EngagementDimension.components)
+            .selectinload(EngagementComponent.criteria)
+        )
+        .order_by(EngagementDimension.order)
+    )
+    return result.scalars().all()
+
+
+@router.patch("/engagements/{engagement_id}/framework/dimensions/{dimension_id}", response_model=EngagementDimensionResponse)
+async def update_engagement_dimension(
+    engagement_id: uuid.UUID,
+    dimension_id: uuid.UUID,
+    data: EngagementDimensionUpdate,
+    db: AsyncSession = Depends(get_db),
+):
+    """Update an engagement dimension (name, description, color)."""
+    result = await db.execute(
+        select(EngagementDimension).where(
+            EngagementDimension.id == dimension_id,
+            EngagementDimension.engagement_id == engagement_id,
+        )
+    )
+    dim = result.scalar_one_or_none()
+    if not dim:
+        raise HTTPException(status_code=404, detail="Dimension not found in this engagement")
+    update_data = data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(dim, field, value)
+    await db.commit()
+    # Reload with components and criteria for response
+    result = await db.execute(
+        select(EngagementDimension)
+        .where(EngagementDimension.id == dimension_id)
+        .options(
+            selectinload(EngagementDimension.components)
+            .selectinload(EngagementComponent.criteria)
+        )
+    )
+    return result.scalar_one()
+
+
+@router.patch("/engagements/{engagement_id}/framework/components/{component_id}", response_model=EngagementComponentResponse)
+async def update_engagement_component(
+    engagement_id: uuid.UUID,
+    component_id: uuid.UUID,
+    data: EngagementComponentUpdate,
+    db: AsyncSession = Depends(get_db),
+):
+    """Update an engagement component (name, description, evidence_guidance)."""
+    result = await db.execute(
+        select(EngagementComponent)
+        .join(EngagementDimension, EngagementComponent.dimension_id == EngagementDimension.id)
+        .where(
+            EngagementComponent.id == component_id,
+            EngagementDimension.engagement_id == engagement_id,
+        )
+    )
+    comp = result.scalar_one_or_none()
+    if not comp:
+        raise HTTPException(status_code=404, detail="Component not found in this engagement")
+    update_data = data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(comp, field, value)
+    await db.commit()
+    # Reload with criteria for response
+    result = await db.execute(
+        select(EngagementComponent)
+        .where(EngagementComponent.id == component_id)
+        .options(selectinload(EngagementComponent.criteria))
+    )
+    return result.scalar_one()
+
+
+@router.post("/engagements/{engagement_id}/framework/dimensions", response_model=EngagementDimensionResponse)
+async def create_engagement_dimension(
+    engagement_id: uuid.UUID,
+    data: EngagementDimensionCreate,
+    db: AsyncSession = Depends(get_db),
+):
+    """Add a custom dimension to an engagement's framework."""
+    # Verify engagement exists
+    eng_result = await db.execute(select(Engagement).where(Engagement.id == engagement_id))
+    if not eng_result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Engagement not found")
+    # Determine next order value
+    max_order_result = await db.execute(
+        select(func.max(EngagementDimension.order)).where(
+            EngagementDimension.engagement_id == engagement_id
+        )
+    )
+    max_order = max_order_result.scalar() or 0
+    new_order = max_order + 1
+    dim = EngagementDimension(
+        engagement_id=engagement_id,
+        source_dimension_id=None,
+        number=str(new_order),
+        name=data.name,
+        description=data.description,
+        color=data.color,
+        is_custom=1,
+        order=new_order,
+    )
+    db.add(dim)
+    await db.commit()
+    # Reload with components (empty) for response
+    result = await db.execute(
+        select(EngagementDimension)
+        .where(EngagementDimension.id == dim.id)
+        .options(
+            selectinload(EngagementDimension.components)
+            .selectinload(EngagementComponent.criteria)
+        )
+    )
+    return result.scalar_one()
+
+
+@router.post("/engagements/{engagement_id}/framework/dimensions/{dimension_id}/components", response_model=EngagementComponentResponse)
+async def create_engagement_component(
+    engagement_id: uuid.UUID,
+    dimension_id: uuid.UUID,
+    data: EngagementComponentCreate,
+    db: AsyncSession = Depends(get_db),
+):
+    """Add a custom component to an engagement dimension."""
+    # Verify dimension belongs to engagement
+    dim_result = await db.execute(
+        select(EngagementDimension).where(
+            EngagementDimension.id == dimension_id,
+            EngagementDimension.engagement_id == engagement_id,
+        )
+    )
+    if not dim_result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Dimension not found in this engagement")
+    # Determine next order value
+    max_order_result = await db.execute(
+        select(func.max(EngagementComponent.order)).where(
+            EngagementComponent.dimension_id == dimension_id
+        )
+    )
+    max_order = max_order_result.scalar() or 0
+    new_order = max_order + 1
+    comp = EngagementComponent(
+        dimension_id=dimension_id,
+        source_component_id=None,
+        code=data.code,
+        name=data.name,
+        description=data.description,
+        evidence_guidance=data.evidence_guidance,
+        is_custom=1,
+        order=new_order,
+    )
+    db.add(comp)
+    await db.flush()
+    # Add criteria if provided
+    if data.criteria:
+        for idx, crit in enumerate(data.criteria):
+            criterion = EngagementCriterion(
+                component_id=comp.id,
+                criterion_type=crit.criterion_type,
+                text=crit.text,
+                order=idx + 1,
+            )
+            db.add(criterion)
+    await db.commit()
+    # Reload with criteria for response
+    result = await db.execute(
+        select(EngagementComponent)
+        .where(EngagementComponent.id == comp.id)
+        .options(selectinload(EngagementComponent.criteria))
+    )
+    return result.scalar_one()
+
+
+@router.delete("/engagements/{engagement_id}/framework/dimensions/{dimension_id}")
+async def delete_engagement_dimension(
+    engagement_id: uuid.UUID,
+    dimension_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Remove a dimension and cascade-delete its components and criteria. Warns about affected scores/mappings."""
+    result = await db.execute(
+        select(EngagementDimension)
+        .where(
+            EngagementDimension.id == dimension_id,
+            EngagementDimension.engagement_id == engagement_id,
+        )
+        .options(selectinload(EngagementDimension.components))
+    )
+    dim = result.scalar_one_or_none()
+    if not dim:
+        raise HTTPException(status_code=404, detail="Dimension not found in this engagement")
+
+    warnings = []
+    component_ids = [c.id for c in dim.components]
+
+    if component_ids:
+        # Check for existing scores
+        score_result = await db.execute(
+            select(func.count()).where(ComponentScore.component_id.in_(component_ids))
+        )
+        score_count = score_result.scalar() or 0
+        if score_count:
+            warnings.append(f"{score_count} component score(s) will be deleted")
+
+        # Check for existing evidence mappings
+        mapping_result = await db.execute(
+            select(func.count()).where(EvidenceMapping.component_id.in_(component_ids))
+        )
+        mapping_count = mapping_result.scalar() or 0
+        if mapping_count:
+            warnings.append(f"{mapping_count} evidence mapping(s) will be deleted")
+
+        # Delete criteria, scores, and mappings for each component
+        for comp_id in component_ids:
+            for model in (EngagementCriterion, ComponentScore, EvidenceMapping):
+                fk = "component_id"
+                child_result = await db.execute(
+                    select(model).where(getattr(model, fk) == comp_id)
+                )
+                for child in child_result.scalars().all():
+                    await db.delete(child)
+
+        # Delete components
+        for comp in dim.components:
+            await db.delete(comp)
+
+    await db.delete(dim)
+    await db.commit()
+
+    return {"ok": True, "warnings": warnings}
+
+
+@router.delete("/engagements/{engagement_id}/framework/components/{component_id}")
+async def delete_engagement_component(
+    engagement_id: uuid.UUID,
+    component_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Remove a single component. Warns about affected scores/mappings. Removes parent dimension if empty."""
+    result = await db.execute(
+        select(EngagementComponent)
+        .join(EngagementDimension, EngagementComponent.dimension_id == EngagementDimension.id)
+        .where(
+            EngagementComponent.id == component_id,
+            EngagementDimension.engagement_id == engagement_id,
+        )
+    )
+    comp = result.scalar_one_or_none()
+    if not comp:
+        raise HTTPException(status_code=404, detail="Component not found in this engagement")
+
+    dimension_id = comp.dimension_id
+    warnings = []
+
+    # Check for existing scores
+    score_result = await db.execute(
+        select(func.count()).where(ComponentScore.component_id == component_id)
+    )
+    score_count = score_result.scalar() or 0
+    if score_count:
+        warnings.append(f"{score_count} component score(s) will be deleted")
+
+    # Check for existing evidence mappings
+    mapping_result = await db.execute(
+        select(func.count()).where(EvidenceMapping.component_id == component_id)
+    )
+    mapping_count = mapping_result.scalar() or 0
+    if mapping_count:
+        warnings.append(f"{mapping_count} evidence mapping(s) will be deleted")
+
+    # Delete criteria, scores, and mappings
+    for model in (EngagementCriterion, ComponentScore, EvidenceMapping):
+        child_result = await db.execute(
+            select(model).where(model.component_id == component_id)
+        )
+        for child in child_result.scalars().all():
+            await db.delete(child)
+
+    await db.delete(comp)
+    await db.flush()
+
+    # Check if parent dimension is now empty
+    dimension_deleted = False
+    remaining = await db.execute(
+        select(func.count()).where(EngagementComponent.dimension_id == dimension_id)
+    )
+    if (remaining.scalar() or 0) == 0:
+        dim_result = await db.execute(
+            select(EngagementDimension).where(EngagementDimension.id == dimension_id)
+        )
+        dim = dim_result.scalar_one_or_none()
+        if dim:
+            await db.delete(dim)
+            dimension_deleted = True
+            warnings.append("Parent dimension was empty and has been removed")
+
+    await db.commit()
+
+    return {"ok": True, "warnings": warnings, "dimension_deleted": dimension_deleted}
 
 
 # ---- Evidence ----
@@ -156,10 +524,29 @@ async def upload_evidence(
     try:
         doc_result = await process_document(file_path, file.filename or "unknown")
 
+        # Build a component list from the engagement's framework for dynamic extraction
+        fw_result = await db.execute(
+            select(EngagementDimension)
+            .where(EngagementDimension.engagement_id == engagement_id)
+            .options(selectinload(EngagementDimension.components))
+            .order_by(EngagementDimension.order)
+        )
+        fw_dims = fw_result.scalars().all()
+        if fw_dims:
+            component_list_lines = []
+            for dim in fw_dims:
+                comp_parts = ", ".join(
+                    f"{c.code}: {c.name}" for c in sorted(dim.components, key=lambda c: c.order)
+                )
+                component_list_lines.append(f"{dim.number}. {dim.name} ({comp_parts})")
+            component_list = "\n".join(component_list_lines)
+        else:
+            component_list = None  # fallback to default SQF list
+
         if doc_result["type"] == "text":
-            ai_result = await extract_from_text(doc_result["content"], file.filename or "unknown", evidence_type)
+            ai_result = await extract_from_text(doc_result["content"], file.filename or "unknown", evidence_type, component_list=component_list)
         elif doc_result["type"] == "spreadsheet":
-            ai_result = await extract_from_spreadsheet(doc_result["content"], file.filename or "unknown")
+            ai_result = await extract_from_spreadsheet(doc_result["content"], file.filename or "unknown", component_list=component_list)
         else:
             ai_result = {"summary": "Unsupported file type", "key_findings": [], "model_used": None}
 
@@ -173,12 +560,17 @@ async def upload_evidence(
         )
         db.add(extraction)
 
-        # Auto-map to components if suggested
+        # Auto-map to engagement-scoped components if suggested
         suggested_components = ai_result.get("suggested_components", [])
         if suggested_components:
             for comp_code in suggested_components[:10]:
                 comp_result = await db.execute(
-                    select(Component).where(Component.code == comp_code)
+                    select(EngagementComponent)
+                    .join(EngagementDimension)
+                    .where(
+                        EngagementDimension.engagement_id == engagement_id,
+                        EngagementComponent.code == comp_code,
+                    )
                 )
                 comp = comp_result.scalar_one_or_none()
                 if comp:
@@ -247,8 +639,8 @@ async def get_evidence_mappings(
 ):
     """Get component mappings for a piece of evidence, including component names."""
     result = await db.execute(
-        select(EvidenceMapping, Component.code, Component.name)
-        .join(Component, EvidenceMapping.component_id == Component.id)
+        select(EvidenceMapping, EngagementComponent.code, EngagementComponent.name)
+        .join(EngagementComponent, EvidenceMapping.component_id == EngagementComponent.id)
         .where(EvidenceMapping.evidence_id == evidence_id)
     )
     rows = result.all()
@@ -409,11 +801,11 @@ async def assess_component_endpoint(
     if existing and existing.approved:
         raise HTTPException(status_code=409, detail="Score is approved/locked. Unlock it before regenerating.")
 
-    # Get component with criteria
+    # Get engagement-scoped component with criteria and dimension
     comp_result = await db.execute(
-        select(Component)
-        .options(selectinload(Component.criteria), selectinload(Component.dimension))
-        .where(Component.id == component_id)
+        select(EngagementComponent)
+        .options(selectinload(EngagementComponent.criteria), selectinload(EngagementComponent.dimension))
+        .where(EngagementComponent.id == component_id)
     )
     comp = comp_result.scalar_one_or_none()
     if not comp:
@@ -453,9 +845,8 @@ async def assess_component_endpoint(
             detail="Insufficient evidence: no evidence has been mapped to this component. Upload or map evidence to enable analysis.",
         )
 
-    from app.models.framework import CriterionType
-    core_actions = [c.text for c in comp.criteria if c.criterion_type == CriterionType.CORE_ACTION]
-    progress_indicators = [c.text for c in comp.criteria if c.criterion_type == CriterionType.PROGRESS_INDICATOR]
+    core_actions = [c.text for c in comp.criteria if c.criterion_type == "core_action"]
+    progress_indicators = [c.text for c in comp.criteria if c.criterion_type == "progress_indicator"]
 
     # Run AI assessment
     try:
@@ -683,7 +1074,7 @@ async def toggle_score_approval(
     else:
         score.status = "draft"
     # Get component name for activity log
-    comp_result = await db.execute(select(Component).where(Component.id == score.component_id))
+    comp_result = await db.execute(select(EngagementComponent).where(EngagementComponent.id == score.component_id))
     comp = comp_result.scalar_one_or_none()
     comp_label = f"{comp.code}: {comp.name}" if comp else "Unknown"
     await log_activity(db, engagement_id, "Sarah Chen", "approved" if data.approved else "unlocked", "component_score", comp_label)
@@ -756,13 +1147,13 @@ async def _assess_single_component(
     db: AsyncSession, engagement_id: uuid.UUID, component_id: uuid.UUID
 ) -> dict:
     """
-    Run AI assessment for a single component.
+    Run AI assessment for a single engagement-scoped component.
     Returns dict with status info. Raises on insufficient evidence.
     """
     comp_result = await db.execute(
-        select(Component)
-        .options(selectinload(Component.criteria), selectinload(Component.dimension))
-        .where(Component.id == component_id)
+        select(EngagementComponent)
+        .options(selectinload(EngagementComponent.criteria), selectinload(EngagementComponent.dimension))
+        .where(EngagementComponent.id == component_id)
     )
     comp = comp_result.scalar_one_or_none()
     if not comp:
@@ -798,9 +1189,8 @@ async def _assess_single_component(
     if not evidence_items:
         return {"status": "no_evidence", "component_code": comp.code}
 
-    from app.models.framework import CriterionType
-    core_actions = [c.text for c in comp.criteria if c.criterion_type == CriterionType.CORE_ACTION]
-    progress_indicators = [c.text for c in comp.criteria if c.criterion_type == CriterionType.PROGRESS_INDICATOR]
+    core_actions = [c.text for c in comp.criteria if c.criterion_type == "core_action"]
+    progress_indicators = [c.text for c in comp.criteria if c.criterion_type == "progress_indicator"]
 
     ai_result = await assess_component(
         component_code=comp.code,
@@ -867,11 +1257,12 @@ async def batch_assess_components(
     db: AsyncSession = Depends(get_db),
 ):
     """Batch-generate ALL component assessments. Skips approved and no-evidence components."""
-    # Get all components
+    # Get engagement-scoped components
     dims_result = await db.execute(
-        select(Dimension)
-        .options(selectinload(Dimension.components))
-        .order_by(Dimension.number)
+        select(EngagementDimension)
+        .where(EngagementDimension.engagement_id == engagement_id)
+        .options(selectinload(EngagementDimension.components))
+        .order_by(EngagementDimension.order)
     )
     dims = dims_result.scalars().all()
     all_components = [comp for dim in dims for comp in dim.components]
@@ -928,9 +1319,10 @@ async def batch_synthesize_dimensions(
 ):
     """Batch-generate ALL dimension syntheses. Skips approved summaries."""
     dims_result = await db.execute(
-        select(Dimension)
-        .options(selectinload(Dimension.components))
-        .order_by(Dimension.number)
+        select(EngagementDimension)
+        .where(EngagementDimension.engagement_id == engagement_id)
+        .options(selectinload(EngagementDimension.components))
+        .order_by(EngagementDimension.order)
     )
     dims = dims_result.scalars().all()
 
@@ -1056,13 +1448,17 @@ async def batch_generate_global(
     if not eng:
         raise HTTPException(status_code=404, detail="Engagement not found")
 
-    dims_result = await db.execute(select(Dimension).order_by(Dimension.number))
-    dims = {str(d.id): d.name for d in dims_result.scalars().all()}
+    dims_result = await db.execute(
+        select(EngagementDimension)
+        .where(EngagementDimension.engagement_id == engagement_id)
+        .order_by(EngagementDimension.order)
+    )
+    eng_dims = {str(d.id): d.name for d in dims_result.scalars().all()}
 
     dimension_data = []
     for ds in dim_summaries:
         dimension_data.append({
-            "name": dims.get(str(ds.dimension_id), "Unknown"),
+            "name": eng_dims.get(str(ds.dimension_id), "Unknown"),
             "overall_assessment": ds.overall_assessment,
             "patterns": ds.patterns,
             "top_opportunities": ds.top_opportunities,
@@ -1125,9 +1521,9 @@ async def synthesize_dimension_endpoint(
         raise HTTPException(status_code=409, detail="Dimension summary is approved/locked. Unlock it before regenerating.")
 
     dim_result = await db.execute(
-        select(Dimension)
-        .options(selectinload(Dimension.components))
-        .where(Dimension.id == dimension_id)
+        select(EngagementDimension)
+        .options(selectinload(EngagementDimension.components))
+        .where(EngagementDimension.id == dimension_id)
     )
     dim = dim_result.scalar_one_or_none()
     if not dim:
@@ -1239,13 +1635,17 @@ async def generate_global_summary_endpoint(
     )
     dim_summaries = dim_summaries_result.scalars().all()
 
-    dims_result = await db.execute(select(Dimension).order_by(Dimension.number))
-    dims = {str(d.id): d.name for d in dims_result.scalars().all()}
+    eng_dims_result = await db.execute(
+        select(EngagementDimension)
+        .where(EngagementDimension.engagement_id == engagement_id)
+        .order_by(EngagementDimension.order)
+    )
+    eng_dims = {str(d.id): d.name for d in eng_dims_result.scalars().all()}
 
     dimension_data = []
     for ds in dim_summaries:
         dimension_data.append({
-            "name": dims.get(str(ds.dimension_id), "Unknown"),
+            "name": eng_dims.get(str(ds.dimension_id), "Unknown"),
             "overall_assessment": ds.overall_assessment,
             "patterns": ds.patterns,
             "top_opportunities": ds.top_opportunities,
@@ -1921,11 +2321,12 @@ async def export_assessment_pdf(
     if not engagement:
         raise HTTPException(status_code=404, detail="Engagement not found")
 
-    # Fetch dimensions with components
+    # Fetch engagement-scoped dimensions with components
     dim_result = await db.execute(
-        select(Dimension)
-        .options(selectinload(Dimension.components))
-        .order_by(Dimension.number)
+        select(EngagementDimension)
+        .where(EngagementDimension.engagement_id == engagement_id)
+        .options(selectinload(EngagementDimension.components))
+        .order_by(EngagementDimension.order)
     )
     dimensions = [
         {
@@ -2015,6 +2416,250 @@ async def export_assessment_pdf(
             "Content-Disposition": f'attachment; filename="{engagement.school_name.replace(" ", "_")}_Assessment_Report.pdf"',
         },
     )
+
+
+# ---- Onboarding ----
+
+@router.post("/onboarding/start")
+async def start_onboarding(
+    data: SchoolCreate,
+    db: AsyncSession = Depends(get_db),
+):
+    """Start the onboarding flow: create a School and return the first interview question."""
+    from app.ai.agents.onboarding_agent import conduct_interview
+    from app.models.school import SchoolOnboardingProfile
+
+    school = School(**data.model_dump())
+    db.add(school)
+    await db.flush()
+
+    profile = SchoolOnboardingProfile(
+        school_id=school.id,
+        programs=[],
+        strategic_priorities=[],
+        pain_points=[],
+        interview_transcript=[],
+    )
+    db.add(profile)
+    await db.commit()
+    await db.refresh(school)
+
+    # Get the first question from the AI
+    school_profile = {
+        "name": school.name,
+        "school_type": school.school_type,
+        "grade_levels": school.grade_levels,
+        "enrollment": school.enrollment,
+        "district": school.district,
+        "state": school.state,
+    }
+
+    try:
+        ai_result = await conduct_interview(
+            school_profile=school_profile,
+            conversation_history=[],
+        )
+    except Exception as e:
+        logger.exception("Onboarding interview start failed")
+        ai_result = {
+            "status": "interviewing",
+            "message": "Welcome! Tell me about your school's top strategic priorities for this year.",
+            "turn": 1,
+        }
+
+    return {
+        "school_id": str(school.id),
+        "school": SchoolResponse.model_validate(school),
+        "ai_response": ai_result,
+    }
+
+
+@router.post("/onboarding/{school_id}/respond")
+async def onboarding_respond(
+    school_id: uuid.UUID,
+    data: dict,
+    db: AsyncSession = Depends(get_db),
+):
+    """Send a user response during the onboarding interview and get the next AI turn."""
+    from app.ai.agents.onboarding_agent import conduct_interview
+    from app.models.school import SchoolOnboardingProfile
+
+    # Get school
+    school_result = await db.execute(select(School).where(School.id == school_id))
+    school = school_result.scalar_one_or_none()
+    if not school:
+        raise HTTPException(status_code=404, detail="School not found")
+
+    # Get or create onboarding profile
+    profile_result = await db.execute(
+        select(SchoolOnboardingProfile).where(SchoolOnboardingProfile.school_id == school_id)
+    )
+    profile = profile_result.scalar_one_or_none()
+    if not profile:
+        profile = SchoolOnboardingProfile(school_id=school_id, interview_transcript=[])
+        db.add(profile)
+
+    # Build conversation history
+    conversation_history = profile.interview_transcript or []
+    user_message = data.get("message", "")
+    conversation_history.append({"role": "user", "content": user_message})
+
+    school_profile = {
+        "name": school.name,
+        "school_type": school.school_type,
+        "grade_levels": school.grade_levels,
+        "enrollment": school.enrollment,
+        "district": school.district,
+        "state": school.state,
+    }
+
+    try:
+        ai_result = await conduct_interview(
+            school_profile=school_profile,
+            conversation_history=conversation_history,
+        )
+    except Exception as e:
+        logger.exception("Onboarding interview respond failed")
+        raise HTTPException(status_code=502, detail=f"AI service error: {e}")
+
+    # Add AI response to transcript
+    if ai_result.get("status") == "interviewing":
+        conversation_history.append({"role": "assistant", "content": ai_result.get("message", "")})
+    elif ai_result.get("status") == "proposal":
+        conversation_history.append({"role": "assistant", "content": json.dumps(ai_result)})
+
+    profile.interview_transcript = conversation_history
+    await db.commit()
+
+    return {"ai_response": ai_result}
+
+
+@router.post("/onboarding/{school_id}/finalize")
+async def finalize_onboarding(
+    school_id: uuid.UUID,
+    data: dict,
+    db: AsyncSession = Depends(get_db),
+):
+    """Accept the proposed framework and create a School Template + Engagement."""
+    from app.models.school import (
+        SchoolFrameworkTemplate,
+        SchoolOnboardingProfile,
+        SchoolTemplateCriterion,
+        SchoolTemplateComponent,
+        SchoolTemplateDimension,
+    )
+
+    school_result = await db.execute(select(School).where(School.id == school_id))
+    school = school_result.scalar_one_or_none()
+    if not school:
+        raise HTTPException(status_code=404, detail="School not found")
+
+    framework_data = data.get("framework", {})
+    dimensions = framework_data.get("dimensions", [])
+
+    if not dimensions:
+        raise HTTPException(status_code=400, detail="Framework must have at least one dimension")
+
+    # Load canonical SQF for source ID matching
+    sqf_dims_result = await db.execute(
+        select(Dimension).options(selectinload(Dimension.components))
+    )
+    sqf_dims = sqf_dims_result.scalars().all()
+    sqf_dim_map = {d.name.lower(): d for d in sqf_dims}
+    sqf_comp_map = {c.code: c for d in sqf_dims for c in d.components}
+
+    # Create school framework template
+    template = SchoolFrameworkTemplate(
+        school_id=school_id,
+        name=f"{school.name} Framework",
+    )
+    db.add(template)
+    await db.flush()
+
+    # Populate template from the proposed framework
+    for i, dim_data in enumerate(dimensions):
+        source_dim_id = None
+        if not dim_data.get("is_custom", False):
+            sqf_dim = sqf_dim_map.get(dim_data["name"].lower())
+            if sqf_dim:
+                source_dim_id = sqf_dim.id
+
+        tmpl_dim = SchoolTemplateDimension(
+            template_id=template.id,
+            source_dimension_id=source_dim_id,
+            number=dim_data.get("number", str(i + 1)),
+            name=dim_data["name"],
+            description=dim_data.get("description", ""),
+            color=dim_data.get("color", "#6366F1"),
+            is_custom="1" if dim_data.get("is_custom", False) else "0",
+            order=str(i),
+        )
+        db.add(tmpl_dim)
+        await db.flush()
+
+        for j, comp_data in enumerate(dim_data.get("components", [])):
+            source_comp_id = None
+            if not comp_data.get("is_custom", False):
+                sqf_comp = sqf_comp_map.get(comp_data.get("code", ""))
+                if sqf_comp:
+                    source_comp_id = sqf_comp.id
+
+            tmpl_comp = SchoolTemplateComponent(
+                dimension_id=tmpl_dim.id,
+                source_component_id=source_comp_id,
+                code=comp_data.get("code", f"{dim_data.get('number', i+1)}{chr(65+j)}"),
+                name=comp_data["name"],
+                description=comp_data.get("description", ""),
+                evidence_guidance=comp_data.get("evidence_guidance", ""),
+                is_custom="1" if comp_data.get("is_custom", False) else "0",
+                order=str(j),
+            )
+            db.add(tmpl_comp)
+            await db.flush()
+
+            for k, crit_data in enumerate(comp_data.get("criteria", [])):
+                tmpl_crit = SchoolTemplateCriterion(
+                    component_id=tmpl_comp.id,
+                    criterion_type=crit_data.get("criterion_type", "core_action"),
+                    text=crit_data.get("text", ""),
+                    order=str(k),
+                )
+                db.add(tmpl_crit)
+
+    # Create engagement
+    engagement = Engagement(
+        school_id=school_id,
+        name=data.get("engagement_name", f"{school.name} - Assessment"),
+        school_name=school.name,
+        school_type=school.school_type,
+        district=school.district,
+        state=school.state,
+        grade_levels=school.grade_levels,
+        enrollment=int(school.enrollment) if school.enrollment and school.enrollment.isdigit() else None,
+    )
+    db.add(engagement)
+    await db.flush()
+
+    # Fork template to engagement
+    await fork_template_to_engagement(db, template.id, engagement.id)
+
+    # Save onboarding context to profile
+    profile_result = await db.execute(
+        select(SchoolOnboardingProfile).where(SchoolOnboardingProfile.school_id == school_id)
+    )
+    profile = profile_result.scalar_one_or_none()
+    if profile:
+        profile.strategic_priorities = data.get("strategic_priorities", [])
+        profile.programs = data.get("programs", [])
+
+    await db.commit()
+    await db.refresh(engagement)
+
+    return {
+        "engagement_id": str(engagement.id),
+        "school_id": str(school.id),
+        "engagement": EngagementResponse.model_validate(engagement),
+    }
 
 
 # ---- Demo Documents Download ----

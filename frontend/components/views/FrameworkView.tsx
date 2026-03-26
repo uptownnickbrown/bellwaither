@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Dimension, Component as ComponentType, ComponentScore, UserRole } from "@/lib/types";
+import type { Dimension, EngagementDimension, Component as ComponentType, ComponentScore, UserRole } from "@/lib/types";
 import { RATING_CONFIG } from "@/lib/types";
 import { getScores, updateScore } from "@/lib/api";
 import EditableText, { EditableListItem } from "@/components/EditableText";
@@ -9,6 +9,7 @@ import { ChevronRight, CheckCircle2, AlertTriangle, BookOpen, Target, ShieldChec
 
 interface Props {
   framework: Dimension[];
+  engagementFramework?: EngagementDimension[];
   engagementId: string;
   role?: UserRole;
   onNavigate?: (tab: string, id?: string) => void;
@@ -16,7 +17,10 @@ interface Props {
   onNavTargetConsumed?: () => void;
 }
 
-export default function FrameworkView({ framework, engagementId, role = "consultant", onNavigate, navTargetId, onNavTargetConsumed }: Props) {
+export default function FrameworkView({ framework, engagementFramework, engagementId, role = "consultant", onNavigate, navTargetId, onNavTargetConsumed }: Props) {
+  const activeDims = engagementFramework
+    ? engagementFramework.map((d) => ({ ...d, number: parseInt(d.number) || 0 }))
+    : framework;
   const isAdmin = role === "school_admin";
   const [selectedDim, setSelectedDim] = useState<Dimension | null>(framework[0] || null);
   const [selectedComp, setSelectedComp] = useState<ComponentType | null>(null);
@@ -28,7 +32,7 @@ export default function FrameworkView({ framework, engagementId, role = "consult
 
   // Handle incoming navigation target (component_id)
   useEffect(() => {
-    if (navTargetId && framework.length > 0) {
+    if (navTargetId && activeDims.length > 0) {
       for (const dim of framework) {
         const comp = dim.components.find((c) => c.id === navTargetId);
         if (comp) {
@@ -48,13 +52,13 @@ export default function FrameworkView({ framework, engagementId, role = "consult
       <div className="mb-4">
         <h1 className="text-lg font-bold text-gray-900">School Quality Framework</h1>
         <p className="text-sm text-gray-600">Defining what it means for a school to deliver strong outcomes for every student — especially those furthest from opportunity.</p>
-        <p className="text-xs text-gray-400 mt-1">9 dimensions, 43 components with Core Actions and Progress Indicators</p>
+        <p className="text-xs text-gray-500 mt-1">9 dimensions, 43 components with Core Actions and Progress Indicators</p>
       </div>
 
       <div className="grid grid-cols-12 gap-6">
         {/* Dimension Sidebar */}
         <div className="col-span-3 space-y-1">
-          {framework.map((dim) => {
+          {activeDims.map((dim) => {
             const dimScores = dim.components.map((c) => scoreMap.get(c.id));
             const scored = dimScores.filter((s) => s && s.rating !== "not_rated").length;
             const approved = dimScores.filter((s) => s?.approved).length;
@@ -72,7 +76,7 @@ export default function FrameworkView({ framework, engagementId, role = "consult
                   <div className="w-2 h-6 rounded-full" style={{ backgroundColor: dim.color || "#6366F1" }} />
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium text-gray-800">{dim.number}. {dim.name}</div>
-                    <div className="text-xs text-gray-400 mt-0.5">
+                    <div className="text-xs text-gray-500 mt-0.5">
                       {dim.components.length} components
                       {!isAdmin && <>{" "}· {scored} scored</>}
                       {!isAdmin && approved > 0 && (
@@ -80,7 +84,7 @@ export default function FrameworkView({ framework, engagementId, role = "consult
                       )}
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-300 flex-shrink-0" />
+                  <ChevronRight className="w-4 h-4 text-gray-500 flex-shrink-0" />
                 </div>
               </button>
             );
@@ -113,20 +117,20 @@ export default function FrameworkView({ framework, engagementId, role = "consult
                           <span className="text-xs font-bold text-gray-400">{comp.code}</span>
                           <span className="text-sm font-medium text-gray-800">{comp.name}</span>
                           {!isAdmin && score?.approved && (
-                            <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-semibold">
+                            <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
                               <ShieldCheck className="w-2.5 h-2.5" /> Approved
                             </span>
                           )}
                         </div>
                         <span
-                          className="text-[10px] font-medium px-2 py-0.5 rounded-full flex-shrink-0"
+                          className="text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0"
                           style={{ backgroundColor: config.bg, color: config.color }}
                         >
                           {config.label}
                         </span>
                       </div>
                       {!isAdmin && score && score.confidence && (
-                        <div className="mt-1 text-xs text-gray-400">
+                        <div className="mt-1 text-xs text-gray-500">
                           Confidence: {score.confidence} · {score.evidence_count} evidence items
                         </div>
                       )}
@@ -144,7 +148,7 @@ export default function FrameworkView({ framework, engagementId, role = "consult
             <ComponentDetail component={selectedComp} score={scoreMap.get(selectedComp.id)} engagementId={engagementId} role={role} onScoreUpdate={(updated) => setScores(scores.map((s) => s.id === updated.id ? updated : s))} onNavigate={onNavigate} />
           ) : (
             <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-              <BookOpen className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+              <BookOpen className="w-10 h-10 text-gray-500 mx-auto mb-3" />
               <p className="text-sm text-gray-500">Select a component to view its success criteria and assessment details.</p>
             </div>
           )}
@@ -181,7 +185,7 @@ function ComponentDetail({ component, score, engagementId, role = "consultant", 
           </div>
           <div className="flex items-center gap-2">
             {!isAdmin && score?.approved && (
-              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-semibold">
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
                 <ShieldCheck className="w-3 h-3" /> Approved
               </span>
             )}
@@ -196,9 +200,9 @@ function ComponentDetail({ component, score, engagementId, role = "consultant", 
         <p className="text-sm text-gray-600">{component.description}</p>
         {!isAdmin && score?.confidence && (
           <div className="flex items-center gap-3 mt-3">
-            <span className="text-xs text-gray-400">Confidence: <strong className="text-gray-600">{score.confidence}</strong></span>
-            <span className="text-xs text-gray-400">Evidence: <strong className="text-gray-600">{score.evidence_count} items</strong></span>
-            <span className="text-xs text-gray-400">Status: <strong className="text-gray-600">{score.status}</strong></span>
+            <span className="text-xs text-gray-500">Confidence: <strong className="text-gray-600">{score.confidence}</strong></span>
+            <span className="text-xs text-gray-500">Evidence: <strong className="text-gray-600">{score.evidence_count} items</strong></span>
+            <span className="text-xs text-gray-500">Status: <strong className="text-gray-600">{score.status}</strong></span>
           </div>
         )}
         <div className="flex items-center gap-3 mt-3">
@@ -230,7 +234,7 @@ function ComponentDetail({ component, score, engagementId, role = "consultant", 
           <ul className="space-y-2">
             {coreActions.map((ca) => (
               <li key={ca.id} className="flex items-start gap-2 text-sm text-gray-700">
-                <CheckCircle2 className="w-4 h-4 text-gray-300 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-gray-500 flex-shrink-0 mt-0.5" />
                 <span>{ca.text}</span>
               </li>
             ))}

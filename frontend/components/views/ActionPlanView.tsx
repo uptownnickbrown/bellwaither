@@ -86,24 +86,24 @@ export default function ActionPlanView({ engagementId, role = "consultant", onNa
             Action planning begins after the diagnostic assessment. Your team will work together with the
             consulting team to build priorities and next steps based on the findings.
           </p>
-          <div className="flex items-center justify-center gap-8 text-sm text-gray-400">
+          <div className="flex items-center justify-center gap-8 text-sm text-gray-500">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
-                <Target className="w-4 h-4 text-gray-300" />
+                <Target className="w-4 h-4 text-gray-500" />
               </div>
               <span>Set priorities</span>
             </div>
             <div className="w-px h-8 bg-gray-100" />
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
-                <CalendarClock className="w-4 h-4 text-gray-300" />
+                <CalendarClock className="w-4 h-4 text-gray-500" />
               </div>
               <span>Define milestones</span>
             </div>
             <div className="w-px h-8 bg-gray-100" />
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
-                <CheckCircle2 className="w-4 h-4 text-gray-300" />
+                <CheckCircle2 className="w-4 h-4 text-gray-500" />
               </div>
               <span>Track progress</span>
             </div>
@@ -196,13 +196,13 @@ export default function ActionPlanView({ engagementId, role = "consultant", onNa
                       </div>
                       <div className="flex items-center gap-3 mt-2">
                         <span
-                          className="flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full"
+                          className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full"
                           style={{ backgroundColor: statusStyle.bg, color: statusStyle.color }}
                         >
                           <Icon className="w-3 h-3" />
                           {statusStyle.label}
                         </span>
-                        {item.owner && <span className="text-xs text-gray-400">Owner: {item.owner}</span>}
+                        {item.owner && <span className="text-xs text-gray-500">Owner: {item.owner}</span>}
                       </div>
                     </div>
                   </div>
@@ -212,7 +212,7 @@ export default function ActionPlanView({ engagementId, role = "consultant", onNa
             {items.length === 0 && !isAdmin && (
               <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
                 <Target className="w-10 h-10 text-gray-200 mx-auto mb-2" />
-                <p className="text-sm text-gray-400">No action items yet</p>
+                <p className="text-sm text-gray-500">No action items yet</p>
               </div>
             )}
           </div>
@@ -310,7 +310,7 @@ export default function ActionPlanView({ engagementId, role = "consultant", onNa
             <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
               <Target className="w-12 h-12 text-gray-200 mx-auto mb-3" />
               <h3 className="text-sm font-medium text-gray-700 mb-1">Select an action item</h3>
-              <p className="text-xs text-gray-400">Click on an action item to see its full description, evidence-based rationale, and milestones.</p>
+              <p className="text-xs text-gray-500">Click on an action item to see its full description, evidence-based rationale, and milestones.</p>
             </div>
           )}
         </div>
