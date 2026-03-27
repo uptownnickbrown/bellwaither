@@ -21,22 +21,15 @@ engine = create_async_engine(TEST_DATABASE_URL, echo=False)
 TestingSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
-# SQLite does not natively understand PostgreSQL UUID columns.  SQLAlchemy's
-# ``UUID(as_uuid=True)`` dialect column type emits ``UUID`` DDL that SQLite
-# treats as a plain text affinity, which works fine for storage.  However we
-# also need to make sure Python ``uuid.UUID`` objects round-trip correctly
-# through the *pysqlite* driver.  The listeners below register adapters so
-# that uuid values are stored as their 32-hex-char canonical strings and
-# loaded back as ``uuid.UUID`` instances.
+# SQLAlchemy 2.0's generic ``Uuid`` type handles SQLite natively (stores as
+# CHAR(32) hex strings).  We only need a listener to register a basic adapter
+# for the old PostgreSQL-dialect ``UUID(as_uuid=True)`` columns that still
+# exist in the original framework/scoring/etc models.
 @event.listens_for(engine.sync_engine, "connect")
 def _set_sqlite_uuid_adapter(dbapi_connection, connection_record):
-    """Register uuid adapter/converter for the raw pysqlite connection."""
+    """Register uuid adapter for pysqlite so uuid.UUID values are stored as hex strings."""
     import sqlite3
-
     sqlite3.register_adapter(uuid.UUID, lambda val: val.hex)
-    sqlite3.register_converter("UUID", lambda b: uuid.UUID(b.decode()))
-    # Also handle CHAR(32) which some dialects use
-    sqlite3.register_converter("CHAR", lambda b: b.decode())
 
 
 # ---------------------------------------------------------------------------

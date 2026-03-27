@@ -1,8 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import JSON, Column, DateTime, ForeignKey, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import JSON, Column, DateTime, ForeignKey, String, Text, Uuid
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -11,7 +10,7 @@ from app.database import Base
 class School(Base):
     __tablename__ = "schools"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4)
     name = Column(String(200), nullable=False)
     school_type = Column(String(50), nullable=True)  # charter, traditional, etc.
     district = Column(String(200), nullable=True)
@@ -30,8 +29,8 @@ class School(Base):
 class SchoolOnboardingProfile(Base):
     __tablename__ = "school_onboarding_profiles"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    school_id = Column(UUID(as_uuid=True), ForeignKey("schools.id"), nullable=False)
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4)
+    school_id = Column(Uuid, ForeignKey("schools.id"), nullable=False)
 
     programs = Column(JSON, nullable=True)  # e.g. ["DLI", "STEM", "IB"]
     strategic_priorities = Column(JSON, nullable=True)  # top priorities from interview
@@ -46,8 +45,8 @@ class SchoolOnboardingProfile(Base):
 class SchoolFrameworkTemplate(Base):
     __tablename__ = "school_framework_templates"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    school_id = Column(UUID(as_uuid=True), ForeignKey("schools.id"), nullable=False)
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4)
+    school_id = Column(Uuid, ForeignKey("schools.id"), nullable=False)
     name = Column(String(200), nullable=True)
     description = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -63,9 +62,9 @@ class SchoolFrameworkTemplate(Base):
 class SchoolTemplateDimension(Base):
     __tablename__ = "school_template_dimensions"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    template_id = Column(UUID(as_uuid=True), ForeignKey("school_framework_templates.id"), nullable=False)
-    source_dimension_id = Column(UUID(as_uuid=True), ForeignKey("dimensions.id"), nullable=True)
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4)
+    template_id = Column(Uuid, ForeignKey("school_framework_templates.id"), nullable=False)
+    source_dimension_id = Column(Uuid, ForeignKey("dimensions.id"), nullable=True)
 
     number = Column(String(10), nullable=False)  # "1", "2", ... or custom
     name = Column(String(200), nullable=False)
@@ -84,9 +83,9 @@ class SchoolTemplateDimension(Base):
 class SchoolTemplateComponent(Base):
     __tablename__ = "school_template_components"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    dimension_id = Column(UUID(as_uuid=True), ForeignKey("school_template_dimensions.id"), nullable=False)
-    source_component_id = Column(UUID(as_uuid=True), ForeignKey("components.id"), nullable=True)
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4)
+    dimension_id = Column(Uuid, ForeignKey("school_template_dimensions.id"), nullable=False)
+    source_component_id = Column(Uuid, ForeignKey("components.id"), nullable=True)
 
     code = Column(String(20), nullable=False)  # "1A", "2B", or custom codes
     name = Column(String(200), nullable=False)
@@ -105,8 +104,8 @@ class SchoolTemplateComponent(Base):
 class SchoolTemplateCriterion(Base):
     __tablename__ = "school_template_criteria"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    component_id = Column(UUID(as_uuid=True), ForeignKey("school_template_components.id"), nullable=False)
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4)
+    component_id = Column(Uuid, ForeignKey("school_template_components.id"), nullable=False)
     criterion_type = Column(String(30), nullable=False)  # "core_action" or "progress_indicator"
     text = Column(Text, nullable=False)
     order = Column(String(10), nullable=False, default="0")

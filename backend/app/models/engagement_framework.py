@@ -1,7 +1,6 @@
 import uuid
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, Uuid
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -11,9 +10,9 @@ class EngagementDimension(Base):
     """Engagement-scoped dimension — forked from school template at engagement creation."""
     __tablename__ = "engagement_dimensions"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    engagement_id = Column(UUID(as_uuid=True), ForeignKey("engagements.id"), nullable=False)
-    source_dimension_id = Column(UUID(as_uuid=True), ForeignKey("dimensions.id"), nullable=True)
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4)
+    engagement_id = Column(Uuid, ForeignKey("engagements.id"), nullable=False)
+    source_dimension_id = Column(Uuid, ForeignKey("dimensions.id"), nullable=True)
 
     number = Column(String(10), nullable=False)
     name = Column(String(200), nullable=False)
@@ -34,9 +33,9 @@ class EngagementComponent(Base):
     """Engagement-scoped component — forked from school template at engagement creation."""
     __tablename__ = "engagement_components"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    dimension_id = Column(UUID(as_uuid=True), ForeignKey("engagement_dimensions.id"), nullable=False)
-    source_component_id = Column(UUID(as_uuid=True), ForeignKey("components.id"), nullable=True)
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4)
+    dimension_id = Column(Uuid, ForeignKey("engagement_dimensions.id"), nullable=False)
+    source_component_id = Column(Uuid, ForeignKey("components.id"), nullable=True)
 
     code = Column(String(20), nullable=False)
     name = Column(String(200), nullable=False)
@@ -60,8 +59,8 @@ class EngagementCriterion(Base):
     """Engagement-scoped success criterion — forked from school template at engagement creation."""
     __tablename__ = "engagement_criteria"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    component_id = Column(UUID(as_uuid=True), ForeignKey("engagement_components.id"), nullable=False)
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4)
+    component_id = Column(Uuid, ForeignKey("engagement_components.id"), nullable=False)
     criterion_type = Column(String(30), nullable=False)  # "core_action" or "progress_indicator"
     text = Column(Text, nullable=False)
     order = Column(Integer, nullable=False, default=0)
