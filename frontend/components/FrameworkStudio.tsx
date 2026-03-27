@@ -59,7 +59,7 @@ export default function FrameworkStudio({
         content: `Here's your framework with ${dimensions.length} dimensions and ${dimensions.reduce((s, d) => s + d.components.length, 0)} components. Explore the tree on the right, or ask me to explain or change anything.`,
       }]);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const toggleDim = (num: string) => {
     setExpandedDims((prev) => {
