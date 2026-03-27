@@ -11,7 +11,7 @@ import {
   Sparkles, BookOpen, XCircle,
 } from "lucide-react";
 
-type Phase = "profile" | "interview" | "studio";
+type Phase = "profile" | "interview" | "building" | "studio";
 
 interface ConversationMessage {
   role: "user" | "assistant";
@@ -115,27 +115,41 @@ export default function OnboardingPage() {
     setConversation((prev) => [...prev, { role: "user", content: msg }]);
     setLoading(true);
 
+    // Count user turns to detect when a proposal is likely
+    const userTurns = conversation.filter((m) => m.role === "user").length + 1;
+    const looksLikeProposalRequest = /give me|build it|let'?s go|ready|framework|no[,.]?\s*(just|go|build|give)/i.test(msg);
+    const likelyProposal = userTurns >= 3 || looksLikeProposalRequest;
+
+    // Optimistically transition to building screen if proposal is likely
+    if (likelyProposal) {
+      setPhase("building");
+    }
+
     try {
       const result = await onboardingRespond(school.id, msg);
       const aiResp = result.ai_response;
       if (aiResp.status === "interviewing" && aiResp.message) {
+        // AI asked another question — go back to interview
         setConversation((prev) => [...prev, { role: "assistant" as const, content: aiResp.message! }]);
         if (aiResp.learned) setLearned((prev) => mergeLearned(prev, aiResp.learned!));
         if (aiResp.turn) setTurnCount(aiResp.turn);
+        setPhase("interview");
       } else if (aiResp.status === "proposal" && aiResp.framework) {
         setProposedFramework(aiResp.framework.dimensions);
         setProposalRationale(aiResp.rationale || "");
         setConversation((prev) => [
           ...prev,
-          { role: "assistant" as const, content: "I've built your framework. Let me walk you through it in the Studio." },
+          { role: "assistant" as const, content: "Here's your customized framework. Let's explore it together." },
         ]);
-        setTimeout(() => setPhase("studio"), 1200);
+        setPhase("studio");
       }
     } catch {
+      // If we were in building phase, go back to interview
       setConversation((prev) => [
         ...prev,
-        { role: "assistant", content: "I'm having trouble connecting. Please try again in a moment." },
+        { role: "assistant", content: "That took longer than expected. Let me try again — please click send once more." },
       ]);
+      setPhase("interview");
     } finally {
       setLoading(false);
     }
@@ -446,6 +460,53 @@ export default function OnboardingPage() {
                 <p className="text-xs text-gray-400">Context will appear here as we talk about your school</p>
               </div>
             )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ---- Building Phase (optimistic transition while proposal generates) ----
+  if (phase === "building") {
+    return (
+      <div className="h-screen flex flex-col bg-[#FAFBFC]">
+        <header className="bg-white border-b border-gray-200 px-6 h-14 flex items-center flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
+              <Compass className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-semibold text-gray-900">Framework Studio</span>
+            <span className="text-sm text-gray-500">{school?.name}</span>
+          </div>
+        </header>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center max-w-md">
+            <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">Building your framework</h2>
+            <p className="text-gray-600 leading-relaxed mb-2">
+              Assembling all 9 SQF dimensions with your customizations — this takes about 30 seconds.
+            </p>
+            <div className="mt-6 space-y-2.5 text-left mx-auto max-w-xs">
+              {[
+                { label: "School profile analyzed", done: true },
+                { label: "Priorities mapped to dimensions", done: true },
+                { label: "Custom components drafted", done: false },
+                { label: "Success criteria generated", done: false },
+              ].map(({ label, done }, i) => (
+                <div key={i} className="flex items-center gap-2.5">
+                  {done ? (
+                    <div className="w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                    </div>
+                  ) : (
+                    <div className="w-5 h-5 border-2 border-gray-200 rounded-full flex-shrink-0 animate-pulse" />
+                  )}
+                  <span className={`text-sm ${done ? "text-gray-900" : "text-gray-400"}`}>{label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

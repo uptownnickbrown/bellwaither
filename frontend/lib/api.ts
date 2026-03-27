@@ -1,19 +1,29 @@
 const API_BASE = "/api";
 
-async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    ...options,
-  });
-  if (!res.ok) {
-    let detail = res.statusText;
-    try {
-      const body = await res.json();
-      if (body.detail) detail = body.detail;
-    } catch { /* no JSON body */ }
-    throw new Error(`API error ${res.status}: ${detail}`);
+async function fetchApi<T>(path: string, options?: RequestInit & { timeoutMs?: number }): Promise<T> {
+  const { timeoutMs, ...fetchOpts } = options || {};
+  const controller = new AbortController();
+  const timeout = timeoutMs || 30000;
+  const timer = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      headers: { "Content-Type": "application/json", ...fetchOpts?.headers },
+      signal: controller.signal,
+      ...fetchOpts,
+    });
+    if (!res.ok) {
+      let detail = res.statusText;
+      try {
+        const body = await res.json();
+        if (body.detail) detail = body.detail;
+      } catch { /* no JSON body */ }
+      throw new Error(`API error ${res.status}: ${detail}`);
+    }
+    return res.json();
+  } finally {
+    clearTimeout(timer);
   }
-  return res.json();
 }
 
 // Framework (canonical SQF library)
@@ -160,10 +170,11 @@ export const chatWithCopilot = (engId: string, data: { message: string; context?
 export const getExportUrl = (engId: string) => `${API_BASE}/engagements/${engId}/export`;
 
 // Onboarding
+// Onboarding uses custom API routes (not the rewrite proxy) for longer timeouts
 export const startOnboarding = (data: { name: string; school_type?: string; district?: string; state?: string; grade_levels?: string; enrollment?: string }) =>
-  fetchApi<{ school_id: string; school: import("./types").School; ai_response: import("./types").OnboardingAIResponse }>("/onboarding/start", { method: "POST", body: JSON.stringify(data) });
+  fetchApi<{ school_id: string; school: import("./types").School; ai_response: import("./types").OnboardingAIResponse }>("/onboarding/start", { method: "POST", body: JSON.stringify(data), timeoutMs: 60000 });
 export const onboardingRespond = (schoolId: string, message: string) =>
-  fetchApi<{ ai_response: import("./types").OnboardingAIResponse }>(`/onboarding/${schoolId}/respond`, { method: "POST", body: JSON.stringify({ message }) });
+  fetchApi<{ ai_response: import("./types").OnboardingAIResponse }>(`/onboarding/${schoolId}/respond`, { method: "POST", body: JSON.stringify({ message }), timeoutMs: 120000 });
 export const finalizeOnboarding = (schoolId: string, data: { framework: unknown; engagement_name?: string; strategic_priorities?: string[]; programs?: string[] }) =>
   fetchApi<{ engagement_id: string; school_id: string; engagement: import("./types").Engagement }>(`/onboarding/${schoolId}/finalize`, { method: "POST", body: JSON.stringify(data) });
 
