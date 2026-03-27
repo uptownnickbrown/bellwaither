@@ -11,8 +11,8 @@ from app.models.school import (
     School,
     SchoolFrameworkTemplate,
     SchoolOnboardingProfile,
-    SchoolTemplateCriterion,
     SchoolTemplateComponent,
+    SchoolTemplateCriterion,
     SchoolTemplateDimension,
 )
 from app.models.scoring import ComponentScore, DimensionSummary, GlobalSummary

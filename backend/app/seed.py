@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 
 from app.database import async_session
 from app.models.action_plan import ActionItem, ActionPlan, ItemStatus, PlanStatus

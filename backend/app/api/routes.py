@@ -2459,7 +2459,7 @@ async def start_onboarding(
             school_profile=school_profile,
             conversation_history=[],
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Onboarding interview start failed")
         ai_result = {
             "status": "interviewing",
@@ -2544,8 +2544,8 @@ async def finalize_onboarding(
     from app.models.school import (
         SchoolFrameworkTemplate,
         SchoolOnboardingProfile,
-        SchoolTemplateCriterion,
         SchoolTemplateComponent,
+        SchoolTemplateCriterion,
         SchoolTemplateDimension,
     )
 

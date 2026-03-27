@@ -9,11 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models.engagement_framework import EngagementComponent, EngagementCriterion, EngagementDimension
-from app.models.framework import Component, Dimension, SuccessCriterion
+from app.models.framework import Component, Dimension
 from app.models.school import (
     SchoolFrameworkTemplate,
-    SchoolTemplateCriterion,
     SchoolTemplateComponent,
+    SchoolTemplateCriterion,
     SchoolTemplateDimension,
 )
 
