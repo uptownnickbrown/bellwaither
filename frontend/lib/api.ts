@@ -176,7 +176,7 @@ export const startOnboarding = (data: { name: string; school_type?: string; dist
 export const onboardingRespond = (schoolId: string, message: string) =>
   fetchApi<{ ai_response: import("./types").OnboardingAIResponse }>(`/onboarding/${schoolId}/respond`, { method: "POST", body: JSON.stringify({ message }), timeoutMs: 120000 });
 export const finalizeOnboarding = (schoolId: string, data: { framework: unknown; engagement_name?: string; strategic_priorities?: string[]; programs?: string[] }) =>
-  fetchApi<{ engagement_id: string; school_id: string; engagement: import("./types").Engagement }>(`/onboarding/${schoolId}/finalize`, { method: "POST", body: JSON.stringify(data) });
+  fetchApi<{ engagement_id: string; school_id: string; engagement: import("./types").Engagement }>(`/onboarding/${schoolId}/finalize`, { method: "POST", body: JSON.stringify(data), timeoutMs: 120000 });
 
 // Activity Log
 export const getActivityLog = (engId: string, limit = 50) =>

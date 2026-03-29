@@ -2522,14 +2522,20 @@ async def onboarding_respond(
         logger.exception("Onboarding interview respond failed")
         raise HTTPException(status_code=502, detail=f"AI service error: {e}")
 
-    # Add AI response to transcript
-    if ai_result.get("status") == "interviewing":
-        conversation_history.append({"role": "assistant", "content": ai_result.get("message", "")})
-    elif ai_result.get("status") == "proposal":
-        conversation_history.append({"role": "assistant", "content": json.dumps(ai_result)})
+    # Save transcript in background — don't block the response
+    try:
+        if ai_result.get("status") == "interviewing":
+            conversation_history.append({"role": "assistant", "content": ai_result.get("message", "")})
+        elif ai_result.get("status") == "proposal":
+            # Store a summary instead of the full framework to avoid JSON column bloat
+            conversation_history.append({"role": "assistant", "content": "[Framework proposal generated]"})
 
-    profile.interview_transcript = conversation_history
-    await db.commit()
+        # Force SQLAlchemy to detect the change by assigning a new list
+        profile.interview_transcript = list(conversation_history)
+        await db.commit()
+    except Exception:
+        logger.exception("Failed to save onboarding transcript (non-fatal)")
+        await db.rollback()
 
     return {"ai_response": ai_result}
 
