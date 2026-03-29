@@ -68,8 +68,22 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(false);
   const [proposedFramework, setProposedFramework] = useState<OnboardingDimension[] | null>(null);
   const [proposalRationale, setProposalRationale] = useState("");
+  const [buildingStep, setBuildingStep] = useState(0);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Animate building steps over time
+  useEffect(() => {
+    if (phase !== "building") {
+      setBuildingStep(0);
+      return;
+    }
+    setBuildingStep(1);
+    const t2 = setTimeout(() => setBuildingStep(2), 5000);
+    const t3 = setTimeout(() => setBuildingStep(3), 15000);
+    const t4 = setTimeout(() => setBuildingStep(4), 25000);
+    return () => { clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+  }, [phase]);
 
   // Auto-scroll chat
   useEffect(() => {
@@ -115,21 +129,15 @@ export default function OnboardingPage() {
     setConversation((prev) => [...prev, { role: "user", content: msg }]);
     setLoading(true);
 
-    // Count user turns to detect when a proposal is likely
-    const userTurns = conversation.filter((m) => m.role === "user").length + 1;
-    const looksLikeProposalRequest = /give me|build it|let'?s go|ready|framework|no[,.]?\s*(just|go|build|give)/i.test(msg);
-    const likelyProposal = userTurns >= 3 || looksLikeProposalRequest;
-
-    // Optimistically transition to building screen if proposal is likely
-    if (likelyProposal) {
-      setPhase("building");
-    }
+    // Show building screen after 5s of waiting — long responses are likely proposals.
+    // If the AI responds quickly (interviewing), we cancel before it shows.
+    const buildingTimer = setTimeout(() => setPhase("building"), 5000);
 
     try {
       const result = await onboardingRespond(school.id, msg);
+      clearTimeout(buildingTimer);
       const aiResp = result.ai_response;
       if (aiResp.status === "interviewing" && aiResp.message) {
-        // AI asked another question — go back to interview
         setConversation((prev) => [...prev, { role: "assistant" as const, content: aiResp.message! }]);
         if (aiResp.learned) setLearned((prev) => mergeLearned(prev, aiResp.learned!));
         if (aiResp.turn) setTurnCount(aiResp.turn);
@@ -144,7 +152,7 @@ export default function OnboardingPage() {
         setPhase("studio");
       }
     } catch {
-      // If we were in building phase, go back to interview
+      clearTimeout(buildingTimer);
       setConversation((prev) => [
         ...prev,
         { role: "assistant", content: "That took longer than expected. Let me try again — please click send once more." },
@@ -490,22 +498,29 @@ export default function OnboardingPage() {
             </p>
             <div className="mt-6 space-y-2.5 text-left mx-auto max-w-xs">
               {[
-                { label: "School profile analyzed", done: true },
-                { label: "Priorities mapped to dimensions", done: true },
-                { label: "Custom components drafted", done: false },
-                { label: "Success criteria generated", done: false },
-              ].map(({ label, done }, i) => (
-                <div key={i} className="flex items-center gap-2.5">
-                  {done ? (
-                    <div className="w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
-                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                    </div>
-                  ) : (
-                    <div className="w-5 h-5 border-2 border-gray-200 rounded-full flex-shrink-0 animate-pulse" />
-                  )}
-                  <span className={`text-sm ${done ? "text-gray-900" : "text-gray-400"}`}>{label}</span>
-                </div>
-              ))}
+                "School profile analyzed",
+                "Priorities mapped to dimensions",
+                "Custom components drafted",
+                "Success criteria generated",
+              ].map((label, i) => {
+                const stepNum = i + 1;
+                const done = buildingStep > stepNum;
+                const active = buildingStep === stepNum;
+                return (
+                  <div key={i} className="flex items-center gap-2.5">
+                    {done ? (
+                      <div className="w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                      </div>
+                    ) : active ? (
+                      <div className="w-5 h-5 border-2 border-indigo-400 rounded-full flex-shrink-0 animate-pulse" />
+                    ) : (
+                      <div className="w-5 h-5 border-2 border-gray-200 rounded-full flex-shrink-0" />
+                    )}
+                    <span className={`text-sm ${done ? "text-gray-900" : active ? "text-gray-700" : "text-gray-400"}`}>{label}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
