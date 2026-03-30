@@ -175,8 +175,10 @@ export const startOnboarding = (data: { name: string; school_type?: string; dist
   fetchApi<{ school_id: string; school: import("./types").School; ai_response: import("./types").OnboardingAIResponse }>("/onboarding/start", { method: "POST", body: JSON.stringify(data), timeoutMs: 60000 });
 export const onboardingRespond = (schoolId: string, message: string) =>
   fetchApi<{ ai_response: import("./types").OnboardingAIResponse }>(`/onboarding/${schoolId}/respond`, { method: "POST", body: JSON.stringify({ message }), timeoutMs: 60000 });
-export const onboardingBuild = (schoolId: string, learned: import("./types").OnboardingLearned) =>
-  fetchApi<{ ai_response: import("./types").OnboardingAIResponse }>(`/onboarding/${schoolId}/build`, { method: "POST", body: JSON.stringify({ learned }), timeoutMs: 120000 });
+export const startOnboardingBuild = (schoolId: string, learned: import("./types").OnboardingLearned) =>
+  fetchApi<{ job_id: string }>(`/onboarding/${schoolId}/build`, { method: "POST", body: JSON.stringify({ learned }) });
+export const pollOnboardingBuild = (schoolId: string, jobId: string) =>
+  fetchApi<{ status: string; ai_response?: import("./types").OnboardingAIResponse; detail?: string }>(`/onboarding/${schoolId}/build/${jobId}`);
 export const finalizeOnboarding = (schoolId: string, data: { framework: unknown; engagement_name?: string; strategic_priorities?: string[]; programs?: string[] }) =>
   fetchApi<{ engagement_id: string; school_id: string; engagement: import("./types").Engagement }>(`/onboarding/${schoolId}/finalize`, { method: "POST", body: JSON.stringify(data), timeoutMs: 120000 });
 

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { startOnboarding, onboardingRespond, onboardingBuild, finalizeOnboarding } from "@/lib/api";
+import { startOnboarding, onboardingRespond, startOnboardingBuild, pollOnboardingBuild, finalizeOnboarding } from "@/lib/api";
 import type { School, OnboardingAIResponse, OnboardingDimension, OnboardingLearned } from "@/lib/types";
 import FrameworkStudio from "@/components/FrameworkStudio";
 import {
@@ -156,22 +156,42 @@ export default function OnboardingPage() {
     setPhase("building");
 
     try {
-      const result = await onboardingBuild(school.id, learned);
-      const aiResp = result.ai_response;
-      if (aiResp.status === "proposal" && aiResp.framework) {
-        setProposedFramework(aiResp.framework.dimensions);
-        setProposalRationale(aiResp.rationale || "");
-        setConversation((prev) => [
-          ...prev,
-          { role: "assistant" as const, content: "Here's your customized framework. Let's explore it together." },
-        ]);
-        setPhase("studio");
-      } else {
-        setBuildError("The framework couldn't be generated. Please try again.");
-        setPhase("interview");
+      // Start the build — returns immediately with a job ID
+      const { job_id } = await startOnboardingBuild(school.id, learned);
+
+      // Poll every 3 seconds until the build completes
+      const maxPolls = 60; // 3 minutes max
+      for (let i = 0; i < maxPolls; i++) {
+        await new Promise((r) => setTimeout(r, 3000));
+        try {
+          const job = await pollOnboardingBuild(school.id, job_id);
+          if (job.status === "complete" && job.ai_response) {
+            const aiResp = job.ai_response;
+            if (aiResp.framework) {
+              setProposedFramework(aiResp.framework.dimensions);
+              setProposalRationale(aiResp.rationale || "");
+              setConversation((prev) => [
+                ...prev,
+                { role: "assistant" as const, content: "Here's your customized framework. Let's explore it together." },
+              ]);
+              setPhase("studio");
+              return;
+            }
+          } else if (job.status === "error") {
+            setBuildError(job.detail || "Framework generation failed. Please try again.");
+            setPhase("interview");
+            return;
+          }
+          // status === "building" — keep polling
+        } catch {
+          // Poll request failed — keep trying (transient network error)
+        }
       }
+      // Timed out after 3 minutes
+      setBuildError("Framework generation is taking too long. Please try again.");
+      setPhase("interview");
     } catch {
-      setBuildError("Framework generation failed. Please try again.");
+      setBuildError("Failed to start framework generation. Please try again.");
       setPhase("interview");
     }
   };

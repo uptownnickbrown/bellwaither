@@ -1,5 +1,6 @@
 """API routes for the Meridian platform."""
 
+import asyncio
 import io
 import json
 import logging
@@ -2535,15 +2536,33 @@ async def onboarding_respond(
     return {"ai_response": ai_result}
 
 
+# In-memory store for framework build jobs (keyed by job_id)
+_build_jobs: dict[str, dict] = {}
+
+
+async def _run_framework_build(job_id: str, school_profile: dict, learned: dict):
+    """Background task that builds the framework and stores the result."""
+    from app.ai.agents.onboarding_agent import build_framework
+
+    try:
+        ai_result = await build_framework(
+            school_profile=school_profile,
+            learned=learned,
+        )
+        _build_jobs[job_id] = {"status": "complete", "ai_response": ai_result}
+        logger.info("Framework build job %s completed", job_id)
+    except Exception as e:
+        logger.exception("Framework build job %s failed", job_id)
+        _build_jobs[job_id] = {"status": "error", "detail": str(e)}
+
+
 @router.post("/onboarding/{school_id}/build")
 async def onboarding_build_framework(
     school_id: uuid.UUID,
     data: dict,
     db: AsyncSession = Depends(get_db),
 ):
-    """Build the customized framework based on interview context. This is the slow call."""
-    from app.ai.agents.onboarding_agent import build_framework
-
+    """Start building a customized framework. Returns a job_id to poll for results."""
     # Get school
     school_result = await db.execute(select(School).where(School.id == school_id))
     school = school_result.scalar_one_or_none()
@@ -2560,17 +2579,31 @@ async def onboarding_build_framework(
     }
 
     learned = data.get("learned", {})
+    job_id = str(uuid.uuid4())
+    _build_jobs[job_id] = {"status": "building"}
 
-    try:
-        ai_result = await build_framework(
-            school_profile=school_profile,
-            learned=learned,
-        )
-    except Exception as e:
-        logger.exception("Onboarding framework build failed")
-        raise HTTPException(status_code=502, detail=f"AI service error: {e}")
+    # Fire and forget — the result will be stored in _build_jobs
+    asyncio.create_task(_run_framework_build(job_id, school_profile, learned))
+    logger.info("Framework build job %s started for school %s", job_id, school.name)
 
-    return {"ai_response": ai_result}
+    return {"job_id": job_id}
+
+
+@router.get("/onboarding/{school_id}/build/{job_id}")
+async def onboarding_build_status(
+    school_id: uuid.UUID,
+    job_id: str,
+):
+    """Poll for the result of a framework build job."""
+    job = _build_jobs.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Build job not found")
+
+    # Clean up completed/errored jobs after returning them
+    if job["status"] in ("complete", "error"):
+        _build_jobs.pop(job_id, None)
+
+    return job
 
 
 @router.post("/onboarding/{school_id}/finalize")
