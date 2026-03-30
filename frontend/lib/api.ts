@@ -174,7 +174,9 @@ export const getExportUrl = (engId: string) => `${API_BASE}/engagements/${engId}
 export const startOnboarding = (data: { name: string; school_type?: string; district?: string; state?: string; grade_levels?: string; enrollment?: string }) =>
   fetchApi<{ school_id: string; school: import("./types").School; ai_response: import("./types").OnboardingAIResponse }>("/onboarding/start", { method: "POST", body: JSON.stringify(data), timeoutMs: 60000 });
 export const onboardingRespond = (schoolId: string, message: string) =>
-  fetchApi<{ ai_response: import("./types").OnboardingAIResponse }>(`/onboarding/${schoolId}/respond`, { method: "POST", body: JSON.stringify({ message }), timeoutMs: 120000 });
+  fetchApi<{ ai_response: import("./types").OnboardingAIResponse }>(`/onboarding/${schoolId}/respond`, { method: "POST", body: JSON.stringify({ message }), timeoutMs: 60000 });
+export const onboardingBuild = (schoolId: string, learned: import("./types").OnboardingLearned) =>
+  fetchApi<{ ai_response: import("./types").OnboardingAIResponse }>(`/onboarding/${schoolId}/build`, { method: "POST", body: JSON.stringify({ learned }), timeoutMs: 120000 });
 export const finalizeOnboarding = (schoolId: string, data: { framework: unknown; engagement_name?: string; strategic_priorities?: string[]; programs?: string[] }) =>
   fetchApi<{ engagement_id: string; school_id: string; engagement: import("./types").Engagement }>(`/onboarding/${schoolId}/finalize`, { method: "POST", body: JSON.stringify(data), timeoutMs: 120000 });
 

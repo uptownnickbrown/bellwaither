@@ -2522,20 +2522,53 @@ async def onboarding_respond(
         logger.exception("Onboarding interview respond failed")
         raise HTTPException(status_code=502, detail=f"AI service error: {e}")
 
-    # Save transcript in background — don't block the response
+    # Save transcript — interview responses are small so this should be fast
     try:
-        if ai_result.get("status") == "interviewing":
-            conversation_history.append({"role": "assistant", "content": ai_result.get("message", "")})
-        elif ai_result.get("status") == "proposal":
-            # Store a summary instead of the full framework to avoid JSON column bloat
-            conversation_history.append({"role": "assistant", "content": "[Framework proposal generated]"})
-
+        conversation_history.append({"role": "assistant", "content": ai_result.get("message", "")})
         # Force SQLAlchemy to detect the change by assigning a new list
         profile.interview_transcript = list(conversation_history)
         await db.commit()
     except Exception:
         logger.exception("Failed to save onboarding transcript (non-fatal)")
         await db.rollback()
+
+    return {"ai_response": ai_result}
+
+
+@router.post("/onboarding/{school_id}/build")
+async def onboarding_build_framework(
+    school_id: uuid.UUID,
+    data: dict,
+    db: AsyncSession = Depends(get_db),
+):
+    """Build the customized framework based on interview context. This is the slow call."""
+    from app.ai.agents.onboarding_agent import build_framework
+
+    # Get school
+    school_result = await db.execute(select(School).where(School.id == school_id))
+    school = school_result.scalar_one_or_none()
+    if not school:
+        raise HTTPException(status_code=404, detail="School not found")
+
+    school_profile = {
+        "name": school.name,
+        "school_type": school.school_type,
+        "grade_levels": school.grade_levels,
+        "enrollment": school.enrollment,
+        "district": school.district,
+        "state": school.state,
+    }
+
+    learned = data.get("learned", {})
+
+    try:
+        ai_result = await build_framework(
+            school_profile=school_profile,
+            learned=learned,
+        )
+    except Exception as e:
+        logger.exception("Onboarding framework build failed")
+        raise HTTPException(status_code=502, detail=f"AI service error: {e}")
 
     return {"ai_response": ai_result}
 

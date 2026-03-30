@@ -300,6 +300,7 @@ export interface OnboardingAIResponse {
   status: "interviewing" | "proposal";
   message?: string;
   turn?: number;
+  ready_to_build?: boolean;
   learned?: OnboardingLearned;
   framework?: {
     dimensions: OnboardingDimension[];

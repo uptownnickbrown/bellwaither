@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { startOnboarding, onboardingRespond, finalizeOnboarding } from "@/lib/api";
+import { startOnboarding, onboardingRespond, onboardingBuild, finalizeOnboarding } from "@/lib/api";
 import type { School, OnboardingAIResponse, OnboardingDimension, OnboardingLearned } from "@/lib/types";
 import FrameworkStudio from "@/components/FrameworkStudio";
 import {
@@ -66,9 +66,11 @@ export default function OnboardingPage() {
   };
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [readyToBuild, setReadyToBuild] = useState(false);
   const [proposedFramework, setProposedFramework] = useState<OnboardingDimension[] | null>(null);
   const [proposalRationale, setProposalRationale] = useState("");
   const [buildingStep, setBuildingStep] = useState(0);
+  const [buildError, setBuildError] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -129,20 +131,34 @@ export default function OnboardingPage() {
     setConversation((prev) => [...prev, { role: "user", content: msg }]);
     setLoading(true);
 
-    // Show building screen after 5s of waiting — long responses are likely proposals.
-    // If the AI responds quickly (interviewing), we cancel before it shows.
-    const buildingTimer = setTimeout(() => setPhase("building"), 5000);
-
     try {
       const result = await onboardingRespond(school.id, msg);
-      clearTimeout(buildingTimer);
       const aiResp = result.ai_response;
-      if (aiResp.status === "interviewing" && aiResp.message) {
+      if (aiResp.message) {
         setConversation((prev) => [...prev, { role: "assistant" as const, content: aiResp.message! }]);
-        if (aiResp.learned) setLearned((prev) => mergeLearned(prev, aiResp.learned!));
-        if (aiResp.turn) setTurnCount(aiResp.turn);
-        setPhase("interview");
-      } else if (aiResp.status === "proposal" && aiResp.framework) {
+      }
+      if (aiResp.learned) setLearned((prev) => mergeLearned(prev, aiResp.learned!));
+      if (aiResp.turn) setTurnCount(aiResp.turn);
+      if (aiResp.ready_to_build) setReadyToBuild(true);
+    } catch {
+      setConversation((prev) => [
+        ...prev,
+        { role: "assistant", content: "Something went wrong. Please try sending your message again." },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBuildFramework = async () => {
+    if (!school) return;
+    setBuildError(null);
+    setPhase("building");
+
+    try {
+      const result = await onboardingBuild(school.id, learned);
+      const aiResp = result.ai_response;
+      if (aiResp.status === "proposal" && aiResp.framework) {
         setProposedFramework(aiResp.framework.dimensions);
         setProposalRationale(aiResp.rationale || "");
         setConversation((prev) => [
@@ -150,16 +166,13 @@ export default function OnboardingPage() {
           { role: "assistant" as const, content: "Here's your customized framework. Let's explore it together." },
         ]);
         setPhase("studio");
+      } else {
+        setBuildError("The framework couldn't be generated. Please try again.");
+        setPhase("interview");
       }
     } catch {
-      clearTimeout(buildingTimer);
-      setConversation((prev) => [
-        ...prev,
-        { role: "assistant", content: "That took longer than expected. Let me try again — please click send once more." },
-      ]);
+      setBuildError("Framework generation failed. Please try again.");
       setPhase("interview");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -326,21 +339,42 @@ export default function OnboardingPage() {
 
             {/* Input bar */}
             <div className="border-t border-gray-200 bg-white px-6 py-4">
-              <div className="max-w-2xl mx-auto flex gap-3">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={userInput}
-                  onChange={(e) => setUserInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-                  disabled={loading}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="Type your response..."
-                />
-                <button onClick={handleSendMessage} disabled={loading || !userInput.trim()}
-                  className="px-4 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-50 transition-colors">
-                  <Send className="w-4 h-4" />
-                </button>
+              <div className="max-w-2xl mx-auto">
+                {buildError && (
+                  <div className="mb-3 px-4 py-2.5 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+                    {buildError}
+                  </div>
+                )}
+                {readyToBuild && !loading ? (
+                  <div className="flex gap-3">
+                    <button onClick={handleBuildFramework}
+                      className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
+                      <Sparkles className="w-4 h-4" />
+                      Build My Framework
+                    </button>
+                    <button onClick={() => { setReadyToBuild(false); inputRef.current?.focus(); }}
+                      className="px-4 py-3 border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors text-sm">
+                      Keep talking
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-3">
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={userInput}
+                      onChange={(e) => setUserInput(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                      disabled={loading}
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="Type your response..."
+                    />
+                    <button onClick={handleSendMessage} disabled={loading || !userInput.trim()}
+                      className="px-4 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-50 transition-colors">
+                      <Send className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
