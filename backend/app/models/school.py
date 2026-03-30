@@ -36,6 +36,7 @@ class SchoolOnboardingProfile(Base):
     strategic_priorities = Column(JSON, nullable=True)  # top priorities from interview
     pain_points = Column(JSON, nullable=True)  # known challenges
     interview_transcript = Column(JSON, nullable=True)  # full conversation history
+    amendments = Column(JSON, nullable=True)  # rationalized amendment list for audit trail
     additional_context = Column(Text, nullable=True)  # free-form notes
     created_at = Column(DateTime, default=datetime.utcnow)
 

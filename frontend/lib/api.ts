@@ -178,8 +178,10 @@ export const onboardingRespond = (schoolId: string, message: string) =>
 export const startOnboardingBuild = (schoolId: string, learned: import("./types").OnboardingLearned) =>
   fetchApi<{ job_id: string }>(`/onboarding/${schoolId}/build`, { method: "POST", body: JSON.stringify({ learned }) });
 export const pollOnboardingBuild = (schoolId: string, jobId: string) =>
-  fetchApi<{ status: string; ai_response?: import("./types").OnboardingAIResponse; detail?: string }>(`/onboarding/${schoolId}/build/${jobId}`);
-export const finalizeOnboarding = (schoolId: string, data: { framework: unknown; engagement_name?: string; strategic_priorities?: string[]; programs?: string[] }) =>
+  fetchApi<import("./types").BuildProgress>(`/onboarding/${schoolId}/build/${jobId}`);
+export const getCanonicalSQF = () =>
+  fetchApi<import("./types").OnboardingDimension[]>("/framework/onboarding-tree");
+export const finalizeOnboarding = (schoolId: string, data: { framework: unknown; engagement_name?: string; strategic_priorities?: string[]; programs?: string[]; amendments?: import("./types").Amendment[] }) =>
   fetchApi<{ engagement_id: string; school_id: string; engagement: import("./types").Engagement }>(`/onboarding/${schoolId}/finalize`, { method: "POST", body: JSON.stringify(data), timeoutMs: 120000 });
 
 // Activity Log

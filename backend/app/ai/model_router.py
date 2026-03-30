@@ -33,6 +33,9 @@ class AITaskType(str, Enum):
 
     # Onboarding
     ONBOARDING_INTERVIEW = "onboarding_interview"  # Framework customization interview
+    ONBOARDING_AMENDMENT_PLAN = "onboarding_amendment_plan"  # Step 0: dimension plan
+    ONBOARDING_AMENDMENT_DIMENSION = "onboarding_amendment_dim"  # Step 1: per-dimension amendments
+    ONBOARDING_AMENDMENT_COHERENCE = "onboarding_amendment_coh"  # Step 2: coherence pass
 
 
 # Model routing table - maps task types to models
@@ -49,6 +52,9 @@ MODEL_ROUTING: dict[AITaskType, str] = {
     AITaskType.FOLLOW_UP_GENERATION: settings.model_extraction,
     AITaskType.REPORT_COMPOSITION: settings.model_composition,
     AITaskType.ONBOARDING_INTERVIEW: settings.model_synthesis,
+    AITaskType.ONBOARDING_AMENDMENT_PLAN: settings.model_extraction,
+    AITaskType.ONBOARDING_AMENDMENT_DIMENSION: settings.model_extraction,
+    AITaskType.ONBOARDING_AMENDMENT_COHERENCE: settings.model_synthesis,
 }
 
 

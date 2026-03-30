@@ -209,6 +209,52 @@ async def fork_sqf_directly_to_engagement(
     return eng_dims
 
 
+async def load_sqf_tree(db: AsyncSession) -> list[dict]:
+    """Load the canonical SQF from the database as a serializable dict tree.
+
+    Returns a list of dimension dicts in the OnboardingDimension shape:
+    [{"number": 1, "name": "...", "description": "...", "color": "...", "is_custom": False,
+      "components": [{"code": "1A", "name": "...", ...}]}]
+    """
+    result = await db.execute(
+        select(Dimension)
+        .options(
+            selectinload(Dimension.components).selectinload(Component.criteria)
+        )
+        .order_by(Dimension.number)
+    )
+    dimensions = result.scalars().all()
+
+    tree = []
+    for dim in dimensions:
+        dim_dict = {
+            "number": dim.number,
+            "name": dim.name,
+            "description": dim.description or "",
+            "color": dim.color or "#6366F1",
+            "is_custom": False,
+            "components": [],
+        }
+        for comp in sorted(dim.components, key=lambda c: c.code):
+            comp_dict = {
+                "code": comp.code,
+                "name": comp.name,
+                "description": comp.description or "",
+                "evidence_guidance": comp.evidence_guidance or "",
+                "is_custom": False,
+                "criteria": [],
+            }
+            for crit in sorted(comp.criteria, key=lambda c: c.order):
+                comp_dict["criteria"].append({
+                    "criterion_type": crit.criterion_type.value if hasattr(crit.criterion_type, 'value') else str(crit.criterion_type),
+                    "text": crit.text,
+                })
+            dim_dict["components"].append(comp_dict)
+        tree.append(dim_dict)
+
+    return tree
+
+
 def _parse_order(val: str) -> int:
     """Parse a component code like '2A' into a sortable integer, or return 0."""
     if not val:

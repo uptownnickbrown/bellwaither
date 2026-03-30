@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import type { School, OnboardingDimension, OnboardingComponent } from "@/lib/types";
+import type { School, OnboardingDimension, OnboardingComponent, BuildProgress } from "@/lib/types";
 import { onboardingRespond } from "@/lib/api";
 import {
   ChevronRight, ChevronDown, Send, Loader2, Check,
@@ -21,6 +21,8 @@ interface Props {
   onFinalize: (framework: { dimensions: OnboardingDimension[] }) => void;
   onBack: () => void;
   loading: boolean;
+  buildProgress?: BuildProgress | null;
+  buildError?: string | null;
 }
 
 export default function FrameworkStudio({
@@ -31,9 +33,25 @@ export default function FrameworkStudio({
   onFinalize,
   onBack,
   loading: externalLoading,
+  buildProgress,
+  buildError,
 }: Props) {
   const [dimensions, setDimensions] = useState<OnboardingDimension[]>(initialDimensions);
+  const [prevDimensions, setPrevDimensions] = useState<OnboardingDimension[]>(initialDimensions);
+  const [amendedHighlight, setAmendedHighlight] = useState(false);
   const [conversation, setConversation] = useState<ConversationMessage[]>(initialConversation);
+
+  // Sync dimensions when parent updates them (e.g., after amendments applied)
+  if (initialDimensions !== prevDimensions) {
+    setPrevDimensions(initialDimensions);
+    setDimensions(initialDimensions);
+    // Brief highlight to indicate amendments were applied
+    if (initialDimensions.length !== prevDimensions.length ||
+        initialDimensions.some((d, i) => d.name !== prevDimensions[i]?.name)) {
+      setAmendedHighlight(true);
+      setTimeout(() => setAmendedHighlight(false), 3000);
+    }
+  }
   const [userInput, setUserInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const [expandedDims, setExpandedDims] = useState<Set<string>>(new Set(initialDimensions.map((d) => d.number)));
@@ -318,7 +336,7 @@ export default function FrameworkStudio({
           </div>
           <button
             onClick={() => onFinalize({ dimensions })}
-            disabled={externalLoading || dimensions.length === 0}
+            disabled={externalLoading || dimensions.length === 0 || !!buildProgress}
             className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2 transition-colors"
           >
             {externalLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
@@ -326,6 +344,40 @@ export default function FrameworkStudio({
           </button>
         </div>
       </header>
+
+      {/* Build Progress Overlay */}
+      {buildProgress && buildProgress.status === "building" && (
+        <div className="bg-indigo-50 border-b border-indigo-100 px-6 py-2.5 flex items-center gap-3">
+          <Loader2 className="w-4 h-4 text-indigo-600 animate-spin flex-shrink-0" />
+          <span className="text-sm text-indigo-700 font-medium">{buildProgress.step_label}</span>
+          {buildProgress.dimensions_total > 0 && (
+            <div className="flex items-center gap-2 ml-auto">
+              <div className="w-32 h-1.5 bg-indigo-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-indigo-600 rounded-full transition-all duration-500"
+                  style={{ width: `${(buildProgress.dimensions_completed / buildProgress.dimensions_total) * 100}%` }}
+                />
+              </div>
+              <span className="text-xs text-indigo-500">{buildProgress.dimensions_completed}/{buildProgress.dimensions_total}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Build Error (non-fatal — user can still edit base framework) */}
+      {buildError && (
+        <div className="bg-amber-50 border-b border-amber-100 px-6 py-2.5 flex items-center gap-3">
+          <span className="text-sm text-amber-700">{buildError}</span>
+        </div>
+      )}
+
+      {/* Amendment Applied Highlight */}
+      {amendedHighlight && (
+        <div className="bg-emerald-50 border-b border-emerald-100 px-6 py-2.5 flex items-center gap-3">
+          <Sparkles className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+          <span className="text-sm text-emerald-700 font-medium">Framework customized. Review the changes and finalize when ready.</span>
+        </div>
+      )}
 
       {/* Split Screen */}
       <div className="flex-1 flex overflow-hidden">

@@ -331,6 +331,32 @@ export interface OnboardingCriterion {
   text: string;
 }
 
+export type AmendmentType =
+  | "add_dimension" | "remove_dimension"
+  | "add_component" | "remove_component"
+  | "edit_description"
+  | "add_criterion" | "remove_criterion" | "edit_criterion";
+
+export interface Amendment {
+  type: AmendmentType;
+  dimension_number?: number;
+  component_code?: string;
+  criterion_index?: number;
+  content?: Record<string, unknown>;
+  rationale: string;
+}
+
+export interface BuildProgress {
+  status: "building" | "complete" | "error";
+  step: number;
+  step_label: string;
+  dimensions_total: number;
+  dimensions_completed: number;
+  ai_response?: OnboardingAIResponse;
+  amendments?: Amendment[];
+  detail?: string;
+}
+
 export type UserRole = "consultant" | "school_admin";
 
 export const RATING_CONFIG = {

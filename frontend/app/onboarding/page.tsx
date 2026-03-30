@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { startOnboarding, onboardingRespond, startOnboardingBuild, pollOnboardingBuild, finalizeOnboarding } from "@/lib/api";
-import type { School, OnboardingAIResponse, OnboardingDimension, OnboardingLearned } from "@/lib/types";
+import { startOnboarding, onboardingRespond, startOnboardingBuild, pollOnboardingBuild, finalizeOnboarding, getCanonicalSQF } from "@/lib/api";
+import type { School, OnboardingAIResponse, OnboardingDimension, OnboardingLearned, BuildProgress, Amendment } from "@/lib/types";
 import FrameworkStudio from "@/components/FrameworkStudio";
 import {
   Compass, ArrowRight, ArrowLeft, Loader2, Send,
@@ -11,7 +11,7 @@ import {
   Sparkles, BookOpen, XCircle,
 } from "lucide-react";
 
-type Phase = "profile" | "interview" | "building" | "studio";
+type Phase = "profile" | "interview" | "studio";
 
 interface ConversationMessage {
   role: "user" | "assistant";
@@ -69,23 +69,11 @@ export default function OnboardingPage() {
   const [readyToBuild, setReadyToBuild] = useState(false);
   const [proposedFramework, setProposedFramework] = useState<OnboardingDimension[] | null>(null);
   const [proposalRationale, setProposalRationale] = useState("");
-  const [buildingStep, setBuildingStep] = useState(0);
+  const [buildProgress, setBuildProgress] = useState<BuildProgress | null>(null);
+  const [amendments, setAmendments] = useState<Amendment[]>([]);
   const [buildError, setBuildError] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Animate building steps over time
-  useEffect(() => {
-    if (phase !== "building") {
-      setBuildingStep(0);
-      return;
-    }
-    setBuildingStep(1);
-    const t2 = setTimeout(() => setBuildingStep(2), 5000);
-    const t3 = setTimeout(() => setBuildingStep(3), 15000);
-    const t4 = setTimeout(() => setBuildingStep(4), 25000);
-    return () => { clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
-  }, [phase]);
 
   // Auto-scroll chat
   useEffect(() => {
@@ -153,45 +141,59 @@ export default function OnboardingPage() {
   const handleBuildFramework = async () => {
     if (!school) return;
     setBuildError(null);
-    setPhase("building");
+    setBuildProgress({ status: "building", step: 0, step_label: "Loading framework...", dimensions_total: 0, dimensions_completed: 0 });
 
     try {
-      // Start the build — returns immediately with a job ID
-      const { job_id } = await startOnboardingBuild(school.id, learned);
+      // Load canonical SQF + start build in parallel
+      const [sqfTree, { job_id }] = await Promise.all([
+        getCanonicalSQF(),
+        startOnboardingBuild(school.id, learned),
+      ]);
+
+      // Enter studio immediately with the real SQF
+      setProposedFramework(sqfTree);
+      setConversation((prev) => [
+        ...prev,
+        { role: "assistant" as const, content: "Here's the School Quality Framework. I'm customizing it for your school now..." },
+      ]);
+      setPhase("studio");
 
       // Poll every 3 seconds until the build completes
-      const maxPolls = 60; // 3 minutes max
+      const maxPolls = 80; // 4 minutes max
       for (let i = 0; i < maxPolls; i++) {
         await new Promise((r) => setTimeout(r, 3000));
         try {
           const job = await pollOnboardingBuild(school.id, job_id);
+          setBuildProgress(job);
+
           if (job.status === "complete" && job.ai_response) {
             const aiResp = job.ai_response;
             if (aiResp.framework) {
               setProposedFramework(aiResp.framework.dimensions);
               setProposalRationale(aiResp.rationale || "");
+              if (job.amendments) setAmendments(job.amendments);
               setConversation((prev) => [
                 ...prev,
-                { role: "assistant" as const, content: "Here's your customized framework. Let's explore it together." },
+                { role: "assistant" as const, content: `Framework customized with ${job.amendments?.length || 0} amendments. Review the changes and finalize when ready.` },
               ]);
-              setPhase("studio");
+              setBuildProgress(null);
               return;
             }
           } else if (job.status === "error") {
-            setBuildError(job.detail || "Framework generation failed. Please try again.");
-            setPhase("interview");
+            setBuildProgress(null);
+            setBuildError(job.detail || "Framework customization failed. You can still edit the base framework manually.");
             return;
           }
-          // status === "building" — keep polling
         } catch {
           // Poll request failed — keep trying (transient network error)
         }
       }
-      // Timed out after 3 minutes
-      setBuildError("Framework generation is taking too long. Please try again.");
-      setPhase("interview");
+      // Timed out
+      setBuildProgress(null);
+      setBuildError("Framework customization is taking too long. You can still edit the base framework manually.");
     } catch {
-      setBuildError("Failed to start framework generation. Please try again.");
+      setBuildProgress(null);
+      setBuildError("Failed to start framework customization. Please try again.");
       setPhase("interview");
     }
   };
@@ -205,6 +207,7 @@ export default function OnboardingPage() {
         engagement_name: `${school.name} - Assessment`,
         strategic_priorities: learned.priorities || [],
         programs: learned.programs || [],
+        amendments: amendments.length > 0 ? amendments : undefined,
       });
       router.push(`/?engagement=${result.engagement_id}`);
     } catch (e) {
@@ -528,60 +531,6 @@ export default function OnboardingPage() {
     );
   }
 
-  // ---- Building Phase (optimistic transition while proposal generates) ----
-  if (phase === "building") {
-    return (
-      <div className="h-screen flex flex-col bg-[#FAFBFC]">
-        <header className="bg-white border-b border-gray-200 px-6 h-14 flex items-center flex-shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <Compass className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-semibold text-gray-900">Framework Studio</span>
-            <span className="text-sm text-gray-500">{school?.name}</span>
-          </div>
-        </header>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center max-w-md">
-            <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
-            </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">Building your framework</h2>
-            <p className="text-gray-600 leading-relaxed mb-2">
-              Assembling all 9 SQF dimensions with your customizations — this takes about 30 seconds.
-            </p>
-            <div className="mt-6 space-y-2.5 text-left mx-auto max-w-xs">
-              {[
-                "School profile analyzed",
-                "Priorities mapped to dimensions",
-                "Custom components drafted",
-                "Success criteria generated",
-              ].map((label, i) => {
-                const stepNum = i + 1;
-                const done = buildingStep > stepNum;
-                const active = buildingStep === stepNum;
-                return (
-                  <div key={i} className="flex items-center gap-2.5">
-                    {done ? (
-                      <div className="w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
-                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                      </div>
-                    ) : active ? (
-                      <div className="w-5 h-5 border-2 border-indigo-400 rounded-full flex-shrink-0 animate-pulse" />
-                    ) : (
-                      <div className="w-5 h-5 border-2 border-gray-200 rounded-full flex-shrink-0" />
-                    )}
-                    <span className={`text-sm ${done ? "text-gray-900" : active ? "text-gray-700" : "text-gray-400"}`}>{label}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // ---- Framework Studio Phase ----
   if (phase === "studio" && proposedFramework) {
     return (
@@ -593,6 +542,8 @@ export default function OnboardingPage() {
         onFinalize={handleFinalize}
         onBack={() => setPhase("interview")}
         loading={loading}
+        buildProgress={buildProgress}
+        buildError={buildError}
       />
     );
   }

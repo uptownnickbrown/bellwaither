@@ -2540,20 +2540,182 @@ async def onboarding_respond(
 _build_jobs: dict[str, dict] = {}
 
 
+async def _safe_amend_dimension(sem, school_profile, learned, dim_data, job):
+    """Run one dimension amendment with semaphore, retry, and progress tracking."""
+    from app.ai.agents.amendment_agent import amend_standard_dimension, validate_amendments
+
+    dim_name = dim_data["name"]
+    async with sem:
+        for attempt in range(2):
+            try:
+                raw = await amend_standard_dimension(school_profile, learned, dim_data)
+                amendments = validate_amendments(raw, dim_data["number"])
+                job["dimensions_completed"] += 1
+                job["step_label"] = f"Reviewed {dim_name}"
+                return amendments
+            except Exception as e:
+                if attempt == 0:
+                    logger.warning("Dimension '%s' attempt 1 failed: %s, retrying", dim_name, e)
+                    await asyncio.sleep(1)
+                else:
+                    logger.error("Dimension '%s' failed after retry: %s, skipping", dim_name, e)
+                    job["dimensions_completed"] += 1
+                    return []
+
+
+async def _safe_generate_custom(sem, school_profile, learned, dim_spec, job):
+    """Generate a custom dimension with semaphore and retry."""
+    from app.ai.agents.amendment_agent import generate_custom_dimension
+
+    dim_name = dim_spec.get("name", "Custom")
+    async with sem:
+        for attempt in range(2):
+            try:
+                result = await generate_custom_dimension(school_profile, learned, dim_spec)
+                job["dimensions_completed"] += 1
+                job["step_label"] = f"Generated {dim_name}"
+                return result
+            except Exception as e:
+                if attempt == 0:
+                    logger.warning("Custom dim '%s' attempt 1 failed: %s, retrying", dim_name, e)
+                    await asyncio.sleep(1)
+                else:
+                    logger.error("Custom dim '%s' failed after retry: %s, skipping", dim_name, e)
+                    job["dimensions_completed"] += 1
+                    return None
+
+
 async def _run_framework_build(job_id: str, school_profile: dict, learned: dict):
-    """Background task that builds the framework and stores the result."""
-    from app.ai.agents.onboarding_agent import build_framework
+    """Background task: amendment pipeline to customize the SQF."""
+    from app.ai.agents.amendment_agent import (
+        apply_amendments,
+        plan_dimensions,
+        rationalize_amendments,
+    )
+    from app.database import async_session
+    from app.services.framework_service import load_sqf_tree
 
     try:
-        ai_result = await build_framework(
-            school_profile=school_profile,
-            learned=learned,
-        )
-        _build_jobs[job_id] = {"status": "complete", "ai_response": ai_result}
-        logger.info("Framework build job %s completed", job_id)
+        # Load canonical SQF from database
+        async with async_session() as db:
+            sqf_tree = await load_sqf_tree(db)
+
+        dim_names = [{"number": d["number"], "name": d["name"]} for d in sqf_tree]
+
+        # Step 0: Dimension plan
+        _build_jobs[job_id].update({
+            "step": 0, "step_label": "Planning framework structure...",
+            "dimensions_total": 0, "dimensions_completed": 0,
+            "completed_dimensions": [],
+        })
+        plan = await plan_dimensions(school_profile, learned, dim_names)
+
+        # Determine active standard dims and custom dims
+        active_dims = []
+        removed_numbers = set()
+        for sd in plan.get("standard_dimensions", []):
+            if sd.get("action") == "remove":
+                removed_numbers.add(sd["number"])
+            else:
+                active_dims.append(sd["number"])
+        custom_specs = plan.get("custom_dimensions", [])
+        total = len(active_dims) + len(custom_specs)
+
+        _build_jobs[job_id].update({
+            "step": 1,
+            "step_label": "Reviewing dimensions...",
+            "dimensions_total": total,
+            "dimensions_completed": 0,
+        })
+
+        # Step 1: Per-dimension amendments (parallel with semaphore)
+        sem = asyncio.Semaphore(3)
+
+        # Standard dimension tasks
+        std_tasks = []
+        dim_by_number = {d["number"]: d for d in sqf_tree}
+        for num in active_dims:
+            dim_data = dim_by_number.get(num)
+            if dim_data:
+                std_tasks.append(_safe_amend_dimension(sem, school_profile, learned, dim_data, _build_jobs[job_id]))
+
+        # Custom dimension tasks
+        custom_tasks = []
+        for spec in custom_specs:
+            custom_tasks.append(_safe_generate_custom(sem, school_profile, learned, spec, _build_jobs[job_id]))
+
+        # Run all in parallel (bounded by semaphore)
+        std_results = await asyncio.gather(*std_tasks)
+        custom_results = await asyncio.gather(*custom_tasks)
+
+        # Collect all amendments from standard dimensions
+        all_amendments = []
+        for amendments_list in std_results:
+            if amendments_list:
+                all_amendments.extend(amendments_list)
+
+        # Add remove_dimension amendments for removed dims
+        for num in removed_numbers:
+            dim = dim_by_number.get(num)
+            all_amendments.append({
+                "type": "remove_dimension",
+                "dimension_number": num,
+                "rationale": f"Dimension '{dim['name'] if dim else num}' removed per school customization",
+            })
+
+        # Add add_dimension amendments for custom dims
+        for custom_result in custom_results:
+            if custom_result:
+                all_amendments.append({
+                    "type": "add_dimension",
+                    "content": custom_result,
+                    "rationale": f"Custom dimension '{custom_result.get('name', 'Custom')}' added",
+                })
+
+        # Step 2: Coherence pass
+        _build_jobs[job_id].update({
+            "step": 2,
+            "step_label": "Finalizing amendments...",
+        })
+        final_amendments = await rationalize_amendments(school_profile, all_amendments)
+
+        # Step 3: Apply amendments
+        _build_jobs[job_id].update({
+            "step": 3,
+            "step_label": "Applying changes...",
+        })
+        final_tree = apply_amendments(sqf_tree, final_amendments)
+
+        # Build the response in OnboardingAIResponse shape
+        ai_result = {
+            "status": "proposal",
+            "framework": {"dimensions": final_tree},
+            "rationale": f"Applied {len(final_amendments)} amendments to the SQF baseline.",
+        }
+
+        _build_jobs[job_id] = {
+            "status": "complete",
+            "step": 3,
+            "step_label": "Done",
+            "dimensions_total": total,
+            "dimensions_completed": total,
+            "ai_response": ai_result,
+            "amendments": final_amendments,
+        }
+        logger.info("Framework build job %s completed: %d amendments applied", job_id, len(final_amendments))
+
     except Exception as e:
         logger.exception("Framework build job %s failed", job_id)
         _build_jobs[job_id] = {"status": "error", "detail": str(e)}
+
+
+@router.get("/framework/onboarding-tree")
+async def get_framework_onboarding_tree(db: AsyncSession = Depends(get_db)):
+    """Return the canonical SQF formatted for the onboarding studio."""
+    from app.services.framework_service import load_sqf_tree
+
+    tree = await load_sqf_tree(db)
+    return tree
 
 
 @router.post("/onboarding/{school_id}/build")
@@ -2563,7 +2725,6 @@ async def onboarding_build_framework(
     db: AsyncSession = Depends(get_db),
 ):
     """Start building a customized framework. Returns a job_id to poll for results."""
-    # Get school
     school_result = await db.execute(select(School).where(School.id == school_id))
     school = school_result.scalar_one_or_none()
     if not school:
@@ -2580,9 +2741,9 @@ async def onboarding_build_framework(
 
     learned = data.get("learned", {})
     job_id = str(uuid.uuid4())
-    _build_jobs[job_id] = {"status": "building"}
+    _build_jobs[job_id] = {"status": "building", "step": 0, "step_label": "Starting...",
+                           "dimensions_total": 0, "dimensions_completed": 0}
 
-    # Fire and forget — the result will be stored in _build_jobs
     asyncio.create_task(_run_framework_build(job_id, school_profile, learned))
     logger.info("Framework build job %s started for school %s", job_id, school.name)
 
@@ -2594,16 +2755,25 @@ async def onboarding_build_status(
     school_id: uuid.UUID,
     job_id: str,
 ):
-    """Poll for the result of a framework build job."""
+    """Poll for the status/result of a framework build job."""
     job = _build_jobs.get(job_id)
     if not job:
         raise HTTPException(status_code=404, detail="Build job not found")
 
-    # Clean up completed/errored jobs after returning them
-    if job["status"] in ("complete", "error"):
-        _build_jobs.pop(job_id, None)
+    # For building status, return progress only (small response)
+    if job["status"] == "building":
+        return {
+            "status": "building",
+            "step": job.get("step", 0),
+            "step_label": job.get("step_label", ""),
+            "dimensions_total": job.get("dimensions_total", 0),
+            "dimensions_completed": job.get("dimensions_completed", 0),
+        }
 
-    return job
+    # For complete/error, return full result and clean up
+    result = dict(job)
+    _build_jobs.pop(job_id, None)
+    return result
 
 
 @router.post("/onboarding/{school_id}/finalize")
@@ -2723,6 +2893,8 @@ async def finalize_onboarding(
     if profile:
         profile.strategic_priorities = data.get("strategic_priorities", [])
         profile.programs = data.get("programs", [])
+        if data.get("amendments"):
+            profile.amendments = data["amendments"]
 
     await db.commit()
     await db.refresh(engagement)
