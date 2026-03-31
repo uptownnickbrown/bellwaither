@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import type { School, OnboardingDimension, OnboardingComponent, BuildProgress, OnboardingLearned, Amendment } from "@/lib/types";
 import { studioChat } from "@/lib/api";
+import AIMarkdown from "@/components/AIMarkdown";
 import {
   ChevronRight, ChevronDown, Send, Loader2, Check,
   Plus, X, Sparkles, ArrowLeft, Compass, GripVertical, Info,
@@ -312,6 +313,11 @@ export default function FrameworkStudio({
       if (result.message) {
         setConversation((prev) => [...prev, { role: "assistant" as const, content: result.message }]);
       }
+
+      // Apply any amendments the AI proposed
+      if (result.amendments && result.amendments.length > 0) {
+        setDimensions((prev) => applyAmendmentsToTree(prev, result.amendments!));
+      }
     } catch {
       setConversation((prev) => [
         ...prev,
@@ -320,6 +326,33 @@ export default function FrameworkStudio({
     } finally {
       setChatLoading(false);
     }
+  };
+
+  // Apply amendments from studio chat to the dimension tree
+  const applyAmendmentsToTree = (tree: OnboardingDimension[], edits: Amendment[]): OnboardingDimension[] => {
+    const result = tree.map((d) => ({ ...d, components: d.components.map((c) => ({ ...c, criteria: [...c.criteria] })) }));
+    for (const a of edits) {
+      const dimIdx = result.findIndex((d) => String(d.number) === String(a.dimension_number));
+      if (a.type === "edit_description" && a.component_code && dimIdx >= 0) {
+        const comp = result[dimIdx].components.find((c) => c.code === a.component_code);
+        if (comp && a.content?.description) comp.description = String(a.content.description);
+      } else if (a.type === "add_criterion" && a.component_code && dimIdx >= 0) {
+        const comp = result[dimIdx].components.find((c) => c.code === a.component_code);
+        if (comp && a.content) comp.criteria.push({ criterion_type: (a.content.criterion_type as "core_action" | "progress_indicator") || "core_action", text: String(a.content.text || ""), is_custom: true });
+      } else if (a.type === "remove_criterion" && a.component_code && a.criterion_index != null && dimIdx >= 0) {
+        const comp = result[dimIdx].components.find((c) => c.code === a.component_code);
+        if (comp && a.criterion_index >= 0 && a.criterion_index < comp.criteria.length) comp.criteria.splice(a.criterion_index, 1);
+      } else if (a.type === "edit_criterion" && a.component_code && a.criterion_index != null && dimIdx >= 0) {
+        const comp = result[dimIdx].components.find((c) => c.code === a.component_code);
+        if (comp && a.criterion_index >= 0 && a.criterion_index < comp.criteria.length && a.content?.text) comp.criteria[a.criterion_index].text = String(a.content.text);
+      } else if (a.type === "remove_component" && a.component_code && dimIdx >= 0) {
+        result[dimIdx].components = result[dimIdx].components.filter((c) => c.code !== a.component_code);
+      } else if (a.type === "add_component" && dimIdx >= 0 && a.content) {
+        const content = a.content as Record<string, unknown>;
+        result[dimIdx].components.push({ code: String(content.code || ""), name: String(content.name || ""), description: String(content.description || ""), is_custom: true, criteria: (content.criteria as OnboardingDimension["components"][0]["criteria"]) || [] });
+      }
+    }
+    return result;
   };
 
   const totalComponents = dimensions.reduce((s, d) => s + d.components.length, 0);
@@ -413,7 +446,7 @@ export default function FrameworkStudio({
                       : "bg-gray-50 border border-gray-100 text-gray-800 rounded-bl-md"
                   }`}
                 >
-                  {msg.role === "assistant" ? renderLinkedMessage(msg.content) : msg.content}
+                  {msg.role === "assistant" ? <AIMarkdown content={msg.content} /> : msg.content}
                 </div>
               </div>
             ))}

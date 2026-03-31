@@ -171,16 +171,29 @@ KEY RULES:
 3. If the user asks about something that IS in the framework, describe exactly where it is (which dimension, which component, which criteria).
 4. If the user asks about something that is NOT in the framework, say so clearly and offer to add it.
 5. Be concise and specific. Reference component codes (e.g., "2H: Instructional Technology") when discussing the framework.
-6. If the user wants to move, add, or remove something, describe the change clearly. You cannot make edits directly — the user does that in the tree on the right.
-7. Stay focused on the current question. Do not bring up unrelated customizations or repeat information the user hasn't asked about.
+6. Stay focused on the current question. Do not bring up unrelated customizations or repeat information the user hasn't asked about.
+7. You CAN apply edits to the framework. When the user asks you to make changes, include amendments in your response.
 
-You will receive:
-- The school's profile and what you learned about them
-- The list of amendments that were applied to customize the framework
-- A summary of the current framework structure
-- The conversation history
+APPLYING EDITS:
+When the user asks you to edit, add, remove, or move something in the framework, include an "amendments" array in your JSON response. Use the same amendment types as the build pipeline:
+- "edit_description": Edit a component's description. Requires component_code and content.description.
+- "add_criterion": Add a criterion. Requires component_code and content with criterion_type and text.
+- "remove_criterion": Remove a criterion by index. Requires component_code and criterion_index.
+- "edit_criterion": Edit a criterion. Requires component_code, criterion_index, and content with text.
+- "add_component": Add a component. Requires content with code, name, description, is_custom, criteria.
+- "remove_component": Remove a component. Requires component_code.
 
-Respond with a plain text message (not JSON). Be helpful, specific, and grounded in the actual framework content."""
+Each amendment needs dimension_number and a rationale. Only include amendments when the user asks for changes. For questions/explanations, return an empty amendments array.
+
+RESPONSE FORMAT (always JSON):
+{
+  "message": "Your response text (can use markdown: **bold**, *italic*, bullet lists, headings)",
+  "amendments": []
+}
+
+Use markdown freely in your message — bold for emphasis, bullet lists for comparisons, headings for structure. The UI renders markdown.
+
+You will receive the school's profile, learned context, amendments applied, current framework structure, and conversation history."""
 
 COHERENCE_PROMPT = """You are the Meridian Framework Advisor performing a COHERENCE REVIEW.
 
@@ -425,9 +438,13 @@ async def studio_chat(
     response = await client.chat.completions.create(
         model=model,
         messages=messages,
+        response_format={"type": "json_object"},
         temperature=0.3,
     )
-    return response.choices[0].message.content
+    result = json.loads(response.choices[0].message.content)
+    num_edits = len(result.get("amendments", []))
+    logger.info("Studio chat result: %d amendments proposed", num_edits)
+    return result
 
 
 # ---------------------------------------------------------------------------

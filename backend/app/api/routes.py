@@ -2754,7 +2754,7 @@ async def onboarding_studio_chat(
         logger.exception("Studio chat failed")
         raise HTTPException(status_code=502, detail=f"AI service error: {e}")
 
-    return {"message": response}
+    return response  # {"message": "...", "amendments": [...]}
 
 
 @router.post("/onboarding/{school_id}/build")
