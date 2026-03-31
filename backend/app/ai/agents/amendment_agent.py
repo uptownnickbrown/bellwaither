@@ -163,6 +163,25 @@ RESPONSE FORMAT (JSON):
   ]
 }"""
 
+STUDIO_CHAT_PROMPT = """You are the Meridian Framework Advisor in REVIEW MODE. The framework has already been built and customized for this school. You are now helping the user explore, understand, and refine it.
+
+KEY RULES:
+1. You ALREADY built the framework. Never say "I'll add" or "I'll build" — use past tense ("I added", "The framework includes").
+2. You have full knowledge of what amendments were applied. When asked about customizations, reference SPECIFIC components and criteria by code and name.
+3. If the user asks about something that IS in the framework, describe exactly where it is (which dimension, which component, which criteria).
+4. If the user asks about something that is NOT in the framework, say so clearly and offer to add it.
+5. Be concise and specific. Reference component codes (e.g., "2H: Instructional Technology") when discussing the framework.
+6. If the user wants to move, add, or remove something, describe the change clearly. You cannot make edits directly — the user does that in the tree on the right.
+7. Stay focused on the current question. Do not bring up unrelated customizations or repeat information the user hasn't asked about.
+
+You will receive:
+- The school's profile and what you learned about them
+- The list of amendments that were applied to customize the framework
+- A summary of the current framework structure
+- The conversation history
+
+Respond with a plain text message (not JSON). Be helpful, specific, and grounded in the actual framework content."""
+
 COHERENCE_PROMPT = """You are the Meridian Framework Advisor performing a COHERENCE REVIEW.
 
 You will receive a list of proposed amendments to a school's framework, collected from reviewing each dimension independently. Your job:
@@ -323,6 +342,95 @@ async def rationalize_amendments(
 
 
 # ---------------------------------------------------------------------------
+# Studio Chat (post-build)
+# ---------------------------------------------------------------------------
+
+async def studio_chat(
+    school_profile: dict,
+    learned: dict,
+    amendments: list[dict],
+    framework_summary: list[dict],
+    conversation_history: list[dict],
+    message: str,
+) -> str:
+    """Answer questions about the customized framework in the studio.
+
+    Returns a plain text response (not JSON).
+    """
+    client = AsyncOpenAI(api_key=settings.openai_api_key)
+    model = get_model_for_task(AITaskType.ONBOARDING_AMENDMENT_COHERENCE)  # use strong model
+
+    school_context = _build_school_context(school_profile, learned)
+
+    # Format amendments as readable text
+    amendments_text = ""
+    if amendments:
+        lines = []
+        for a in amendments:
+            dim = a.get("dimension_number", "?")
+            comp = a.get("component_code", "")
+            desc = a.get("rationale", "")
+            atype = a.get("type", "")
+            if atype == "add_dimension":
+                name = a.get("content", {}).get("name", "Custom")
+                lines.append(f"  - Added custom dimension: {name} ({desc})")
+            elif atype == "add_component":
+                name = a.get("content", {}).get("name", "")
+                lines.append(f"  - Dim {dim}: Added component {name} ({desc})")
+            elif atype == "add_criterion":
+                text = a.get("content", {}).get("text", "")[:80]
+                lines.append(f"  - Dim {dim}, {comp}: Added criterion: {text}... ({desc})")
+            elif atype == "edit_description":
+                lines.append(f"  - Dim {dim}, {comp}: Edited description ({desc})")
+            elif atype == "edit_criterion":
+                lines.append(f"  - Dim {dim}, {comp}: Edited criterion ({desc})")
+            elif atype == "remove_component":
+                lines.append(f"  - Dim {dim}: Removed component {comp} ({desc})")
+            elif atype == "remove_dimension":
+                lines.append(f"  - Removed dimension {dim} ({desc})")
+            else:
+                lines.append(f"  - {atype} on dim {dim} {comp} ({desc})")
+        amendments_text = "\n".join(lines)
+
+    # Format framework summary compactly
+    fw_lines = []
+    for dim in framework_summary:
+        custom_tag = " [CUSTOM]" if dim.get("is_custom") else ""
+        fw_lines.append(f"Dim {dim.get('number', '?')}: {dim.get('name', '?')}{custom_tag}")
+        for comp in dim.get("components", []):
+            comp_custom = " [CUSTOM]" if comp.get("is_custom") else ""
+            fw_lines.append(f"  {comp.get('code', '?')}: {comp.get('name', '?')}{comp_custom}")
+    framework_text = "\n".join(fw_lines)
+
+    system_content = f"""{STUDIO_CHAT_PROMPT}
+
+--- SCHOOL CONTEXT ---
+{school_context}
+
+--- AMENDMENTS APPLIED ({len(amendments)} total) ---
+{amendments_text or "No amendments were applied."}
+
+--- CURRENT FRAMEWORK STRUCTURE ---
+{framework_text}"""
+
+    messages = [{"role": "system", "content": system_content}]
+    # Include last 10 messages of conversation history
+    for msg in conversation_history[-10:]:
+        messages.append({"role": msg["role"], "content": msg["content"]})
+    messages.append({"role": "user", "content": message})
+
+    logger.info("Studio chat: model=%s, %d amendments in context, %d history msgs",
+                model, len(amendments), len(conversation_history))
+
+    response = await client.chat.completions.create(
+        model=model,
+        messages=messages,
+        temperature=0.3,
+    )
+    return response.choices[0].message.content
+
+
+# ---------------------------------------------------------------------------
 # Validation
 # ---------------------------------------------------------------------------
 
@@ -422,9 +530,11 @@ def apply_amendments(sqf_tree: list[dict], amendments: list[dict]) -> list[dict]
                 "is_custom": True,
                 "components": content.get("components", []),
             }
-            # Ensure components have is_custom set
+            # Ensure components and criteria in custom dims have is_custom set
             for comp in new_dim["components"]:
                 comp.setdefault("is_custom", True)
+                for crit in comp.get("criteria", []):
+                    crit.setdefault("is_custom", True)
             tree.append(new_dim)
             dim_by_number[new_dim["number"]] = new_dim
             continue
@@ -471,6 +581,7 @@ def apply_amendments(sqf_tree: list[dict], amendments: list[dict]) -> list[dict]
             new_crit = {
                 "criterion_type": content.get("criterion_type", "core_action"),
                 "text": content.get("text", ""),
+                "is_custom": True,
             }
             comp.setdefault("criteria", []).append(new_crit)
             continue

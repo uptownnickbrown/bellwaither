@@ -329,6 +329,7 @@ export interface OnboardingComponent {
 export interface OnboardingCriterion {
   criterion_type: "core_action" | "progress_indicator";
   text: string;
+  is_custom?: boolean;
 }
 
 export type AmendmentType =

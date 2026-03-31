@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import type { School, OnboardingDimension, OnboardingComponent, BuildProgress } from "@/lib/types";
-import { onboardingRespond } from "@/lib/api";
+import type { School, OnboardingDimension, OnboardingComponent, BuildProgress, OnboardingLearned, Amendment } from "@/lib/types";
+import { studioChat } from "@/lib/api";
 import {
   ChevronRight, ChevronDown, Send, Loader2, Check,
   Plus, X, Sparkles, ArrowLeft, Compass, GripVertical, Info,
@@ -23,6 +23,8 @@ interface Props {
   loading: boolean;
   buildProgress?: BuildProgress | null;
   buildError?: string | null;
+  learned?: OnboardingLearned;
+  amendments?: Amendment[];
 }
 
 export default function FrameworkStudio({
@@ -35,6 +37,8 @@ export default function FrameworkStudio({
   loading: externalLoading,
   buildProgress,
   buildError,
+  learned,
+  amendments,
 }: Props) {
   const [dimensions, setDimensions] = useState<OnboardingDimension[]>(initialDimensions);
   const [prevDimensions, setPrevDimensions] = useState<OnboardingDimension[]>(initialDimensions);
@@ -284,21 +288,29 @@ export default function FrameworkStudio({
     if (!userInput.trim() || chatLoading) return;
     const msg = userInput.trim();
     setUserInput("");
-    setConversation((prev) => [...prev, { role: "user", content: msg }]);
+    const updatedConversation = [...conversation, { role: "user" as const, content: msg }];
+    setConversation(updatedConversation);
     setChatLoading(true);
 
     try {
-      const result = await onboardingRespond(school.id, msg);
-      const aiResp = result.ai_response;
+      // Build compact framework summary for the AI
+      const frameworkSummary = dimensions.map((d) => ({
+        number: d.number,
+        name: d.name,
+        is_custom: d.is_custom,
+        components: d.components.map((c) => ({ code: c.code, name: c.name, is_custom: c.is_custom })),
+      }));
 
-      if (aiResp.status === "proposal" && aiResp.framework) {
-        setDimensions(aiResp.framework.dimensions);
-        setConversation((prev) => [
-          ...prev,
-          { role: "assistant" as const, content: aiResp.rationale || "I've updated the framework based on your feedback." },
-        ]);
-      } else if (aiResp.message) {
-        setConversation((prev) => [...prev, { role: "assistant" as const, content: aiResp.message! }]);
+      const result = await studioChat(school.id, {
+        message: msg,
+        learned: learned || {},
+        amendments: amendments || [],
+        framework_summary: frameworkSummary,
+        conversation_history: updatedConversation.slice(-10),
+      });
+
+      if (result.message) {
+        setConversation((prev) => [...prev, { role: "assistant" as const, content: result.message }]);
       }
     } catch {
       setConversation((prev) => [
@@ -576,6 +588,9 @@ export default function FrameworkStudio({
                                     {crit.criterion_type === "core_action" ? "CA" : "PI"}
                                   </span>
                                   <span className="text-xs text-gray-500 leading-relaxed">{crit.text}</span>
+                                  {crit.is_custom && (
+                                    <span className="px-1.5 py-0.5 text-[10px] font-medium bg-indigo-50 text-indigo-600 rounded ml-auto flex-shrink-0">Custom</span>
+                                  )}
                                 </div>
                               ))}
                             </div>

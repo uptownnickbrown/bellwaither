@@ -2718,6 +2718,45 @@ async def get_framework_onboarding_tree(db: AsyncSession = Depends(get_db)):
     return tree
 
 
+@router.post("/onboarding/{school_id}/studio-chat")
+async def onboarding_studio_chat(
+    school_id: uuid.UUID,
+    data: dict,
+    db: AsyncSession = Depends(get_db),
+):
+    """Chat with the Framework Advisor in the studio (post-build)."""
+    from app.ai.agents.amendment_agent import studio_chat
+
+    school_result = await db.execute(select(School).where(School.id == school_id))
+    school = school_result.scalar_one_or_none()
+    if not school:
+        raise HTTPException(status_code=404, detail="School not found")
+
+    school_profile = {
+        "name": school.name,
+        "school_type": school.school_type,
+        "grade_levels": school.grade_levels,
+        "enrollment": school.enrollment,
+        "district": school.district,
+        "state": school.state,
+    }
+
+    try:
+        response = await studio_chat(
+            school_profile=school_profile,
+            learned=data.get("learned", {}),
+            amendments=data.get("amendments", []),
+            framework_summary=data.get("framework_summary", []),
+            conversation_history=data.get("conversation_history", []),
+            message=data.get("message", ""),
+        )
+    except Exception as e:
+        logger.exception("Studio chat failed")
+        raise HTTPException(status_code=502, detail=f"AI service error: {e}")
+
+    return {"message": response}
+
+
 @router.post("/onboarding/{school_id}/build")
 async def onboarding_build_framework(
     school_id: uuid.UUID,

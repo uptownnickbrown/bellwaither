@@ -544,6 +544,8 @@ export default function OnboardingPage() {
         loading={loading}
         buildProgress={buildProgress}
         buildError={buildError}
+        learned={learned}
+        amendments={amendments}
       />
     );
   }

@@ -181,6 +181,8 @@ export const pollOnboardingBuild = (schoolId: string, jobId: string) =>
   fetchApi<import("./types").BuildProgress>(`/onboarding/${schoolId}/build/${jobId}`);
 export const getCanonicalSQF = () =>
   fetchApi<import("./types").OnboardingDimension[]>("/framework/onboarding-tree");
+export const studioChat = (schoolId: string, data: { message: string; learned: import("./types").OnboardingLearned; amendments: import("./types").Amendment[]; framework_summary: unknown[]; conversation_history: Array<{role: string; content: string}> }) =>
+  fetchApi<{ message: string }>(`/onboarding/${schoolId}/studio-chat`, { method: "POST", body: JSON.stringify(data), timeoutMs: 60000 });
 export const finalizeOnboarding = (schoolId: string, data: { framework: unknown; engagement_name?: string; strategic_priorities?: string[]; programs?: string[]; amendments?: import("./types").Amendment[] }) =>
   fetchApi<{ engagement_id: string; school_id: string; engagement: import("./types").Engagement }>(`/onboarding/${schoolId}/finalize`, { method: "POST", body: JSON.stringify(data), timeoutMs: 120000 });
 
