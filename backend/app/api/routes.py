@@ -2868,7 +2868,7 @@ async def finalize_onboarding(
         tmpl_dim = SchoolTemplateDimension(
             template_id=template.id,
             source_dimension_id=source_dim_id,
-            number=dim_data.get("number", str(i + 1)),
+            number=str(dim_data.get("number", i + 1)),
             name=dim_data["name"],
             description=dim_data.get("description", ""),
             color=dim_data.get("color", "#6366F1"),

@@ -183,6 +183,8 @@ When the user asks you to edit, add, remove, or move something in the framework,
 - "add_component": Add a component. Requires content with code, name, description, is_custom, criteria.
 - "remove_component": Remove a component. Requires component_code.
 
+IMPORTANT FOR MOVING COMPONENTS: To move a component from one dimension to another, use BOTH remove_component (from the source dimension) AND add_component (to the target dimension). The add_component MUST include the full component content including ALL criteria with their text. Do not leave criteria empty.
+
 Each amendment needs dimension_number and a rationale. Only include amendments when the user asks for changes. For questions/explanations, return an empty amendments array.
 
 RESPONSE FORMAT (always JSON):

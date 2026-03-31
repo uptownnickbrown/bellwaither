@@ -331,25 +331,56 @@ export default function FrameworkStudio({
   // Apply amendments from studio chat to the dimension tree
   const applyAmendmentsToTree = (tree: OnboardingDimension[], edits: Amendment[]): OnboardingDimension[] => {
     const result = tree.map((d) => ({ ...d, components: d.components.map((c) => ({ ...c, criteria: [...c.criteria] })) }));
+
+    // Helper: find a component across ALL dimensions by code
+    const findComponentAcrossTree = (code: string) => {
+      for (const dim of result) {
+        const comp = dim.components.find((c) => c.code === code);
+        if (comp) return comp;
+      }
+      return null;
+    };
+
     for (const a of edits) {
       const dimIdx = result.findIndex((d) => String(d.number) === String(a.dimension_number));
+
       if (a.type === "edit_description" && a.component_code && dimIdx >= 0) {
         const comp = result[dimIdx].components.find((c) => c.code === a.component_code);
         if (comp && a.content?.description) comp.description = String(a.content.description);
+
       } else if (a.type === "add_criterion" && a.component_code && dimIdx >= 0) {
         const comp = result[dimIdx].components.find((c) => c.code === a.component_code);
         if (comp && a.content) comp.criteria.push({ criterion_type: (a.content.criterion_type as "core_action" | "progress_indicator") || "core_action", text: String(a.content.text || ""), is_custom: true });
+
       } else if (a.type === "remove_criterion" && a.component_code && a.criterion_index != null && dimIdx >= 0) {
         const comp = result[dimIdx].components.find((c) => c.code === a.component_code);
         if (comp && a.criterion_index >= 0 && a.criterion_index < comp.criteria.length) comp.criteria.splice(a.criterion_index, 1);
+
       } else if (a.type === "edit_criterion" && a.component_code && a.criterion_index != null && dimIdx >= 0) {
         const comp = result[dimIdx].components.find((c) => c.code === a.component_code);
         if (comp && a.criterion_index >= 0 && a.criterion_index < comp.criteria.length && a.content?.text) comp.criteria[a.criterion_index].text = String(a.content.text);
+
       } else if (a.type === "remove_component" && a.component_code && dimIdx >= 0) {
         result[dimIdx].components = result[dimIdx].components.filter((c) => c.code !== a.component_code);
+
       } else if (a.type === "add_component" && dimIdx >= 0 && a.content) {
         const content = a.content as Record<string, unknown>;
-        result[dimIdx].components.push({ code: String(content.code || ""), name: String(content.name || ""), description: String(content.description || ""), is_custom: true, criteria: (content.criteria as OnboardingDimension["components"][0]["criteria"]) || [] });
+        // For "move" operations: if content has a source_code, copy criteria from the existing component
+        const sourceCode = content.source_code as string | undefined;
+        let criteria = (content.criteria as OnboardingDimension["components"][0]["criteria"]) || [];
+        if (sourceCode && criteria.length === 0) {
+          const sourceComp = findComponentAcrossTree(sourceCode);
+          if (sourceComp) criteria = [...sourceComp.criteria];
+        }
+        // Normalize criteria — ensure each has text (AI might return objects with different shapes)
+        criteria = criteria.filter((c) => c && c.text);
+        result[dimIdx].components.push({
+          code: String(content.code || ""),
+          name: String(content.name || ""),
+          description: String(content.description || ""),
+          is_custom: Boolean(content.is_custom ?? true),
+          criteria,
+        });
       }
     }
     return result;
