@@ -185,13 +185,25 @@ When the user asks you to edit, add, remove, or move something in the framework,
 
 IMPORTANT FOR MOVING COMPONENTS: To move a component from one dimension to another, use BOTH remove_component (from the source dimension) AND add_component (to the target dimension). The add_component MUST include the full component content including ALL criteria with their text. Do not leave criteria empty.
 
-Each amendment needs dimension_number and a rationale. Only include amendments when the user asks for changes. For questions/explanations, return an empty amendments array.
+Each amendment MUST have these exact field names: "type", "dimension_number" (integer), "component_code" (string), "rationale" (string), and "content" (object, when needed). Only include amendments when the user asks for changes. For questions/explanations, return an empty amendments array.
 
-RESPONSE FORMAT (always JSON):
+RESPONSE FORMAT — follow this EXACTLY (always valid JSON):
 {
-  "message": "Your response text (can use markdown: **bold**, *italic*, bullet lists, headings)",
-  "amendments": []
+  "message": "Your response text here",
+  "amendments": [
+    {"type": "remove_component", "dimension_number": 2, "component_code": "2G", "rationale": "Merging into new combined component"},
+    {"type": "add_component", "dimension_number": 2, "content": {"code": "2F", "name": "Combined Component Name", "description": "Description here", "is_custom": true, "criteria": [{"criterion_type": "core_action", "text": "First criterion text"}, {"criterion_type": "progress_indicator", "text": "Second criterion text"}]}, "rationale": "Created combined component"},
+    {"type": "edit_description", "dimension_number": 6, "component_code": "6B", "content": {"description": "Updated description"}, "rationale": "Clarified focus"},
+    {"type": "add_criterion", "dimension_number": 2, "component_code": "2C", "content": {"criterion_type": "core_action", "text": "New criterion text"}, "rationale": "Added focus area"},
+    {"type": "remove_criterion", "dimension_number": 3, "component_code": "3A", "criterion_index": 2, "rationale": "Redundant with new criterion"}
+  ]
 }
+
+CRITICAL SCHEMA RULES:
+- Every amendment has "type" as a STRING VALUE, not as a key. WRONG: {"remove_component": true}. RIGHT: {"type": "remove_component"}.
+- "criterion_type" is always "core_action" or "progress_indicator" (not "core" or "progress").
+- "dimension_number" is always an integer (e.g., 2, not "Academic Program").
+- When no edits are needed, return "amendments": [].
 
 Use markdown freely in your message — bold for emphasis, bullet lists for comparisons, headings for structure. The UI renders markdown.
 
@@ -444,8 +456,13 @@ async def studio_chat(
         temperature=0.3,
     )
     result = json.loads(response.choices[0].message.content)
-    num_edits = len(result.get("amendments", []))
-    logger.info("Studio chat result: %d amendments proposed", num_edits)
+    edits = result.get("amendments", [])
+
+    result["amendments"] = edits
+    logger.info("Studio chat result: %d amendments proposed", len(edits))
+    for i, a in enumerate(edits):
+        logger.info("  Amendment %d: type=%s dim=%s comp=%s",
+                     i, a.get("type"), a.get("dimension_number"), a.get("component_code"))
     return result
 
 

@@ -316,7 +316,15 @@ export default function FrameworkStudio({
 
       // Apply any amendments the AI proposed
       if (result.amendments && result.amendments.length > 0) {
-        setDimensions((prev) => applyAmendmentsToTree(prev, result.amendments!));
+        console.log("[Studio] Applying amendments:", JSON.stringify(result.amendments, null, 2));
+        setDimensions((prev) => {
+          const updated = applyAmendmentsToTree(prev, result.amendments!);
+          console.log("[Studio] Dimensions before:", prev.length, "components:", prev.reduce((s, d) => s + d.components.length, 0));
+          console.log("[Studio] Dimensions after:", updated.length, "components:", updated.reduce((s, d) => s + d.components.length, 0));
+          return updated;
+        });
+      } else {
+        console.log("[Studio] No amendments in response:", Object.keys(result));
       }
     } catch {
       setConversation((prev) => [
@@ -342,7 +350,20 @@ export default function FrameworkStudio({
     };
 
     for (const a of edits) {
-      const dimIdx = result.findIndex((d) => String(d.number) === String(a.dimension_number));
+      // Try matching by number first, then by name (AI might use either)
+      let dimIdx = result.findIndex((d) => String(d.number) === String(a.dimension_number));
+      if (dimIdx < 0 && a.dimension_number) {
+        // Try matching dimension_number as a name
+        dimIdx = result.findIndex((d) => d.name.toLowerCase() === String(a.dimension_number).toLowerCase());
+      }
+      // Also try a "dimension" field if the AI used that instead of dimension_number
+      const aAny = a as unknown as Record<string, unknown>;
+      if (dimIdx < 0 && aAny.dimension) {
+        dimIdx = result.findIndex((d) => String(d.number) === String(aAny.dimension) || d.name.toLowerCase() === String(aAny.dimension).toLowerCase());
+      }
+      if (dimIdx < 0) {
+        console.warn("Amendment targets unknown dimension:", a.dimension_number, aAny.dimension, a);
+      }
 
       if (a.type === "edit_description" && a.component_code && dimIdx >= 0) {
         const comp = result[dimIdx].components.find((c) => c.code === a.component_code);
