@@ -72,6 +72,7 @@ export default function OnboardingPage() {
   const [buildProgress, setBuildProgress] = useState<BuildProgress | null>(null);
   const [amendments, setAmendments] = useState<Amendment[]>([]);
   const [buildError, setBuildError] = useState<string | null>(null);
+  const studioEditsRef = useRef(false); // tracks if user has made studio chat edits
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -169,7 +170,10 @@ export default function OnboardingPage() {
           if (job.status === "complete" && job.ai_response) {
             const aiResp = job.ai_response;
             if (aiResp.framework) {
-              setProposedFramework(aiResp.framework.dimensions);
+              // Only replace the framework if the user hasn't made studio chat edits
+              if (!studioEditsRef.current) {
+                setProposedFramework(aiResp.framework.dimensions);
+              }
               setProposalRationale(aiResp.rationale || "");
               if (job.amendments) setAmendments(job.amendments);
               setConversation((prev) => [
@@ -542,6 +546,7 @@ export default function OnboardingPage() {
         onFinalize={handleFinalize}
         onBack={() => setPhase("interview")}
         loading={loading}
+        onStudioEdit={() => { studioEditsRef.current = true; }}
         buildProgress={buildProgress}
         buildError={buildError}
         learned={learned}

@@ -26,6 +26,7 @@ interface Props {
   buildError?: string | null;
   learned?: OnboardingLearned;
   amendments?: Amendment[];
+  onStudioEdit?: () => void;
 }
 
 export default function FrameworkStudio({
@@ -40,6 +41,7 @@ export default function FrameworkStudio({
   buildError,
   learned,
   amendments,
+  onStudioEdit,
 }: Props) {
   const [dimensions, setDimensions] = useState<OnboardingDimension[]>(initialDimensions);
   const [prevDimensions, setPrevDimensions] = useState<OnboardingDimension[]>(initialDimensions);
@@ -323,6 +325,7 @@ export default function FrameworkStudio({
           console.log("[Studio] Dimensions after:", updated.length, "components:", updated.reduce((s, d) => s + d.components.length, 0));
           return updated;
         });
+        onStudioEdit?.();
       } else {
         console.log("[Studio] No amendments in response:", Object.keys(result));
       }
@@ -349,7 +352,17 @@ export default function FrameworkStudio({
       return null;
     };
 
-    for (const a of edits) {
+    // Sort: process remove_criterion in reverse index order to avoid index shifting
+    const sorted = [...edits].sort((a, b) => {
+      if (a.type === "remove_criterion" && b.type === "remove_criterion"
+          && a.component_code === b.component_code
+          && a.criterion_index != null && b.criterion_index != null) {
+        return b.criterion_index - a.criterion_index; // highest index first
+      }
+      return 0; // preserve original order for everything else
+    });
+
+    for (const a of sorted) {
       // Try matching by number first, then by name (AI might use either)
       let dimIdx = result.findIndex((d) => String(d.number) === String(a.dimension_number));
       if (dimIdx < 0 && a.dimension_number) {
@@ -365,7 +378,21 @@ export default function FrameworkStudio({
         console.warn("Amendment targets unknown dimension:", a.dimension_number, aAny.dimension, a);
       }
 
-      if (a.type === "edit_description" && a.component_code && dimIdx >= 0) {
+      if (a.type === "remove_dimension" && dimIdx >= 0) {
+        result.splice(dimIdx, 1);
+        continue;
+      } else if (a.type === "add_dimension" && a.content) {
+        const content = a.content as Record<string, unknown>;
+        result.push({
+          number: String(content.number || result.length + 1),
+          name: String(content.name || "New Dimension"),
+          description: String(content.description || ""),
+          color: undefined as unknown as string,
+          is_custom: true,
+          components: ((content.components as OnboardingDimension["components"]) || []).map(c => ({ ...c, is_custom: true })),
+        });
+        continue;
+      } else if (a.type === "edit_description" && a.component_code && dimIdx >= 0) {
         const comp = result[dimIdx].components.find((c) => c.code === a.component_code);
         if (comp && a.content?.description) comp.description = String(a.content.description);
 

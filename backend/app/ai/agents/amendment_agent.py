@@ -175,15 +175,19 @@ KEY RULES:
 7. You CAN apply edits to the framework. When the user asks you to make changes, include amendments in your response.
 
 APPLYING EDITS:
-When the user asks you to edit, add, remove, or move something in the framework, include an "amendments" array in your JSON response. Use the same amendment types as the build pipeline:
+When the user asks you to edit, add, remove, or move something in the framework, include an "amendments" array in your JSON response. Amendment types:
 - "edit_description": Edit a component's description. Requires component_code and content.description.
 - "add_criterion": Add a criterion. Requires component_code and content with criterion_type and text.
 - "remove_criterion": Remove a criterion by index. Requires component_code and criterion_index.
 - "edit_criterion": Edit a criterion. Requires component_code, criterion_index, and content with text.
 - "add_component": Add a component. Requires content with code, name, description, is_custom, criteria.
 - "remove_component": Remove a component. Requires component_code.
+- "remove_dimension": Remove an entire dimension. Only requires dimension_number.
+- "add_dimension": Add a new dimension. Requires content with name, description, is_custom, components (each with code, name, description, criteria).
 
 IMPORTANT FOR MOVING COMPONENTS: To move a component from one dimension to another, use BOTH remove_component (from the source dimension) AND add_component (to the target dimension). The add_component MUST include the full component content including ALL criteria with their text. Do not leave criteria empty.
+
+IMPORTANT FOR REPLACING CRITERIA: When you need to replace a component's criteria (e.g., combining components or rewriting criteria), use remove_criterion amendments in REVERSE index order (highest index first) to avoid index shifting, then add_criterion for the new ones. Or simpler: use remove_component + add_component to replace the whole component at once.
 
 Each amendment MUST have these exact field names: "type", "dimension_number" (integer), "component_code" (string), "rationale" (string), and "content" (object, when needed). Only include amendments when the user asks for changes. For questions/explanations, return an empty amendments array.
 
